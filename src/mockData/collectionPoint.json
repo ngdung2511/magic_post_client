@@ -1,0 +1,114 @@
+{
+  "collection_points": [
+    {
+      "id": 1,
+      "name": "Điểm Giao Hàng A",
+      "address": "123 Đường Trần Hưng Đạo, Quận 1, Thành phố Hồ Chí Minh",
+      "head_of_site": "John Doe",
+      "number_of_staff": 10,
+      "contact_number": "+1234567890",
+      "email": "diemgiahanga@example.com",
+      "type": "Giao Dịch",
+      "number_of_goods": 1000
+    },
+    {
+      "id": 2,
+      "name": "Điểm Giao Hàng B",
+      "address": "456 Đường Lê Lợi, Quận 3, Thành phố Hồ Chí Minh",
+      "head_of_site": "Jane Smith",
+      "number_of_staff": 8,
+      "contact_number": "+9876543210",
+      "email": "diemgiaohangb@example.com",
+      "type": "Tập Kết",
+      "number_of_goods": 800
+    },
+    {
+      "id": 3,
+      "name": "Điểm Giao Hàng C",
+      "address": "789 Đường Nguyễn Huệ, Quận 2, Thành phố Hồ Chí Minh",
+      "head_of_site": "Nguyễn Văn C",
+      "number_of_staff": 12,
+      "contact_number": "+3456789012",
+      "email": "diemgiaohangc@example.com",
+      "type": "Giao Dịch",
+      "number_of_goods": 1200
+    },
+    {
+      "id": 4,
+      "name": "Điểm Giao Hàng D",
+      "address": "101 Đường Lý Tự Trọng, Quận 1, Thành phố Hồ Chí Minh",
+      "head_of_site": "Hoa Phương",
+      "number_of_staff": 9,
+      "contact_number": "+6543210987",
+      "email": "diemgiaohangd@example.com",
+      "type": "Tập Kết",
+      "number_of_goods": 900
+    },
+    {
+      "id": 5,
+      "name": "Điểm Giao Hàng E",
+      "address": "111 Đường Võ Văn Tần, Quận 3, Thành phố Hồ Chí Minh",
+      "head_of_site": "Trần Hưng",
+      "number_of_staff": 11,
+      "contact_number": "+7890123456",
+      "email": "diemgiaohange@example.com",
+      "type": "Giao Dịch",
+      "number_of_goods": 1100
+    },
+    {
+      "id": 6,
+      "name": "Điểm Giao Hàng F",
+      "address": "222 Đường Hai Bà Trưng, Quận 1, Thành phố Hà Nội",
+      "head_of_site": "Ngọc Trinh",
+      "number_of_staff": 7,
+      "contact_number": "+1234509876",
+      "email": "diemgiaohangf@example.com",
+      "type": "Tập Kết",
+      "number_of_goods": 700
+    },
+    {
+      "id": 7,
+      "name": "Điểm Giao Hàng G",
+      "address": "333 Đường Lý Thường Kiệt, Quận 5, Thành phố Hồ Chí Minh",
+      "head_of_site": "Mai Phương",
+      "number_of_staff": 15,
+      "contact_number": "+6789012345",
+      "email": "diemgiaohangg@example.com",
+      "type": "Giao Dịch",
+      "number_of_goods": 1500
+    },
+    {
+      "id": 8,
+      "name": "Điểm Giao Hàng H",
+      "address": "444 Đường Trần Phú, Quận 10, Thành phố Hồ Chí Minh",
+      "head_of_site": "Hải Dương",
+      "number_of_staff": 6,
+      "contact_number": "+2345678901",
+      "email": "diemgiaohangh@example.com",
+      "type": "Tập Kết",
+      "number_of_goods": 600
+    },
+    {
+      "id": 9,
+      "name": "Điểm Giao Hàng I",
+      "address": "555 Đường Lê Duẩn, Quận 1, Thành phố Hồ Chí Minh",
+      "head_of_site": "Lê Minh",
+      "number_of_staff": 11,
+      "contact_number": "+8901234567",
+      "email": "diemgiaohangi@example.com",
+      "type": "Giao Dịch",
+      "number_of_goods": 1100
+    },
+    {
+      "id": 10,
+      "name": "Điểm Giao Hàng J",
+      "address": "666 Đường Nguyễn Du, Quận 3, Thành phố Hồ Chí Minh",
+      "head_of_site": "Hoàng Long",
+      "number_of_staff": 9,
+      "contact_number": "+3456789123",
+      "email": "diemgiaohangj@example.com",
+      "type": "Tập Kết",
+      "number_of_goods": 900
+    }
+  ]
+}
