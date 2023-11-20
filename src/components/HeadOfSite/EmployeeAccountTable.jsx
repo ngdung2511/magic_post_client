@@ -6,7 +6,7 @@ import {
 import { Button, Input, Popconfirm, Space, Table, Typography } from "antd";
 import { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import AddSiteModal from "../BossPage/AddSiteModal";
+
 import { NavLink } from "react-router-dom";
 import { employees as data } from "../../mockData/employees.json";
 import CreateEmployeeModal from "./CreateEmployeeModal";

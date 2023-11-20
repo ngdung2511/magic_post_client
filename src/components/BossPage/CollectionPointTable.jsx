@@ -132,7 +132,6 @@ const CollectionPointTable = () => {
       dataIndex: "name",
       width: "20%",
       render: (value, record) => {
-        console.log(record.id);
         return (
           <NavLink to={`/boss/manage-sites/${record.id}`}>{value}</NavLink>
         );
