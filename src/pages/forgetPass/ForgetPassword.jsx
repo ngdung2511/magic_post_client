@@ -12,7 +12,7 @@ const ForgetPassword = () => {
     if (current === 1) {
       console.log("Đổi mật khẩu");
     } else setCurrent(current + 1);
-  };
+  }; 
 
   const [isLoading, setIsLoading] = useState(false);
   const [current, setCurrent] = useState(0);

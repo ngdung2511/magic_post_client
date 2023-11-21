@@ -1,9 +1,14 @@
 import axios from "axios";
 import UtilConstants from "../../shared/constants";
 
-export const signin = async (user) => {
+export const signin = async (email, password) => {
     try {
-        return await axios.post(UtilConstants.baseUrl + '/signin', user);
+        const data = {
+            email: email,
+            password: password
+        }
+
+        return await axios.post(UtilConstants.baseUrl + '/auth/login', data);
     } catch (error) {
         console.log('Error:', error);
         throw error;

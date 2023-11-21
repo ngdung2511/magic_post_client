@@ -1,15 +1,48 @@
 import { Button, Form, Input } from "antd";
 import Container from "../../components/Container";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { signin } from "../../repository/auth/auth";
+import { useStoreActions, useStoreState } from "../../store/hook";
+import Swal from "sweetalert2";
 
 const Login = () => {
-  const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+  const currentUser = useStoreState((state) => state.currentUser);
+  const setUserInfo = useStoreActions((actions) => actions.setUserInfo);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser?.loggedIn) {
+      console.log("User has logged in:", currentUser?.loggedIn);
+      navigate("/dashboard");
+    }
+  }, [currentUser?.loggedIn, navigate]);
+
+  const onFinish = async (values) => {
+    try {
+      const res = await signin(values.email, values.password);
+      console.log(res.data.data);
+      setUserInfo({
+        email: res.data.data.user.email,
+        password: res.data.data.user.name,
+        loggedIn: true,
+      });
+
+      if (res.data.status === 200) {}
+    } catch (error) {
+      console.log(error);
+      return Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Tên đăng nhập hoặc mật khẩu không đúng`,
+        showConfirmButton: true,
+      });
+    }
   };
 
   const [isLoading, setIsLoading] = useState(false);
   return (
+    <>
     <Container>
       <div className="flex items-center justify-center mt-[100px] grow">
         <div>
@@ -53,6 +86,7 @@ const Login = () => {
         </div>
       </div>
     </Container>
+    </>
   );
 };
 export default Login;

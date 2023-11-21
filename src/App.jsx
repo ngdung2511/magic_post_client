@@ -21,7 +21,7 @@ function App() {
       isPublic: true,
     },
     {
-      path: "/",
+      path: "/dashboard",
       component: <DashBoard />,
       exact: true,
       isPublic: true,
