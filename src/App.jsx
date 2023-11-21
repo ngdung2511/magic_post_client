@@ -8,6 +8,9 @@ import SingleSitePage from "./pages/DashBoard/boss/SingleSitePage";
 import GoodsStatsPage from "./pages/DashBoard/boss/GoodsStatsPage";
 import ManageAccountPage from "./pages/DashBoard/headOfSite/ManageAccountPage";
 import GoodsInventoryPage from "./pages/DashBoard/headOfSite/GoodsInventoryPage";
+import Home from "./pages/Home/Home";
+import Hero from "./components/hero/Hero";
+import ForgetPassword from "./pages/forgetPass/ForgetPassword";
 
 function App() {
   const ROUTE = [
@@ -53,6 +56,11 @@ function App() {
               path="/head/collection-point/goods-inventory"
               element={<GoodsInventoryPage />}
             />
+          </Route>
+          <Route path="/home" element={<Home />}>
+            <Route index element={<Hero />} />
+            <Route path="/home/login" element={<Login />} />
+            <Route path="/home/forget-password" element={<ForgetPassword />} />
           </Route>
         </Routes>
       </BrowserRouter>
