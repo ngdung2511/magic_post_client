@@ -9,9 +9,9 @@ export const createDepartment = async (department) => {
         throw error;
     }
 }
-export const getDepartment = async (department) => {
+export const getDepartment = async () => {
     try {
-        return await axios.post(UtilConstants.baseUrl + '/department', department);
+        return await axios.post(UtilConstants.baseUrl + '/department');
     } catch (error) {
         console.log('Error:', error);
         throw error;

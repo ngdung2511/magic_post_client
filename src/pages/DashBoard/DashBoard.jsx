@@ -67,8 +67,8 @@ function DashBoard() {
       ),
     ]),
     getItem("Lãnh đạo", "sub3", <UserOutlined />, [
-      getItem(<NavLink to="boss/manage-sites">Quản lý điểm</NavLink>, "8"),
-      getItem(<NavLink to="boss/goods-stats">Thống kê hàng hóa</NavLink>, "9"),
+      getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "8"),
+      getItem(<NavLink to="/boss/goods-stats">Thống kê hàng hóa</NavLink>, "9"),
     ]),
   ];
   return (

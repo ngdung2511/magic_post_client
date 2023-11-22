@@ -41,11 +41,13 @@ function App() {
           {ROUTE.map((e, i) => (
             <Route key={i} path={e.path} element={e.component} />
           ))}
-          <Route path="*" element={<Navigate to="/notfound" />} />
+          {/* <Route path="*" element={<Navigate to="/notfound" />} /> */}
+          <Route path="/" element={<Navigate to="/home" />} />
+
           <Route path="/" element={<DashBoard />}>
-            <Route path="/boss/manage-sites" element={<ManageSitePage />} />
-            <Route path="/boss/manage-sites/:id" element={<SingleSitePage />} />
-            <Route path="/boss/goods-stats" element={<GoodsStatsPage />} />
+            <Route path="boss/manage-sites" element={<ManageSitePage />} />
+            <Route path="boss/manage-sites/:id" element={<SingleSitePage />} />
+            <Route path="boss/goods-stats" element={<GoodsStatsPage />} />
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route

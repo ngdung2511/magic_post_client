@@ -1,4 +1,4 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import Container from "../../components/Container";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -10,7 +10,7 @@ const Login = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   const setUserInfo = useStoreActions((actions) => actions.setUserInfo);
   const navigate = useNavigate();
-
+  const [messageApi, contextHolder] = message.useMessage();
   useEffect(() => {
     if (currentUser?.loggedIn) {
       console.log("User has logged in:", currentUser?.loggedIn);
@@ -27,23 +27,17 @@ const Login = () => {
         password: res.data.data.user.name,
         loggedIn: true,
       });
-
-      if (res.data.status === 200) {}
     } catch (error) {
       console.log(error);
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Tên đăng nhập hoặc mật khẩu không đúng`,
-        showConfirmButton: true,
-      });
+      messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");
     }
   };
 
   const [isLoading, setIsLoading] = useState(false);
   return (
     <>
-    <Container>
+      {contextHolder}
+
       <div className="flex items-center justify-center mt-[100px] grow">
         <div>
           <h1 className="mb-4 text-4xl text-center">Đăng nhập vào hệ thống</h1>
@@ -85,7 +79,6 @@ const Login = () => {
           </Form>
         </div>
       </div>
-    </Container>
     </>
   );
 };

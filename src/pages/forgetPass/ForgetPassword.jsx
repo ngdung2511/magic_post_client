@@ -12,7 +12,7 @@ const ForgetPassword = () => {
     if (current === 1) {
       console.log("Đổi mật khẩu");
     } else setCurrent(current + 1);
-  }; 
+  };
 
   const [isLoading, setIsLoading] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -82,8 +82,8 @@ const ForgetPassword = () => {
     title: item.title,
   }));
   return (
-    <Container>
-      <div className="flex items-center justify-center mt-[100px] grow">
+    <>
+      <div className="flex items-center justify-center">
         <div>
           <h1 className="mb-4 text-4xl text-center">Lấy lại mật khẩu</h1>
           <Steps current={current} items={items} />
@@ -100,7 +100,7 @@ const ForgetPassword = () => {
           </Form>
         </div>
       </div>
-    </Container>
+    </>
   );
 };
 
