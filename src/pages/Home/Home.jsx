@@ -1,39 +1,32 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
-import { Button, Divider, Image, Input, Typography } from "antd";
+import { Divider, FloatButton } from "antd";
 import Container from "../../components/Container";
 
-import trackOrderImg from "../../assets/track-order.jpg";
-import { SearchOutlined } from "@ant-design/icons";
 import Footer from "../../components/footer/Footer";
+import SearchOrder from "../../components/searchOrder/searchOrder";
+import { ArrowUpOutlined } from "@ant-design/icons";
+
 const Home = () => {
   return (
-    <div className="w-full h-screen">
+    <div className="flex flex-col w-full h-screen">
       <Navbar />
-      <div className="mt-[100px] mb-[50px]">
+      <div className="md:mb-[46px] mb-[20px]">
         <Outlet />
       </div>
-      <Container>
-        <Divider>
-          <h2 className="text-3xl font-semibold sm:text-4xl">
-            Theo dõi đơn hàng
-          </h2>
-        </Divider>
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-[60%]">
-            <Input prefix={<SearchOutlined />} allowClear size="large" />
-          </div>
-          <Button size="large">Tra cứu</Button>
-        </div>
-        <Image
-          height={460}
-          width="100%"
-          className="object-contain"
-          preview={false}
-          src={trackOrderImg}
-        />
-      </Container>
+      <div className="grow mb-[30px]">
+        <Container>
+          <Divider>
+            <h2 className="text-3xl font-semibold sm:text-4xl">
+              Theo dõi đơn hàng
+            </h2>
+          </Divider>
+          <SearchOrder />
+        </Container>
+      </div>
+
       <Footer />
+      <FloatButton.BackTop icon={<ArrowUpOutlined />} />
     </div>
   );
 };

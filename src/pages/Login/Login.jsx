@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { signin } from "../../repository/auth/auth";
 import { useStoreActions, useStoreState } from "../../store/hook";
-import Swal from "sweetalert2";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const Login = () => {
   const currentUser = useStoreState((state) => state.currentUser);
@@ -35,10 +35,10 @@ const Login = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <>
+    <Container>
       {contextHolder}
 
-      <div className="flex items-center justify-center mt-[100px] grow">
+      <div className="flex items-center justify-center mt-[100px]">
         <div>
           <h1 className="mb-4 text-4xl text-center">Đăng nhập vào hệ thống</h1>
           <Form
@@ -48,6 +48,8 @@ const Login = () => {
           >
             <Form.Item name="email">
               <Input
+                allowClear
+                prefix={<UserOutlined />}
                 size="large"
                 type="email"
                 placeholder="Nhập email của bạn"
@@ -55,6 +57,7 @@ const Login = () => {
             </Form.Item>
             <Form.Item name="password">
               <Input.Password
+                prefix={<LockOutlined />}
                 required
                 size="large"
                 type="password"
@@ -79,7 +82,7 @@ const Login = () => {
           </Form>
         </div>
       </div>
-    </>
+    </Container>
   );
 };
 export default Login;

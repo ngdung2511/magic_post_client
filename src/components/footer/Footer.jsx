@@ -14,14 +14,14 @@ const Footer = () => {
         <div className="flex flex-wrap justify-between py-6">
           <div className="w-full mb-4 lg:w-1/4 lg:mb-0">
             <h2 className="mb-2 text-xl font-bold text-white">Giới thiệu</h2>
-            <p className="leading-tight text-neutral-400">
+            <div className="leading-tight text-neutral-400">
               Magic Post là doanh nghiệp hàng đầu cung cấp dịch vụ chuyển phát
               nhanh hàng hoá tại Việt Nam.
-            </p>
+            </div>
           </div>
           <div className="w-full mb-4 lg:w-1/4 lg:mb-0">
             <h2 className="mb-2 text-xl font-bold text-white">Liên hệ</h2>
-            <p className="leading-tight text-neutral-400">
+            <div className="leading-tight text-neutral-400">
               <p>
                 <HomeOutlined />
                 <span className="ml-[4px]">
@@ -32,11 +32,11 @@ const Footer = () => {
                 <PhoneOutlined />
                 <span className="ml-[4px]">0989987637</span>
               </p>
-            </p>
+            </div>
           </div>
           <div className="w-full mb-4 lg:w-1/4 lg:mb-0">
             <h2 className="mb-2 text-xl font-bold text-white">Mạng xã hội</h2>
-            <p className="leading-tight text-neutral-400">
+            <div className="leading-tight text-neutral-400">
               <p>
                 <InstagramOutlined />
                 <span className="ml-[4px]">MagicPost</span>
@@ -45,7 +45,7 @@ const Footer = () => {
                 <YoutubeOutlined />
                 <span className="ml-[4px]">MagicPost Services</span>
               </p>
-            </p>
+            </div>
           </div>
         </div>
       </div>

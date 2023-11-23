@@ -54,7 +54,6 @@ const ForgetPassword = () => {
       title: "Nhập email đã đăng ký",
       content: (
         <>
-          {" "}
           <Form.Item name="email">
             <Input
               size="large"
@@ -69,7 +68,6 @@ const ForgetPassword = () => {
       title: "Nhập mã xác minh",
       content: (
         <>
-          {" "}
           <Form.Item name="OTP">
             <Input size="large" type="text" placeholder="Nhập mã OTP" />
           </Form.Item>
@@ -82,15 +80,15 @@ const ForgetPassword = () => {
     title: item.title,
   }));
   return (
-    <>
-      <div className="flex items-center justify-center">
+    <Container>
+      <div className="flex items-center justify-center mt-[100px]">
         <div>
           <h1 className="mb-4 text-4xl text-center">Lấy lại mật khẩu</h1>
           <Steps current={current} items={items} />
           <Form
             onFinish={onFinish}
             name="forget-password-form"
-            className="flex flex-col justify-center mx-auto w-[400px]"
+            className="flex flex-col justify-center max-w-md mx-auto"
           >
             <div className="mt-[20px]">{steps[current].content}</div>
             <div className="flex items-center justify-between">
@@ -100,7 +98,7 @@ const ForgetPassword = () => {
           </Form>
         </div>
       </div>
-    </>
+    </Container>
   );
 };
 
