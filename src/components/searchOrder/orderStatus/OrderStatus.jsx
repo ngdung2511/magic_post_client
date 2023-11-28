@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, SmileOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined } from "@ant-design/icons";
 import { Image, Timeline } from "antd";
 
 const OrderStatus = () => {
@@ -68,15 +68,14 @@ const OrderStatus = () => {
           </p>
         </div>
       </div>
-      <div className="flex flex-col items-center justify-start gap-x-4 md:p-4 lg:p-8 md:flex-row">
-        <div className="grow">
-          <Timeline items={items} mode="left" />
-        </div>
-
+      <div className="flex flex-col-reverse items-center justify-start gap-x-4 md:p-4 lg:p-8 md:flex-row">
         <Image
           preview={false}
           src="https://cdn.shopify.com/s/files/1/0386/0971/5244/files/track-order_480x480.png?v=1631886893"
         />
+        <div className="grow">
+          <Timeline items={items} mode="left" />
+        </div>
       </div>
     </div>
   );

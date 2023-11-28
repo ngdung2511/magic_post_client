@@ -1,6 +1,6 @@
 import { Button, Layout, Menu, Modal, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
-import { Content, Footer } from "antd/es/layout/layout";
+import { Content } from "antd/es/layout/layout";
 
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
@@ -11,6 +11,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import Navbar from "../../components/navbar/Navbar";
+import Footer from "../../components/footer/Footer";
 function DashBoard() {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -108,10 +109,12 @@ function DashBoard() {
           style={{
             minHeight: "100vh",
             padding: "0 10px",
+            display: "flex",
           }}
         >
           <Content
             style={{
+              flexGrow: 1,
               height: "100vh",
               marginTop: "64px",
             }}
@@ -126,13 +129,7 @@ function DashBoard() {
               <Outlet />
             </div>
           </Content>
-          <Footer
-            style={{
-              textAlign: "center",
-            }}
-          >
-            This is footer
-          </Footer>
+          {/* <Footer /> */}
         </Layout>
       </Layout>
     </Layout>

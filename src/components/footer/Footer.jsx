@@ -4,16 +4,20 @@ import {
   PhoneOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
+import { Image } from "antd";
 
 const Footer = () => {
-  //write footer with general information using tailwindcss
-
   return (
     <div className="bg-[#212d33] w-full border-t-[6px] border-0 border-solid border-red-500">
       <div className="container px-4 mx-auto">
         <div className="flex flex-wrap justify-between py-6">
           <div className="w-full mb-4 lg:w-1/4 lg:mb-0">
             <h2 className="mb-2 text-xl font-bold text-white">Giới thiệu</h2>
+            <Image
+              width={150}
+              preview={false}
+              src="https://deo.shopeemobile.com/shopee/shopee-spx-live-vn/static/media/logoSaleNoti.520fec30.png"
+            />
             <div className="leading-tight text-neutral-400">
               Magic Post là doanh nghiệp hàng đầu cung cấp dịch vụ chuyển phát
               nhanh hàng hoá tại Việt Nam.
@@ -48,6 +52,9 @@ const Footer = () => {
             </div>
           </div>
         </div>
+        <p className="text-center text-neutral-400 mb-[10px]">
+          @2023 Magic Post All Rights Reserved
+        </p>
       </div>
     </div>
   );

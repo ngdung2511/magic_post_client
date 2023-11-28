@@ -1,6 +1,14 @@
-import { Button, Input, Popconfirm, Space, Table, Typography } from "antd";
+import {
+  Button,
+  Input,
+  Popconfirm,
+  Space,
+  Table,
+  Typography,
+  message,
+} from "antd";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { collection_points as data } from "../../mockData/collectionPoint.json";
 import {
@@ -11,14 +19,29 @@ import {
 import Highlighter from "react-highlight-words";
 import AddSiteModal from "./AddSiteModal";
 import { NavLink } from "react-router-dom";
+import { useStoreActions, useStoreState } from "../../store/hook";
+import { deleteDepartment } from "../../repository/department/department";
 console.log(data);
 const CollectionPointTable = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const searchInput = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Get all departments from API
+  const fetchDepartments = useStoreActions(
+    (actions) => actions.fetchDepartments
+  );
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+  const departments = useStoreState((state) => state.departments);
+  console.log(departments);
+
+  // Handle search in table
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -27,6 +50,22 @@ const CollectionPointTable = () => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+  // Handle delete department
+  const handleDelete = async (departmentId) => {
+    setIsLoading(true);
+    try {
+      const res = await deleteDepartment(departmentId);
+      console.log(res);
+      if (res.status === 200) {
+        messageApi.success("Xóa thành công");
+        setIsLoading(false);
+        fetchDepartments();
+      }
+    } catch (error) {
+      console.log(error);
+      messageApi.error("Đã có lỗi xảy ra");
+    }
   };
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -121,8 +160,8 @@ const CollectionPointTable = () => {
   });
   const columns = [
     {
-      title: "STT",
-      dataIndex: "id",
+      title: "ID",
+      dataIndex: "_id",
       width: "6%",
       className: "text-center font-bold",
       sorter: (a, b) => a.id - b.id,
@@ -133,7 +172,7 @@ const CollectionPointTable = () => {
       width: "20%",
       render: (value, record) => {
         return (
-          <NavLink to={`/boss/manage-sites/${record.id}`}>{value}</NavLink>
+          <NavLink to={`/boss/manage-sites/${record._id}`}>{value}</NavLink>
         );
       },
     },
@@ -231,11 +270,12 @@ const CollectionPointTable = () => {
             okType="danger"
             okText="Xóa"
             cancelText="Hủy"
+            onConfirm={() => handleDelete(record._id)}
+            okButtonProps={{
+              loading: isLoading,
+            }}
           >
-            <span
-              onClick={() => console.log(record.id)}
-              className="text-lg cursor-pointer hover:text-red-600"
-            >
+            <span className="text-lg cursor-pointer hover:text-red-600">
               <DeleteOutlined />
             </span>
           </Popconfirm>
@@ -245,37 +285,40 @@ const CollectionPointTable = () => {
     },
   ];
   return (
-    <div className="w-full h-full py-4">
-      <Table
-        rowKey={(row) => row.id}
-        columns={columns}
-        dataSource={data}
-        bordered
-        scroll={{
-          x: "calc(700px + 50%)",
-        }}
-        pagination={{ pageSize: 3 }}
-        title={() => (
-          <div className="flex items-center justify-between">
-            <Typography.Title className="mb-0" level={3}>
-              Điểm Giao dịch và Tập kết
-            </Typography.Title>
-            <AddSiteModal
-              isModalOpen={isModalOpen}
-              setIsModalOpen={setIsModalOpen}
-            />
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              icon={<PlusOutlined />}
-              type="primary"
-              size="large"
-            >
-              Thêm điểm
-            </Button>
-          </div>
-        )}
-      />
-    </div>
+    <>
+      {contextHolder}
+      <div className="w-full h-full py-4">
+        <Table
+          rowKey={(row) => row._id}
+          columns={columns}
+          dataSource={departments}
+          bordered
+          scroll={{
+            x: "calc(700px + 50%)",
+          }}
+          pagination={{ pageSize: 3 }}
+          title={() => (
+            <div className="flex items-center justify-between">
+              <Typography.Title className="mb-0" level={3}>
+                Điểm Giao dịch và Tập kết
+              </Typography.Title>
+              <AddSiteModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+              />
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                icon={<PlusOutlined />}
+                type="primary"
+                size="large"
+              >
+                Thêm điểm
+              </Button>
+            </div>
+          )}
+        />
+      </div>
+    </>
   );
 };
 

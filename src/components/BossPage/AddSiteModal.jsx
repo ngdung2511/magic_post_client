@@ -1,13 +1,28 @@
-import { InfoCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
-import { Button, Cascader, Form, Input, Modal, Select, message } from "antd";
+import {
+  InfoCircleOutlined,
+  PlusCircleTwoTone,
+  UploadOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Cascader,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Upload,
+  message,
+} from "antd";
 import { useForm } from "antd/es/form/Form";
 
 import { useEffect, useState } from "react";
 
 import { createDepartment } from "../../repository/department/department";
+import { useStoreActions, useStoreState } from "../../store/hook";
 const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(false);
+
   // Handle form logic
   const [form] = useForm();
   const siteLocation = Form.useWatch("siteLocation", {
@@ -21,6 +36,16 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
       `${siteLocation?.reverse().join(", ")}`
     );
   }, [siteLocation, form]);
+
+  // Get all departments from API
+  const fetchDepartments = useStoreActions(
+    (actions) => actions.fetchDepartments
+  );
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+  const departments = useStoreState((state) => state.departments);
+  console.log(departments);
 
   // Handle modal
   const handleOk = () => {
@@ -103,6 +128,10 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
       ],
     },
   ];
+
+  const filterOption = (input, option) => {
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  };
   return (
     <>
       {contextHolder}
@@ -110,7 +139,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         title={
           <>
             <h1 className="mb-[10px] text-3xl font-semibold">
-              <PlusCircleTwoTone style={{ color: "#e1ebfe" }} />
+              <PlusCircleTwoTone twoToneColor="#f15757" />
               <span className="ml-[10px]">Thêm điểm</span>
             </h1>
           </>
@@ -124,13 +153,12 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         <div className="w-full h-full pb-6">
           <Form form={form} onFinish={onHandleFinish}>
             <h2 className="py-3 text-xl font-semibold">Thông tin Điểm</h2>
-            <div className="grid w-full col-span-8 gap-x-3 gap-y-0">
-              <div className="col-span-4">
-                <Form.Item name="siteName">
+            <div className="flex flex-col w-full">
+              <div className="flex items-center gap-x-3">
+                <Form.Item name="siteName" className="grow">
                   <Input size="large" placeholder="Tên điểm" type="text" />
                 </Form.Item>
-              </div>
-              <div className="col-span-4 col-start-5">
+
                 <Form.Item name="siteType">
                   <Select
                     size="large"
@@ -149,7 +177,8 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                   />
                 </Form.Item>
               </div>
-              <div className="col-span-8">
+
+              <div>
                 <Form.Item name="siteLocation">
                   <Cascader
                     size="large"
@@ -181,43 +210,65 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                   }
                 </Form.Item>
               </div>
+              <Form.Item name="linkedDepartments">
+                <Select
+                  mode="multiple"
+                  size="large"
+                  showSearch
+                  placeholder="Chọn điểm liên kết"
+                  optionFilterProp="children"
+                  filterOption={filterOption}
+                  options={[
+                    {
+                      value: "jack",
+                      label: "Jack",
+                    },
+                    {
+                      value: "lucy",
+                      label: "Lucy",
+                    },
+                    {
+                      value: "tom",
+                      label: "Tom",
+                    },
+                  ]}
+                />
+              </Form.Item>
             </div>
             <h2 className="py-3 text-xl font-semibold">
-              Thông tin trưởng điểm
+              Thông tin Trưởng điểm
             </h2>
-            <div className="grid w-full col-span-8 gap-x-6">
-              <div className="col-span-4">
-                <Form.Item name="recipientName">
-                  <Input
-                    size="large"
-                    placeholder="Tên người nhận hàng"
-                    type="text"
-                  />
+            <div className="flex flex-col w-full">
+              <div className="flex items-center gap-x-3">
+                <Form.Item name="headOfSiteName" className="grow">
+                  <Input size="large" placeholder="Họ và tên" type="text" />
                 </Form.Item>
-                <Form.Item name="recipientEmail">
+              </div>
+              <div className="flex items-center gap-x-3">
+                <Form.Item name="headOfSiteEmail" className="grow">
                   <Input
                     size="large"
-                    placeholder="Email người nhận hàng"
+                    placeholder="Email tài khoản"
                     type="email"
                   />
                 </Form.Item>
-              </div>
-              <div className="col-span-4 col-start-5">
-                <Form.Item name="recipientAddress">
+                <Form.Item name="headOfSitePassword">
                   <Input
                     size="large"
-                    placeholder="Địa chỉ người nhận"
+                    placeholder="Mật khẩu tài khoản"
                     type="text"
                   />
                 </Form.Item>
-                <Form.Item name="recipientPhoneNumber">
-                  <Input
-                    size="large"
-                    placeholder="Số điện thoại người nhận"
-                    type="number"
-                  />
-                </Form.Item>
               </div>
+
+              <Upload
+                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                listType="picture"
+              >
+                <Button size="large" icon={<UploadOutlined />}>
+                  Tải lên ảnh đại diện
+                </Button>
+              </Upload>
             </div>
             <Form.Item noStyle>
               <Button

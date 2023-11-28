@@ -11,14 +11,22 @@ const SearchOrder = () => {
   const onFinish = (values) => {
     console.log("Received values of form: ", values);
   };
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(0);
   const steps = [
     {
-      title: "Đã xác nhận đơn hàng",
+      title: (
+        <p onClick={() => setCurrent(0)} className="cursor-pointer">
+          Đã xác nhận đơn hàng
+        </p>
+      ),
       content: <OrderInfo />,
     },
     {
-      title: "Đang vận chuyển",
+      title: (
+        <p onClick={() => setCurrent(1)} className="cursor-pointer">
+          Đang vận chuyển
+        </p>
+      ),
       content: <OrderStatus />,
     },
     {
@@ -46,12 +54,12 @@ const SearchOrder = () => {
             size="large"
           />
         </Form.Item>
-        <Button htmlType="submit" size="large">
+        <Button htmlType="submit" size="large" type="primary">
           Tra cứu
         </Button>
       </Form>
       {orderInfo ? (
-        <div className="w-full min-h-[480px] shadow-lg rounded-lg p-4">
+        <div className="w-full min-h-[480px] shadow-xl rounded-lg p-4">
           <Steps current={current} items={items} />
           <div>{steps[current].content}</div>
         </div>

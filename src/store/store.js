@@ -1,4 +1,5 @@
-import { action, persist, createStore } from 'easy-peasy';
+import { action, persist, createStore, thunk } from 'easy-peasy';
+import { getDepartments } from '../repository/department/department';
 
 export const store = createStore({
 
@@ -19,5 +20,18 @@ export const store = createStore({
       email: '',
       password: ''
     };
+
+  }),
+  departments: [],
+  setDepartments: action((state, departments) => {
+    state.departments = departments;
+  }),
+  fetchDepartments: thunk(async (actions) => {
+    try {
+      const res = await getDepartments();
+      actions.setDepartments(res.data.data.departments);
+    } catch (error) {
+      console.log(error);
+    }
   })
 });

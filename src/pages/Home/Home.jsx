@@ -11,7 +11,7 @@ const Home = () => {
   return (
     <div className="flex flex-col w-full h-screen">
       <Navbar />
-      <div className="md:mb-[46px] mb-[20px]">
+      <div className="md:mb-[46px] mb-[20px] w-full rounded-lg">
         <Outlet />
       </div>
       <div className="grow mb-[30px]">
