@@ -15,11 +15,12 @@ import {
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { createDepartment } from "../../repository/department/department";
 import { useStoreActions, useStoreState } from "../../store/hook";
 const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
+  const inputRef = useRef(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +30,11 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     form,
     preserve: true,
   });
-  // console.log(senderLocation);
+  const siteType = Form.useWatch("siteType", {
+    form,
+    preserve: true,
+  });
+
   useEffect(() => {
     form.setFieldValue(
       "detailSiteLocation",
@@ -43,9 +48,33 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   );
   useEffect(() => {
     fetchDepartments();
-  }, []);
-  const departments = useStoreState((state) => state.departments);
-  console.log(departments);
+  }, [fetchDepartments]);
+  let departments = useStoreState((state) => state.departments);
+  let customSelectProps = {};
+  // Filter departments based on site type
+  if (siteType === "Transaction") {
+    departments = departments.filter((item) => item.type === "Gathering");
+    customSelectProps = {};
+  } else if (siteType === "Gathering") {
+    customSelectProps = {
+      mode: "multiple",
+    };
+  }
+
+  const formattedDepOptions = departments.map((item) => {
+    return {
+      label: item.name,
+      value: item._id,
+      type: item.type,
+    };
+  });
+  console.log(formattedDepOptions);
+
+  // Create a lookup object that maps department IDs to types
+  const departmentTypeLookup = formattedDepOptions.reduce((lookup, item) => {
+    lookup[item.value] = item.type;
+    return lookup;
+  }, {});
 
   // Handle modal
   const handleOk = () => {
@@ -57,25 +86,60 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   };
   const onHandleFinish = async (values) => {
     setIsLoading(true);
-    form.resetFields();
     console.log(values);
+    values.siteType === "Transaction"
+      ? (values.role = "headTransaction")
+      : (values.role = "headGathering");
+    let formattedLinkDepValues = [];
+    if (values.linkDepartments?.length > 0 && siteType === "Gathering") {
+      formattedLinkDepValues = values.linkDepartments.map((item) => {
+        return {
+          _id: item,
+          type: departmentTypeLookup[item],
+        };
+      });
+    } else if (siteType === "Transaction") {
+      formattedLinkDepValues.push({
+        _id: values.linkDepartments,
+        type: departmentTypeLookup[values.linkDepartments],
+      });
+    }
+    console.log(formattedLinkDepValues);
     const data = {
-      name: values.siteName,
-      address: values.detailSiteLocation,
-      region: values.siteLocation[1],
-      type: values.siteType,
+      department: {
+        name: values.siteName,
+        address: values.detailSiteLocation,
+        region: values.siteLocation?.[1],
+        type: values.siteType,
+        linkDepartments: formattedLinkDepValues,
+      },
+      user: {
+        name: values.headOfSiteName,
+        email: values.headOfSiteEmail,
+        password: values.headOfSitePassword,
+        role: values.role,
+      },
     };
     console.log(data);
 
     try {
       const res = await createDepartment(data);
       if (res.status === 201) {
+        fetchDepartments();
+
         messageApi.success("Tạo điểm thành công");
         setIsLoading(false);
         setIsModalOpen(false);
+        form.resetFields();
       }
     } catch (error) {
-      messageApi.error(error.response.data.message);
+      if (error.response.data.message === "this user existed") {
+        messageApi.error("Email đã tồn tại");
+      } else if (
+        error.response.data.message === "this gathering point already exists"
+      ) {
+        messageApi.error("Điểm đã tồn tại");
+      } else messageApi.error("Đã có lỗi xảy ra");
       setIsLoading(false);
       console.log(error.response.data.message);
     }
@@ -130,7 +194,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   ];
 
   const filterOption = (input, option) => {
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+    return (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
   };
   return (
     <>
@@ -166,11 +230,11 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                     allowClear
                     options={[
                       {
-                        value: "gathering",
+                        value: "Gathering",
                         label: "Tập kết",
                       },
                       {
-                        value: "transaction",
+                        value: "Transaction",
                         label: "Giao dịch",
                       },
                     ]}
@@ -201,7 +265,12 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                         }
                       >
                         <Input
-                          allowClear
+                          onClick={() => {
+                            inputRef?.current?.focus({
+                              cursor: "start",
+                            });
+                          }}
+                          ref={inputRef}
                           size="large"
                           placeholder="Địa chỉ chi tiết"
                         />
@@ -210,28 +279,19 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                   }
                 </Form.Item>
               </div>
-              <Form.Item name="linkedDepartments">
+              <Form.Item name="linkDepartments">
                 <Select
-                  mode="multiple"
+                  {...customSelectProps}
                   size="large"
                   showSearch
-                  placeholder="Chọn điểm liên kết"
+                  placeholder={
+                    siteType === "Transaction"
+                      ? "Chọn điểm tập kết liên kết"
+                      : "Chọn các điểm liên kết"
+                  }
                   optionFilterProp="children"
                   filterOption={filterOption}
-                  options={[
-                    {
-                      value: "jack",
-                      label: "Jack",
-                    },
-                    {
-                      value: "lucy",
-                      label: "Lucy",
-                    },
-                    {
-                      value: "tom",
-                      label: "Tom",
-                    },
-                  ]}
+                  options={formattedDepOptions}
                 />
               </Form.Item>
             </div>

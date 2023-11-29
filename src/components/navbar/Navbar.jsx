@@ -6,7 +6,9 @@ import { LogoutOutlined } from "@ant-design/icons";
 import logo from "../../assets/logo.svg";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { useNavigate } from "react-router";
-const Navbar = () => {
+
+import defaultAvatar from "../../assets/placeholder.jpg";
+const Navbar = ({ handleClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const removeState = useStoreActions((actions) => actions.removeState);
@@ -14,14 +16,12 @@ const Navbar = () => {
 
   // Check if user is logged in
   const currentUser = useStoreState((state) => state.currentUser);
-  console.log(currentUser?.loggedIn);
+  console.log(currentUser);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -64,14 +64,14 @@ const Navbar = () => {
                 arrow={{ pointAtCenter: true }}
               >
                 <Avatar
-                  className="border-black cursor-pointer"
+                  className="cursor-pointer border-neutral-300"
                   size={50}
-                  src="https://api.dicebear.com/7.x/notionists-neutral/svg?seed=Boo"
+                  src={defaultAvatar}
                 />
               </Dropdown>
               <Modal
                 title={<h1 className="w-full text-2xl">Thông tin cá nhân</h1>}
-                onOk={handleOk}
+                footer={null}
                 onCancel={handleCancel}
                 open={isModalOpen}
               >
@@ -97,7 +97,7 @@ const Navbar = () => {
             </>
           ) : (
             <div className="flex items-center gap-4">
-              <Button type="ghost" size="large">
+              <Button onClick={handleClick} type="ghost" size="large">
                 <span className="hover:underline">Tra cứu trạng thái</span>
               </Button>
               <Button type="ghost" size="large">

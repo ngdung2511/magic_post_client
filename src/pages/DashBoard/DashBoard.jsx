@@ -11,14 +11,16 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import Navbar from "../../components/navbar/Navbar";
-import Footer from "../../components/footer/Footer";
+
+import { useStoreState } from "../../store/hook";
 function DashBoard() {
   const [collapsed, setCollapsed] = useState(false);
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-
+  const currentUser = useStoreState((state) => state.currentUser);
+  console.log(currentUser);
   const [selectedKey, setSelectedKey] = useState(
     localStorage.getItem("selectedKey") || "1"
   );
@@ -28,12 +30,13 @@ function DashBoard() {
     setSelectedKey(e.key);
   };
 
-  function getItem(label, key, icon, children) {
+  function getItem(label, key, icon, children, disabled = false) {
     return {
       key,
       icon,
       children,
       label,
+      disabled,
     };
   }
   const items = [
@@ -53,24 +56,40 @@ function DashBoard() {
       // getItem("Alex", "5"),
     ]),
 
-    getItem("Trưởng điểm tập kết", "sub2", <AppleOutlined />, [
-      getItem(
-        <NavLink to="head/collection-point/manage-accounts">
-          Quản lý tài khoản
-        </NavLink>,
-        "6"
-      ),
-      getItem(
-        <NavLink to="head/collection-point/goods-inventory">
-          Thống kê hàng hóa
-        </NavLink>,
-        "7"
-      ),
-    ]),
-    getItem("Lãnh đạo", "sub3", <UserOutlined />, [
-      getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "8"),
-      getItem(<NavLink to="/boss/goods-stats">Thống kê hàng hóa</NavLink>, "9"),
-    ]),
+    getItem(
+      "Trưởng điểm",
+      "sub2",
+      <AppleOutlined />,
+      [
+        getItem(
+          <NavLink to="head/collection-point/manage-accounts">
+            Quản lý tài khoản
+          </NavLink>,
+          "6"
+        ),
+        getItem(
+          <NavLink to="head/collection-point/goods-inventory">
+            Thống kê hàng hóa
+          </NavLink>,
+          "7"
+        ),
+      ],
+      currentUser?.role !== "headTransaction" &&
+        currentUser?.role !== "headGathering"
+    ),
+    getItem(
+      "Lãnh đạo",
+      "sub3",
+      <UserOutlined />,
+      [
+        getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "8"),
+        getItem(
+          <NavLink to="/boss/goods-stats">Thống kê hàng hóa</NavLink>,
+          "9"
+        ),
+      ],
+      currentUser?.role !== "admin"
+    ),
   ];
   return (
     <Layout>

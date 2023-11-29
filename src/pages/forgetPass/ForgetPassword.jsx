@@ -2,6 +2,7 @@ import { Button, Form, Input, Steps } from "antd";
 
 import Container from "../../components/Container";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const ForgetPassword = () => {
   const onFinish = (values) => {
@@ -96,6 +97,11 @@ const ForgetPassword = () => {
               {stepButton()}
             </div>
           </Form>
+          <Link to={"/home/login"}>
+            <Button type="link" className="float-right mt-4">
+              <span className="text-base underline">Đăng nhập?</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </Container>

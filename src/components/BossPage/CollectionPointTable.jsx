@@ -10,7 +10,6 @@ import {
 
 import { useEffect, useRef, useState } from "react";
 
-import { collection_points as data } from "../../mockData/collectionPoint.json";
 import {
   DeleteOutlined,
   PlusOutlined,
@@ -21,7 +20,7 @@ import AddSiteModal from "./AddSiteModal";
 import { NavLink } from "react-router-dom";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { deleteDepartment } from "../../repository/department/department";
-console.log(data);
+
 const CollectionPointTable = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const searchInput = useRef(null);
@@ -39,7 +38,6 @@ const CollectionPointTable = () => {
     fetchDepartments();
   }, []);
   const departments = useStoreState((state) => state.departments);
-  console.log(departments);
 
   // Handle search in table
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -56,14 +54,14 @@ const CollectionPointTable = () => {
     setIsLoading(true);
     try {
       const res = await deleteDepartment(departmentId);
-      console.log(res);
+      // console.log(res);
       if (res.status === 200) {
         messageApi.success("Xóa thành công");
         setIsLoading(false);
         fetchDepartments();
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       messageApi.error("Đã có lỗi xảy ra");
     }
   };
@@ -162,14 +160,13 @@ const CollectionPointTable = () => {
     {
       title: "ID",
       dataIndex: "_id",
-      width: "6%",
+      width: "12%",
       className: "text-center font-bold",
-      sorter: (a, b) => a.id - b.id,
     },
     {
       title: "Tên điểm",
       dataIndex: "name",
-      width: "20%",
+      width: "12%",
       render: (value, record) => {
         return (
           <NavLink to={`/boss/manage-sites/${record._id}`}>{value}</NavLink>
@@ -200,7 +197,7 @@ const CollectionPointTable = () => {
       filterSearch: true,
       onFilter: (value, record) => {
         const address = record.address;
-        console.log(value, address.split(", "));
+
         return address.toLowerCase().includes(value.toLowerCase());
       },
 
@@ -208,19 +205,23 @@ const CollectionPointTable = () => {
     },
     {
       title: "Phân loại",
+
       dataIndex: "type",
+      render: (value) => {
+        return <span>{value === "Gathering" ? "Tập kết" : "Giao dịch"}</span>;
+      },
       filters: [
         {
           text: "Giao dịch",
-          value: "Giao Dịch",
+          value: "Transaction",
         },
         {
           text: "Tập kết",
-          value: "Tập Kết",
+          value: "Gathering",
         },
       ],
       onFilter: (value, record) => record.type.startsWith(value),
-      filterSearch: true,
+      // filterSearch: true,
       width: "10%",
     },
     {
@@ -260,7 +261,6 @@ const CollectionPointTable = () => {
       width: "10%",
     },
     {
-      title: "Hành động",
       className: "text-center",
       render: (_, record) => {
         return (
@@ -281,7 +281,8 @@ const CollectionPointTable = () => {
           </Popconfirm>
         );
       },
-      width: "10%",
+      width: "4%",
+      fixed: "right",
     },
   ];
   return (
@@ -293,9 +294,7 @@ const CollectionPointTable = () => {
           columns={columns}
           dataSource={departments}
           bordered
-          scroll={{
-            x: "calc(700px + 50%)",
-          }}
+          scroll={{ x: 2000 }}
           pagination={{ pageSize: 3 }}
           title={() => (
             <div className="flex items-center justify-between">

@@ -13,20 +13,22 @@ const Login = () => {
   const [messageApi, contextHolder] = message.useMessage();
   useEffect(() => {
     if (currentUser?.loggedIn) {
-      console.log("User has logged in:", currentUser?.loggedIn);
       navigate("/dashboard");
     }
   }, [currentUser?.loggedIn, navigate]);
 
   const onFinish = async (values) => {
+    setIsLoading(true);
     try {
       const res = await signin(values.email, values.password);
-      console.log(res.data.data);
+
       setUserInfo({
+        role: res.data.data.user.role,
         email: res.data.data.user.email,
         password: res.data.data.user.name,
         loggedIn: true,
       });
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
       messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");
