@@ -10,7 +10,7 @@ const ForgetPassword = () => {
 
     // nếu tồn tại email thì gửi code và chuyển sang bước 2
 
-    if (current === 1) {
+    if (current === 2) {
       console.log("Đổi mật khẩu");
     } else setCurrent(current + 1);
   };
@@ -21,12 +21,14 @@ const ForgetPassword = () => {
     let text = "";
     if (current === 0) {
       text = "Gửi mã xác minh";
+    } else if (current === 1) {
+      text = "Xác nhận";
     } else {
-      text = "Khôi phục mật khẩu";
+      text = "Khôi phục tài khoản";
     }
     return (
       <Button
-        className={current === 0 ? "w-full" : ""}
+        className={current === 0 || current === 2 ? "w-full" : ""}
         size="large"
         type="primary"
         htmlType="submit"
@@ -52,7 +54,7 @@ const ForgetPassword = () => {
   };
   const steps = [
     {
-      title: "Nhập email đã đăng ký",
+      title: "Email đã đăng ký",
       content: (
         <>
           <Form.Item name="email">
@@ -66,11 +68,25 @@ const ForgetPassword = () => {
       ),
     },
     {
-      title: "Nhập mã xác minh",
+      title: "Mã xác minh",
       content: (
         <>
           <Form.Item name="OTP">
             <Input size="large" type="text" placeholder="Nhập mã OTP" />
+          </Form.Item>
+        </>
+      ),
+    },
+    {
+      title: "Nhập mật khẩu mới",
+      content: (
+        <>
+          <Form.Item name="newPassword">
+            <Input
+              size="large"
+              type="text"
+              placeholder="Mật khẩu mới của bạn"
+            />
           </Form.Item>
         </>
       ),
@@ -84,7 +100,7 @@ const ForgetPassword = () => {
     <Container>
       <div className="flex items-center justify-center mt-[100px]">
         <div>
-          <h1 className="mb-4 text-4xl text-center">Lấy lại mật khẩu</h1>
+          <h1 className="mb-4 text-4xl text-center">Đặt lại mật khẩu</h1>
           <Steps current={current} items={items} />
           <Form
             onFinish={onFinish}

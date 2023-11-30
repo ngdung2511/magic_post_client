@@ -68,7 +68,6 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
       type: item.type,
     };
   });
-  console.log(formattedDepOptions);
 
   // Create a lookup object that maps department IDs to types
   const departmentTypeLookup = formattedDepOptions.reduce((lookup, item) => {

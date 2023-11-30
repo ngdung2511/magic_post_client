@@ -17,6 +17,14 @@ export const getDepartments = async () => {
         throw error;
     }
 }
+export const getDepartmentById = async (departmentId) => {
+    try {
+        return await axios.get(`${UtilConstants.baseUrl}/department/${departmentId}`);
+    } catch (error) {
+        console.log('Error:', error);
+        throw error;
+    }
+}
 export const deleteDepartment = async (departmentId) => {
     try {
         return await axios.delete(`${UtilConstants.baseUrl}/department/${departmentId}`);

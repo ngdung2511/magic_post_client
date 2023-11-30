@@ -107,7 +107,7 @@ function DashBoard() {
             left: 0,
             top: 64,
             padding: "8px 0",
-            background: colorBgContainer,
+            background: "#f2f3f5",
           }}
           collapsible
           collapsed={collapsed}
@@ -116,7 +116,7 @@ function DashBoard() {
           collapsedWidth="60"
         >
           <Menu
-            className="overflow-y-auto"
+            className="overflow-y-auto bg-[#f2f3f5]"
             theme="light"
             defaultSelectedKeys={selectedKey}
             mode="inline"
@@ -127,7 +127,7 @@ function DashBoard() {
         <Layout
           style={{
             minHeight: "100vh",
-            padding: "0 10px",
+            padding: "12px 10px",
             display: "flex",
           }}
         >
@@ -139,7 +139,10 @@ function DashBoard() {
             }}
           >
             <div
+              className="no-scrollbar"
               style={{
+                overflowY: "auto",
+                borderRadius: "10px",
                 height: "100vh",
                 padding: 20,
                 background: colorBgContainer,
