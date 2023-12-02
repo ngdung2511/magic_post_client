@@ -33,3 +33,11 @@ export const deleteDepartment = async (departmentId) => {
         throw error;
     }
 }
+export const updateDepartment = async (departmentId, departmentData) => {
+    try {
+        return await axios.put(`${UtilConstants.baseUrl}/department/${departmentId}`, departmentData);
+    } catch (error) {
+        console.log('Error:', error);
+        throw error;
+    }
+}

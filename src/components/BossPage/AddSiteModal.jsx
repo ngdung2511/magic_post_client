@@ -19,6 +19,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { createDepartment } from "../../repository/department/department";
 import { useStoreActions, useStoreState } from "../../store/hook";
+import { treeSelectData } from "../../shared/commonData";
+
 const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   const inputRef = useRef(null);
   const [messageApi, contextHolder] = message.useMessage();
@@ -41,6 +43,11 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
       `${siteLocation?.reverse().join(", ")}`
     );
   }, [siteLocation, form]);
+  useEffect(() => {
+    if (siteType === "Gathering") {
+      form.setFieldsValue({ linkDepartments: [] });
+    }
+  }, [siteType, form]);
 
   // Get all departments from API
   const fetchDepartments = useStoreActions(
@@ -50,8 +57,9 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     fetchDepartments();
   }, [fetchDepartments]);
   let departments = useStoreState((state) => state.departments);
-  let customSelectProps = {};
+
   // Filter departments based on site type
+  let customSelectProps = {};
   if (siteType === "Transaction") {
     departments = departments.filter((item) => item.type === "Gathering");
     customSelectProps = {};
@@ -85,7 +93,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   };
   const onHandleFinish = async (values) => {
     setIsLoading(true);
-    console.log(values);
+    // console.log(values);
     values.siteType === "Transaction"
       ? (values.role = "headTransaction")
       : (values.role = "headGathering");
@@ -119,7 +127,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         role: values.role,
       },
     };
-    console.log(data);
+    // console.log(data);
 
     try {
       const res = await createDepartment(data);
@@ -143,54 +151,6 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
       console.log(error.response.data.message);
     }
   };
-
-  // Tree data for selection input
-  const treeSelectData = [
-    {
-      value: "Hà Nội",
-      label: "Hà Nội",
-      children: [
-        {
-          value: "Bắc Từ Liêm",
-          label: "Bắc Từ Liêm",
-        },
-        {
-          value: "Nam Từ Liêm",
-          label: "Nam Từ Liêm",
-        },
-        {
-          value: "Cầu Giấy",
-          label: "Cầu Giấy",
-        },
-        {
-          value: "Hoàng Mai",
-          label: "Hoàng Mai",
-        },
-      ],
-    },
-    {
-      value: "Hồ Chí Minh",
-      label: "Hồ Chí Minh",
-      children: [
-        {
-          value: "Quận 1",
-          label: "Quận 1",
-        },
-        {
-          value: "Quận 2",
-          label: "Quận 2",
-        },
-        {
-          value: "Quận Thủ Đức",
-          label: "Quận Thủ Đức",
-        },
-        {
-          value: "Quận Thủ Dầu Một",
-          label: "Quận Thủ Dầu Một",
-        },
-      ],
-    },
-  ];
 
   const filterOption = (input, option) => {
     return (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
@@ -218,11 +178,28 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
             <h2 className="py-3 text-xl font-semibold">Thông tin Điểm</h2>
             <div className="flex flex-col w-full">
               <div className="flex items-center gap-x-3">
-                <Form.Item name="siteName" className="grow">
+                <Form.Item
+                  name="siteName"
+                  className="grow"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tên điểm",
+                    },
+                  ]}
+                >
                   <Input size="large" placeholder="Tên điểm" type="text" />
                 </Form.Item>
 
-                <Form.Item name="siteType">
+                <Form.Item
+                  name="siteType"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng chọn loại điểm",
+                    },
+                  ]}
+                >
                   <Select
                     size="large"
                     placeholder="Chọn loại điểm"
@@ -299,19 +276,45 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
             </h2>
             <div className="flex flex-col w-full">
               <div className="flex items-center gap-x-3">
-                <Form.Item name="headOfSiteName" className="grow">
+                <Form.Item
+                  name="headOfSiteName"
+                  className="grow"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập họ và tên trưởng điểm",
+                    },
+                  ]}
+                >
                   <Input size="large" placeholder="Họ và tên" type="text" />
                 </Form.Item>
               </div>
               <div className="flex items-center gap-x-3">
-                <Form.Item name="headOfSiteEmail" className="grow">
+                <Form.Item
+                  name="headOfSiteEmail"
+                  className="grow"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng email tài khoản",
+                    },
+                  ]}
+                >
                   <Input
                     size="large"
                     placeholder="Email tài khoản"
                     type="email"
                   />
                 </Form.Item>
-                <Form.Item name="headOfSitePassword">
+                <Form.Item
+                  name="headOfSitePassword"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mật khẩu",
+                    },
+                  ]}
+                >
                   <Input
                     size="large"
                     placeholder="Mật khẩu tài khoản"

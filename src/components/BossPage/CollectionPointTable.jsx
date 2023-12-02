@@ -160,13 +160,13 @@ const CollectionPointTable = () => {
     {
       title: "ID",
       dataIndex: "_id",
-      width: "12%",
-      className: "text-center font-bold",
+      width: "3%",
+      className: "font-bold",
     },
     {
       title: "Tên điểm",
       dataIndex: "name",
-      width: "12%",
+      width: "6%",
       render: (value, record) => {
         return (
           <NavLink to={`/boss/manage-sites/${record._id}`}>{value}</NavLink>
@@ -201,7 +201,7 @@ const CollectionPointTable = () => {
         return address.toLowerCase().includes(value.toLowerCase());
       },
 
-      width: "30%",
+      width: "5%",
     },
     {
       title: "Phân loại",
@@ -222,44 +222,44 @@ const CollectionPointTable = () => {
       ],
       onFilter: (value, record) => record.type.startsWith(value),
       // filterSearch: true,
-      width: "10%",
+      width: "2%",
     },
-    {
-      title: "Trưởng điểm",
-      dataIndex: "head_of_site",
-      width: "15%",
-      ...getColumnSearchProps("head_of_site"),
-    },
-    {
-      title: "Số lượng",
-      className: "text-center",
+    // {
+    //   title: "Trưởng điểm",
+    //   dataIndex: "head_of_site",
+    //   width: "15%",
+    //   ...getColumnSearchProps("head_of_site"),
+    // },
+    // {
+    //   title: "Số lượng",
+    //   className: "text-center",
 
-      children: [
-        {
-          title: "Nhân viên",
-          dataIndex: "number_of_staff",
-          key: "building",
-          width: "10%",
-          className: "text-center",
-        },
-        {
-          title: "Đơn hàng",
-          dataIndex: "number_of_goods",
-          key: "number",
-          width: "10%",
-          className: "text-center",
-        },
-      ],
-    },
-    {
-      title: "Tình trạng",
-      render: (_, record) => {
-        if (record.number_of_goods > 1000)
-          return <p className="font-semibold text-red-500">Quá tải</p>;
-        else return <p className="font-semibold text-green-500">Bình thường</p>;
-      },
-      width: "10%",
-    },
+    //   children: [
+    //     {
+    //       title: "Nhân viên",
+    //       dataIndex: "number_of_staff",
+    //       key: "building",
+    //       width: "10%",
+    //       className: "text-center",
+    //     },
+    //     {
+    //       title: "Đơn hàng",
+    //       dataIndex: "number_of_goods",
+    //       key: "number",
+    //       width: "10%",
+    //       className: "text-center",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Tình trạng",
+    //   render: (_, record) => {
+    //     if (record.number_of_goods > 1000)
+    //       return <p className="font-semibold text-red-500">Quá tải</p>;
+    //     else return <p className="font-semibold text-green-500">Bình thường</p>;
+    //   },
+    //   width: "10%",
+    // },
     {
       className: "text-center",
       render: (_, record) => {
@@ -281,7 +281,7 @@ const CollectionPointTable = () => {
           </Popconfirm>
         );
       },
-      width: "4%",
+      width: "1%",
       fixed: "right",
     },
   ];

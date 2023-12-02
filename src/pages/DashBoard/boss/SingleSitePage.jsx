@@ -2,52 +2,67 @@ import {
   EditOutlined,
   LeftOutlined,
   ShoppingCartOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
-import {
-  Badge,
-  Button,
-  Card,
-  Descriptions,
-  Divider,
-  Image,
-  Spin,
-  Statistic,
-  Typography,
-} from "antd";
+import { Button, Card, Descriptions, Divider, Spin, Statistic } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getDepartmentById } from "../../../repository/department/department";
+
+import EditSiteModal from "../../../components/BossPage/EditSiteModal";
+import { useStoreActions, useStoreState } from "../../../store/hook";
 
 const SingleSitePage = () => {
   const { id: departmentId } = useParams();
   const [currentDepartment, setCurrentDepartment] = useState(null);
   const [currentHead, setCurrentHead] = useState(null);
+  const [isOpenEditSiteModal, setIsOpenEditSiteModal] = useState(false);
+  const [isDepChanged, setIsDepChanged] = useState(false);
+  console.log("dep changed: ", isDepChanged);
 
+  // Get department by id
+  const fetchDepartmentById = useStoreActions(
+    (actions) => actions.fetchDepartmentById
+  );
   useEffect(() => {
-    async function fetchDepartmentById() {
-      try {
-        const res = await getDepartmentById(departmentId);
-        if (res.status === 200) {
-          console.log(res);
-          setCurrentDepartment(res.data.data.gatherPoint);
-          setCurrentHead(res.data.data.user);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+    async function fetchData() {
+      const res = await fetchDepartmentById(departmentId);
+      setCurrentDepartment(res.gatherPoint);
+      setCurrentHead(res.user);
     }
-    fetchDepartmentById();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [departmentId]);
-  console.log(currentDepartment);
-  if (!currentDepartment)
+    fetchData();
+    setIsDepChanged(false);
+  }, [departmentId, isDepChanged, fetchDepartmentById]);
+
+  // Get all departments from API
+  const fetchDepartments = useStoreActions(
+    (actions) => actions.fetchDepartments
+  );
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+  const departments = useStoreState((state) => state.departments);
+
+  if (!currentDepartment || !currentHead)
     return (
       <div className="flex items-center justify-center w-full h-screen">
         <Spin />
       </div>
     );
+  const { name: nameOfHead, email } = currentHead;
   const { name, address, region, type, linkDepartments } = currentDepartment;
-  const { name: nameOfHead, email, role } = currentHead;
+  const linkDepartmentNames = linkDepartments.map((linkDepartment) => {
+    const department = departments.find(
+      (dept) => dept._id === linkDepartment._id
+    );
+    return department
+      ? {
+          label: department.name,
+          value: department._id,
+        }
+      : null;
+  });
+  console.log(linkDepartmentNames);
+  console.log(linkDepartments);
   const siteInfo = [
     {
       key: "1",
@@ -71,9 +86,8 @@ const SingleSitePage = () => {
       children: (
         <>
           {linkDepartments.length > 0 ? (
-            linkDepartments?.map((item) => {
-              console.log(item);
-              return <div key={item._id}>{item._id}</div>;
+            linkDepartmentNames?.map((item) => {
+              return <div key={item.value}>{item.label}</div>;
             })
           ) : (
             <p>Không có điểm liên kết</p>
@@ -94,6 +108,7 @@ const SingleSitePage = () => {
       children: email,
     },
   ];
+
   return (
     <div className="w-full h-full">
       <div className="flex items-center w-full">
@@ -108,7 +123,12 @@ const SingleSitePage = () => {
           <h1 className="font-semibold text-md">
             {name} - {region}
           </h1>
-          <Button type="primary" size="large" icon={<EditOutlined />}>
+          <Button
+            type="primary"
+            size="large"
+            icon={<EditOutlined />}
+            onClick={() => setIsOpenEditSiteModal(true)}
+          >
             Chỉnh sửa
           </Button>
         </div>
@@ -120,15 +140,33 @@ const SingleSitePage = () => {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
               <Card>
                 <Statistic
-                  prefix={<ShoppingCartOutlined size={20} />}
-                  title="Nhân viên"
+                  prefix={
+                    <TeamOutlined
+                      size={20}
+                      className="p-2 text-white bg-green-500 rounded-full"
+                    />
+                  }
+                  title={
+                    <p className="text-lg font-medium text-neutral-600">
+                      Nhân viên
+                    </p>
+                  }
                   value={112893}
                 />
               </Card>
               <Card>
                 <Statistic
-                  prefix={<ShoppingCartOutlined size={20} />}
-                  title="Đơn hàng"
+                  prefix={
+                    <ShoppingCartOutlined
+                      size={20}
+                      className="p-2 text-white bg-orange-500 rounded-full"
+                    />
+                  }
+                  title={
+                    <p className="text-lg font-medium text-neutral-600">
+                      Đơn hàng
+                    </p>
+                  }
                   value={112893}
                 />
               </Card>
@@ -148,6 +186,13 @@ const SingleSitePage = () => {
               items={headOfSiteInfo}
             />
           </div>
+
+          <EditSiteModal
+            setIsDepChanged={setIsDepChanged}
+            currentDepartment={currentDepartment}
+            isOpenEditSiteModal={isOpenEditSiteModal}
+            setIsOpenEditSiteModal={setIsOpenEditSiteModal}
+          />
         </div>
       </div>
     </div>
