@@ -40,9 +40,10 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   useEffect(() => {
     form.setFieldValue(
       "detailSiteLocation",
-      `${siteLocation?.reverse().join(", ")}`
+      `${siteLocation?.slice().reverse().join(", ")}`
     );
   }, [siteLocation, form]);
+
   useEffect(() => {
     if (siteType === "Gathering") {
       form.setFieldsValue({ linkDepartments: [] });
@@ -68,17 +69,38 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
       mode: "multiple",
     };
   }
+  console.log(departments);
+  let formattedDepOptions = [];
+  if (siteType === "Gathering") {
+    formattedDepOptions = departments
+      .filter(
+        (item) =>
+          (item.linkDepartments.length === 0 && item.type === "Transaction") ||
+          item.type === "Gathering"
+      )
+      .map((item) => {
+        return {
+          label: item.name,
+          value: item._id,
+          type: item.type,
+        };
+      });
+  } else if (siteType === "Transaction") {
+    formattedDepOptions = departments
+      .filter((item) => item.type === "Gathering")
+      .map((item) => {
+        return {
+          label: item.name,
+          value: item._id,
+          type: item.type,
+        };
+      });
+  }
 
-  const formattedDepOptions = departments.map((item) => {
-    return {
-      label: item.name,
-      value: item._id,
-      type: item.type,
-    };
-  });
+  console.log("formattedDepOptions", formattedDepOptions);
 
   // Create a lookup object that maps department IDs to types
-  const departmentTypeLookup = formattedDepOptions.reduce((lookup, item) => {
+  const departmentTypeLookup = formattedDepOptions?.reduce((lookup, item) => {
     lookup[item.value] = item.type;
     return lookup;
   }, {});
@@ -92,8 +114,8 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     setIsModalOpen(false);
   };
   const onHandleFinish = async (values) => {
-    setIsLoading(true);
-    // console.log(values);
+    // setIsLoading(true);
+    console.log("values: ", values);
     values.siteType === "Transaction"
       ? (values.role = "headTransaction")
       : (values.role = "headGathering");
@@ -101,22 +123,27 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     if (values.linkDepartments?.length > 0 && siteType === "Gathering") {
       formattedLinkDepValues = values.linkDepartments.map((item) => {
         return {
-          _id: item,
+          departmentId: item,
           type: departmentTypeLookup[item],
         };
       });
-    } else if (siteType === "Transaction") {
-      formattedLinkDepValues.push({
-        _id: values.linkDepartments,
-        type: departmentTypeLookup[values.linkDepartments],
-      });
+    } else if (
+      siteType === "Transaction" &&
+      values.linkDepartments?.length > 0
+    ) {
+      formattedLinkDepValues = [
+        {
+          departmentId: values.linkDepartments,
+          type: departmentTypeLookup[values.linkDepartments],
+        },
+      ];
     }
     console.log(formattedLinkDepValues);
     const data = {
       department: {
         name: values.siteName,
         address: values.detailSiteLocation,
-        region: values.siteLocation?.[1],
+        region: values.siteLocation?.[0],
         type: values.siteType,
         linkDepartments: formattedLinkDepValues,
       },
@@ -127,7 +154,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         role: values.role,
       },
     };
-    // console.log(data);
+    console.log(data);
 
     try {
       const res = await createDepartment(data);
@@ -201,6 +228,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                   ]}
                 >
                   <Select
+                    onChange={() => form.setFieldValue("linkDepartments", [])}
                     size="large"
                     placeholder="Chọn loại điểm"
                     allowClear
@@ -334,6 +362,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
             </div>
             <Form.Item noStyle>
               <Button
+                size="large"
                 loading={isLoading}
                 type="primary"
                 htmlType="submit"

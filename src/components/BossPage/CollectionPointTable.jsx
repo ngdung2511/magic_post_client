@@ -20,6 +20,7 @@ import AddSiteModal from "./AddSiteModal";
 import { NavLink } from "react-router-dom";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { deleteDepartment } from "../../repository/department/department";
+import { deleteUserById } from "../../repository/user/user";
 
 const CollectionPointTable = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -53,9 +54,10 @@ const CollectionPointTable = () => {
   const handleDelete = async (departmentId) => {
     setIsLoading(true);
     try {
-      const res = await deleteDepartment(departmentId);
+      const deleteDepRes = await deleteDepartment(departmentId);
+      // const deleteUserRes = await deleteUserById(departmentId);
       // console.log(res);
-      if (res.status === 200) {
+      if (deleteDepRes.status === 200) {
         messageApi.success("Xóa thành công");
         setIsLoading(false);
         fetchDepartments();

@@ -41,16 +41,26 @@ img {
   height: auto;
 }
 @layer utilities {
-  @variants responsive {
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
+  /* Custom scrollbar */
+  /* Width */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .no-scrollbar {
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-    }
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    width: 4px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #babac0;
+    border-radius: 4px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #babac0;
   }
 }

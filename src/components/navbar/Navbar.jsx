@@ -1,6 +1,6 @@
 import { Avatar, Button, Dropdown, Image, Modal } from "antd";
 import Container from "../Container";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogoutOutlined } from "@ant-design/icons";
 
 import logo from "../../assets/logo.svg";
@@ -10,14 +10,28 @@ import { useNavigate } from "react-router";
 import defaultAvatar from "../../assets/placeholder.jpg";
 const Navbar = ({ handleClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [roleName, setRoleName] = useState("");
   const removeState = useStoreActions((actions) => actions.removeState);
   const navigate = useNavigate();
 
   // Check if user is logged in
   const currentUser = useStoreState((state) => state.currentUser);
   console.log(currentUser);
-
+  useEffect(() => {
+    if (currentUser?.loggedIn) {
+      if (currentUser?.role === "admin") {
+        setRoleName("Lãnh đạo công ty");
+      } else if (currentUser?.role === "headGathering") {
+        setRoleName("Trưởng điểm Tập kết");
+      } else if (currentUser?.role === "headTransaction") {
+        setRoleName("Trưởng điểm Giao dịch");
+      } else if (currentUser?.role === "tracsactionStaff") {
+        setRoleName("Nhân viên Giao dịch");
+      } else if (currentUser?.role === "gatheringStaff") {
+        setRoleName("Nhân viên Tập kết");
+      }
+    }
+  }, [currentUser?.role, currentUser?.loggedIn]);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -46,6 +60,7 @@ const Navbar = ({ handleClick }) => {
       ),
     },
   ];
+
   return (
     <div className="w-full h-[64px] bg-white fixed top-0 right-0 left-0 z-50 mb-[64px] shadow-md">
       <Container>
@@ -90,7 +105,7 @@ const Navbar = ({ handleClick }) => {
                   </li>
                 </ul>
                 <h3 className="text-lg">Chức vụ</h3>
-                <p>Giao dịch viên</p>
+                <p>{roleName}</p>
                 <h3 className="text-lg">Điểm giao dịch</h3>
                 <p>Số 120, đường Hoàng Quốc Việt, quận Cầu Giấy, Hà Nội</p>
               </Modal>

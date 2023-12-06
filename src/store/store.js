@@ -1,5 +1,6 @@
 import { action, persist, createStore, thunk } from 'easy-peasy';
 import { getDepartmentById, getDepartments } from '../repository/department/department';
+import { getUserById } from '../repository/user/user';
 
 export const store = createStore({
 
@@ -42,5 +43,14 @@ export const store = createStore({
       console.log(error);
     }
   }),
+  fetchUserById: thunk(async (actions, id) => {
+    try {
+      const res = await getUserById(id);
+      console.log(res);
+      return res.data.data;
+    } catch (error) {
+      console.log(error);
+    }
+  })
 
 });
