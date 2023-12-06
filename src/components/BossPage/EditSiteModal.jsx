@@ -25,8 +25,9 @@ const EditSiteModal = ({
   });
 
   useEffect(() => {
-    setCurrentLocation(siteLocation?.reverse().join(", "));
+    setCurrentLocation(siteLocation?.slice().reverse().join(", "));
   }, [siteLocation]);
+
   // useEffect(() => {
   //   form.setFieldValue(
   //     "detailSiteLocation",
@@ -53,15 +54,39 @@ const EditSiteModal = ({
   let departments = useStoreState((state) => state.departments);
 
   // Format departments to options for Select input
-  const formattedDepOptions = departments
-    .filter((item) => item._id !== currentDepartment._id)
-    .map((item) => {
-      return {
-        label: item.name,
-        value: item._id,
-        type: item.type,
-      };
-    });
+  let formattedDepOptions = [];
+  if (type === "Gathering") {
+    formattedDepOptions = departments
+      .filter(
+        (item) =>
+          (item._id !== currentDepartment._id &&
+            item.linkDepartments.length === 0 &&
+            item.type === "Transaction") ||
+          (item.type === "Gathering" && item._id !== currentDepartment._id)
+      )
+      .map((item) => {
+        return {
+          label: item.name,
+          value: item._id,
+          type: item.type,
+        };
+      });
+  } else if (type === "Transaction") {
+    console.log("chece");
+    console.log("all deps: ", departments);
+    formattedDepOptions = departments
+      .filter(
+        (item) =>
+          item.type === "Gathering" && item._id !== currentDepartment._id
+      )
+      .map((item) => {
+        return {
+          label: item.name,
+          value: item._id,
+          type: item.type,
+        };
+      });
+  }
   // Create a lookup object that maps department IDs to types
   const departmentTypeLookup = formattedDepOptions.reduce((lookup, item) => {
     lookup[item.value] = item.type;
@@ -71,28 +96,28 @@ const EditSiteModal = ({
 
   // Handle submit form
   const onHandleFinish = async (values) => {
-    // console.log(values);
+    console.log(values);
     let formattedLinkDepValues = [];
     if (Array.isArray(values.linkDepartments)) {
       formattedLinkDepValues = values.linkDepartments.map((item) => {
         return {
-          _id: item,
+          departmentId: item,
           type: departmentTypeLookup[item],
         };
       });
     }
-    let data;
+    let data = {};
     if (isLinkDepChanged) {
       data = {
         name: values.siteName,
         address: values.detailSiteLocation,
-        region: values.siteLocation?.[1],
+        region: values.siteLocation?.[0],
         linkDepartments:
           type === "Gathering"
             ? formattedLinkDepValues
             : [
                 {
-                  _id: values.linkDepartments,
+                  departmentId: values.linkDepartments,
                   type: "Gathering",
                 },
               ],
@@ -101,11 +126,11 @@ const EditSiteModal = ({
       data = {
         name: values.siteName,
         address: values.detailSiteLocation,
-        region: values.siteLocation?.[1],
+        region: values.siteLocation?.[0],
       };
     }
 
-    // console.log(data);
+    console.log(data);
     try {
       const res = await updateDepartment(currentDepartment._id, data);
       if (res.status === 200) {
@@ -125,8 +150,9 @@ const EditSiteModal = ({
   // Map linkDepartments to department names
   const linkDepartmentNames = linkDepartments.map((linkDepartment) => {
     const department = departments.find(
-      (dept) => dept._id === linkDepartment._id
+      (dept) => dept._id === linkDepartment.departmentId
     );
+    console.log(department);
     return department
       ? {
           label: department.name,

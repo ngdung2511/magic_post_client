@@ -52,17 +52,17 @@ const SingleSitePage = () => {
   const { name, address, region, type, linkDepartments } = currentDepartment;
   const linkDepartmentNames = linkDepartments.map((linkDepartment) => {
     const department = departments.find(
-      (dept) => dept._id === linkDepartment._id
+      (dept) => dept._id === linkDepartment.departmentId
     );
     return department
       ? {
           label: department.name,
-          value: department._id,
+          value: department.departmentId,
         }
       : null;
   });
-  console.log(linkDepartmentNames);
-  console.log(linkDepartments);
+  // console.log(linkDepartmentNames);
+  // console.log(linkDepartments);
   const siteInfo = [
     {
       key: "1",
@@ -87,7 +87,7 @@ const SingleSitePage = () => {
         <>
           {linkDepartments.length > 0 ? (
             linkDepartmentNames?.map((item) => {
-              return <div key={item.value}>{item.label}</div>;
+              return <div key={item?.value}>{item?.label}</div>;
             })
           ) : (
             <p>Không có điểm liên kết</p>

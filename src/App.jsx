@@ -11,6 +11,7 @@ import GoodsInventoryPage from "./pages/DashBoard/headOfSite/GoodsInventoryPage"
 import Home from "./pages/Home/Home";
 import Hero from "./components/hero/Hero";
 import ForgetPassword from "./pages/forgetPass/ForgetPassword";
+import CreateOrderPage from "./pages/DashBoard/employee/CreateOrderPage";
 
 function App() {
   const ROUTE = [
@@ -51,11 +52,18 @@ function App() {
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route
-              path="/head/collection-point/manage-accounts"
+              path="head/manage-accounts"
               element={<ManageAccountPage />}
             />
             <Route
-              path="/head/collection-point/goods-inventory"
+              path="head/goods-inventory"
+              element={<GoodsInventoryPage />}
+            />
+          </Route>
+          <Route path="/" element={<DashBoard />}>
+            <Route path="employee/create-order" element={<CreateOrderPage />} />
+            <Route
+              path="head/goods-inventory"
               element={<GoodsInventoryPage />}
             />
           </Route>

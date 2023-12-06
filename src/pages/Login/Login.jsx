@@ -21,12 +21,13 @@ const Login = () => {
     setIsLoading(true);
     try {
       const res = await signin(values.email, values.password);
-
+      console.log(res);
       setUserInfo({
         role: res.data.data.user.role,
         email: res.data.data.user.email,
-        password: res.data.data.user.name,
+        name: res.data.data.user.name,
         loggedIn: true,
+        id: res.data.data.user._id,
       });
       setIsLoading(false);
     } catch (error) {

@@ -5,6 +5,8 @@ import { createEmployee, getEmployeeById } from "../../repository/employee/emplo
 
 const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   const [form] = useForm();
+
+  // Handle modal
   const handleOk = () => {
     setIsModalOpen(false);
     onHandleFinish();
