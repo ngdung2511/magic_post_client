@@ -1,22 +1,41 @@
 import { Button, Form, Input, Steps } from "antd";
 
 import Container from "../../components/Container";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { checkVerifyCode, forgetPassword } from "../../repository/auth/auth";
 
 const ForgetPassword = () => {
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log("Received values of form: ", values);
 
     // nếu tồn tại email thì gửi code và chuyển sang bước 2
-
+    if (current === 0) {
+      await forgetPassword(values.email);
+    }
+    if (current === 1) {
+      setInfo({
+        token: values.OTP,
+      })
+       
+    }
     if (current === 2) {
-      console.log("Đổi mật khẩu");
+      const data = {
+        password: values.newPassword,
+        token: info.token,
+      }
+      await checkVerifyCode(data);
     } else setCurrent(current + 1);
   };
 
   const [isLoading, setIsLoading] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [info, setInfo] = useState({});
+
+  // useEffect(async () => {
+  //   await checkVerifyCode(info);
+  // }, [info, flag]);
+
   const stepButton = () => {
     let text = "";
     if (current === 0) {
