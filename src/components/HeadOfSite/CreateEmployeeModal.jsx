@@ -1,6 +1,7 @@
 import { PlusCircleTwoTone } from "@ant-design/icons";
 import { Button, Divider, Form, Input, Modal, Select, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
+import { createEmployee, getEmployeeById } from "../../repository/employee/employee";
 
 const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   const [form] = useForm();
@@ -8,12 +9,55 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     setIsModalOpen(false);
     onHandleFinish();
   };
+  
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const onHandleFinish = (values) => {
-    console.log(values);
+
+
+  const onHandleFinish = async (values) => {
+    setIsLoading(true);
+    // console.log(values);
+    const currentUser = useStoreState((state) => state.currentUser);
+    currentUser.role === "headTransaction"
+      ? (values.role = "transactionStaff")
+      : (values.role = "gatheringStaff");
+
+    await getEmployeeById(currentUser.id).then((res) => { currentUser.departmentId = res.data.departmentId });
+    
+    const data = {
+      user: {
+        name: values.employeeName,
+        departmentId: currentUser.departmentId,
+        email: values.employeeEmail,
+        password: values.employeePassword,
+        role: values.role,
+      },
+    };
+    // console.log(data);
+
+    try {
+      const res = await createEmployee(data);
+      if (res.status === 201) {
+        //fetchDepartments();
+        messageApi.success("Tạo nhân viên thành công");
+        setIsLoading(false);
+        setIsModalOpen(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      if (error.response.data.message === "this user existed") {
+        messageApi.error("Email đã tồn tại");
+      } else if (
+        error.response.data.message === "this gathering point already exists"
+      ) {
+        messageApi.error("Điểm đã tồn tại");
+      } else messageApi.error("Đã có lỗi xảy ra");
+      setIsLoading(false);
+      console.log(error.response.data.message);
+    }
   };
+
   const provinces = [
     "An Giang",
     "Bà Rịa-Vũng Tàu",
