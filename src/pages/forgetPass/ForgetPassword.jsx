@@ -1,31 +1,52 @@
-import { Button, Form, Input, Steps } from "antd";
+import { Button, Form, Input, Steps, message } from "antd";
 
 import Container from "../../components/Container";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { checkVerifyCode, forgetPassword } from "../../repository/auth/auth";
+import { useForm } from "antd/es/form/Form";
 
 const ForgetPassword = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [form] = useForm();
+  const navigate = useNavigate();
   const onFinish = async (values) => {
-    console.log("Received values of form: ", values);
-
-    // nếu tồn tại email thì gửi code và chuyển sang bước 2
+    // Nếu tồn tại email thì gửi code và chuyển sang bước 2
     if (current === 0) {
-      await forgetPassword(values.email);
+      setIsLoading(true);
+      const res = await forgetPassword(values.email);
+      if (res.status === 200) {
+        setCurrent(current + 1);
+        setIsLoading(false);
+      }
     }
     if (current === 1) {
       setInfo({
         token: values.OTP,
-      })
-       
+      });
+      setCurrent(current + 1);
     }
     if (current === 2) {
       const data = {
         password: values.newPassword,
         token: info.token,
+      };
+      setIsLoading(true);
+      try {
+        const res = await checkVerifyCode(data);
+        if (res.status === 200) {
+          setIsLoading(false);
+          messageApi.success("Đổi mật khẩu thành công");
+          form.resetFields();
+          setCurrent(0);
+          navigate("/home/login");
+        }
+      } catch (err) {
+        setIsLoading(false);
+        messageApi.error("Đổi mật khẩu thất bại");
+        console.log(err);
       }
-      await checkVerifyCode(data);
-    } else setCurrent(current + 1);
+    }
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -47,11 +68,11 @@ const ForgetPassword = () => {
     }
     return (
       <Button
+        loading={isLoading}
         className={current === 0 || current === 2 ? "w-full" : ""}
         size="large"
         type="primary"
         htmlType="submit"
-        disabled={isLoading}
       >
         {text}
       </Button>
@@ -116,30 +137,34 @@ const ForgetPassword = () => {
     title: item.title,
   }));
   return (
-    <Container>
-      <div className="flex items-center justify-center mt-[100px]">
-        <div>
-          <h1 className="mb-4 text-4xl text-center">Đặt lại mật khẩu</h1>
-          <Steps current={current} items={items} />
-          <Form
-            onFinish={onFinish}
-            name="forget-password-form"
-            className="flex flex-col justify-center max-w-md mx-auto"
-          >
-            <div className="mt-[20px]">{steps[current].content}</div>
-            <div className="flex items-center justify-between">
-              {backButton()}
-              {stepButton()}
-            </div>
-          </Form>
-          <Link to={"/home/login"}>
-            <Button type="link" className="float-right mt-4">
-              <span className="text-base underline">Đăng nhập?</span>
-            </Button>
-          </Link>
+    <>
+      {contextHolder}
+      <Container>
+        <div className="flex items-center justify-center mt-[100px]">
+          <div>
+            <h1 className="mb-4 text-4xl text-center">Đặt lại mật khẩu</h1>
+            <Steps current={current} items={items} />
+            <Form
+              form={form}
+              onFinish={onFinish}
+              name="forget-password-form"
+              className="flex flex-col justify-center max-w-md mx-auto"
+            >
+              <div className="mt-[20px]">{steps[current].content}</div>
+              <div className="flex items-center justify-between">
+                {backButton()}
+                {stepButton()}
+              </div>
+            </Form>
+            <Link to={"/home/login"}>
+              <Button type="link" className="float-right mt-4">
+                <span className="text-base underline">Đăng nhập?</span>
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </>
   );
 };
 
