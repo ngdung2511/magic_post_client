@@ -182,6 +182,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   const filterOption = (input, option) => {
     return (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
   };
+
   return (
     <>
       {contextHolder}
@@ -362,7 +363,6 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
             </div>
             <Form.Item noStyle>
               <Button
-                size="large"
                 loading={isLoading}
                 type="primary"
                 htmlType="submit"

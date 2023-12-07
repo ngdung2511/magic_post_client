@@ -1,10 +1,11 @@
-import { Button, Layout, Menu, Modal, theme } from "antd";
+import { Button, Image, Layout, Menu, Modal, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
-import { Content } from "antd/es/layout/layout";
+import { Content, Header } from "antd/es/layout/layout";
 
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
+import logo from "../../assets/logo.svg";
 import {
   AppleOutlined,
   DashboardOutlined,
@@ -50,11 +51,21 @@ function DashBoard() {
       "2",
       <AppleOutlined />
     ),
-    getItem("Nhân viên", "sub1", <AppleOutlined />, [
-      getItem(<NavLink to="/employee/create-order">Tạo đơn hàng</NavLink>, "3"),
-      // getItem("Bill", "4"),
-      // getItem("Alex", "5"),
-    ]),
+    getItem(
+      "Nhân viên",
+      "sub1",
+      <AppleOutlined />,
+      [
+        getItem(
+          <NavLink to="/employee/create-order">Tạo đơn hàng</NavLink>,
+          "3"
+        ),
+        // getItem("Bill", "4"),
+        // getItem("Alex", "5"),
+      ],
+      currentUser?.role !== "transactionStaff" &&
+        currentUser?.role !== "gatheringStaff"
+    ),
 
     getItem(
       "Trưởng điểm",
@@ -111,8 +122,11 @@ function DashBoard() {
           breakpoint="md"
           collapsedWidth="60"
         >
+          <Header style={{ background: "#f6f8fc" }}>
+            <Image src={logo} preview={false} />
+          </Header>
           <Menu
-            className="overflow-y-auto bg-[#f2f3f5]"
+            className="overflow-y-auto bg-[#f6f8fc]"
             theme="light"
             defaultSelectedKeys={selectedKey}
             mode="inline"

@@ -25,7 +25,7 @@ const Navbar = ({ handleClick }) => {
         setRoleName("Trưởng điểm Tập kết");
       } else if (currentUser?.role === "headTransaction") {
         setRoleName("Trưởng điểm Giao dịch");
-      } else if (currentUser?.role === "tracsactionStaff") {
+      } else if (currentUser?.role === "transactionStaff") {
         setRoleName("Nhân viên Giao dịch");
       } else if (currentUser?.role === "gatheringStaff") {
         setRoleName("Nhân viên Tập kết");
@@ -92,10 +92,10 @@ const Navbar = ({ handleClick }) => {
               >
                 <ul className="font-semibold list-none">
                   <li>
-                    Họ và tên: <span>Nguyễn Huy Dũng</span>
+                    Họ và tên: <span>{currentUser.name}</span>
                   </li>
                   <li>
-                    Email: <span>huydung.jp@gmail.com</span>
+                    Email: <span>{currentUser.email}</span>
                   </li>
                   <li>
                     Ngày sinh: <span>25/11/1969</span>

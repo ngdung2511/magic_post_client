@@ -40,6 +40,7 @@ img {
   max-width: 100%;
   height: auto;
 }
+
 @layer utilities {
   /* Custom scrollbar */
   /* Width */
@@ -62,5 +63,17 @@ img {
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     background: #babac0;
+  }
+  @variants responsive {
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
   }
 }
