@@ -1,13 +1,5 @@
 import { PlusCircleTwoTone } from "@ant-design/icons";
-import {
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Select,
-} from "antd";
+import { Button, Form, Input, InputNumber, Modal, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { useState } from "react";
 
@@ -36,6 +28,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
       checked: true,
     },
   ];
+
   return (
     <>
       <Modal
@@ -63,7 +56,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="senderName"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Vui lòng nhập tên người gửi",
                     },
                   ]}
@@ -80,7 +73,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="senderPhone"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Vui lòng nhập số điện thoại người gửi",
                     },
                     {
@@ -103,7 +96,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="receiverName"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Vui lòng nhập tên người nhận",
                     },
                   ]}
@@ -120,7 +113,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="receiverPhone"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Vui lòng nhập số điện thoại người nhận",
                     },
                     {
@@ -143,7 +136,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="orderPrice"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Vui lòng nhập giá trị đơn hàng",
                     },
                   ]}
@@ -166,7 +159,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="orderWeight"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Vui lòng nhập khối lượng đơn hàng",
                     },
                   ]}
@@ -184,22 +177,42 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                 </Form.Item>
               </div>
 
-              <Form.Item
-                name="orderType"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng chọn loại hàng hóa",
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  placeholder="Chọn loại hàng hóa"
-                  allowClear
-                  options={typeOptions}
-                />
-              </Form.Item>
+              <div className="flex items-center gap-x-[10px]">
+                <Form.Item
+                  className="grow"
+                  name="receiverDep"
+                  rules={[
+                    {
+                      // required: true,
+                      message: "Vui lòng chọn Điểm giao dịch đích",
+                    },
+                  ]}
+                >
+                  <Select
+                    size="large"
+                    placeholder="Chọn Điểm giao dịch đích"
+                    allowClear
+                    options={typeOptions}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="orderType"
+                  rules={[
+                    {
+                      // required: true,
+                      message: "Vui lòng chọn loại hàng hóa",
+                    },
+                  ]}
+                >
+                  <Select
+                    size="large"
+                    placeholder="Chọn loại hàng hóa"
+                    allowClear
+                    options={typeOptions}
+                  />
+                </Form.Item>
+              </div>
               <Form.Item>
                 <TextArea
                   showCount

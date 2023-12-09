@@ -108,7 +108,7 @@ function DashBoard() {
       >
         <Sider
           style={{
-            overflow: "auto",
+            overflowX: "hidden",
             height: "100vh",
             position: "sticky",
             left: 0,
@@ -149,7 +149,7 @@ function DashBoard() {
             }}
           >
             <div
-              className="no-scrollbar"
+              className="no-scrollbar shadow-[0px_6px_18px_3px_#00000024]"
               style={{
                 overflowY: "auto",
                 borderRadius: "10px",

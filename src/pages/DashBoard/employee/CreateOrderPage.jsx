@@ -1,6 +1,6 @@
 import { Divider, Typography } from "antd";
 
-import OrderTable from "../../../components/Staff/OrderTable";
+import OrderTable from "../../../../src/components/Staff/transaction/OrderTable";
 
 const CreateOrderPage = () => {
   return (

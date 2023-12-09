@@ -8,6 +8,7 @@ import { useStoreActions, useStoreState } from "../../store/hook";
 import { useNavigate } from "react-router";
 
 import defaultAvatar from "../../assets/placeholder.jpg";
+// eslint-disable-next-line react/prop-types
 const Navbar = ({ handleClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleName, setRoleName] = useState("");

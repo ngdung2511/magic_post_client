@@ -22,14 +22,17 @@ const Login = () => {
     try {
       const res = await signin(values.email, values.password);
       console.log(res);
-      setUserInfo({
-        role: res.data.data.user.role,
-        email: res.data.data.user.email,
-        name: res.data.data.user.name,
-        loggedIn: true,
-        id: res.data.data.user._id,
-      });
-      setIsLoading(false);
+      if (res.status === 200) {
+        setUserInfo({
+          role: res.data.user.role,
+          email: res.data.user.email,
+          name: res.data.user.name,
+          loggedIn: true,
+          id: res.data.user._id,
+        });
+        setIsLoading(false);
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.log(error);
       messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");

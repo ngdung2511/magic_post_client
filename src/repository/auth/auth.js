@@ -1,18 +1,11 @@
 import axios from "axios";
 import UtilConstants from "../../shared/constants";
+import api from '../index'
 
 export const signin = async (email, password) => {
-    try {
-        const data = {
-            email: email,
-            password: password
-        }
 
-        return await axios.post(UtilConstants.baseUrl + '/auth/login', data);
-    } catch (error) {
-        console.log('Error:', error);
-        throw error;
-    }
+    return api.post(UtilConstants.baseUrl + '/auth/login', { email, password });
+
 }
 
 export const forgetPassword = async (email) => {
@@ -30,7 +23,7 @@ export const forgetPassword = async (email) => {
 
 export const checkVerifyCode = async (information) => {
     try {
-        
+
         return await axios.post(UtilConstants.baseUrl + '/auth/reset-password', information);
     } catch (error) {
         console.log('Error:', error);
