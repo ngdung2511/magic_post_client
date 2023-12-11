@@ -1,9 +1,16 @@
 import axios from "axios";
 import UtilConstants from "../../shared/constants";
+import { utilFuncs } from "../../utils/utils";
+import { useStoreActions, useStoreState } from "../../store/hook";
 
 export const createEmployee = async (user) => {
     try {
-        return await axios.post(UtilConstants.baseUrl + '/user', user);
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+        }
+        const res = await axios.post(UtilConstants.baseUrl + '/user', user, { headers: header });
+
+        return res;
     } catch (error) {
         console.log('Error:', error);
         throw error;
@@ -11,7 +18,21 @@ export const createEmployee = async (user) => {
 }
 export const getEmployees = async () => {
     try {
-        return await axios.get(UtilConstants.baseUrl + '/user');
+        return await axios.get(UtilConstants.baseUrl + '/users');
+    } catch (error) {
+        console.log('Error:', error);
+        throw error;
+    }
+}
+export const getEmployeeByDepartmentId = async (departmentId) => {
+    try {
+        const query = {
+            condition: {
+                departmentId: departmentId 
+            }
+        };
+        
+        return await axios.get(UtilConstants.baseUrl + `/users`, { params: query });
     } catch (error) {
         console.log('Error:', error);
         throw error;

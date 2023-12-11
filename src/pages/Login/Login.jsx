@@ -23,12 +23,15 @@ const Login = () => {
       const res = await signin(values.email, values.password);
       console.log(res);
       setUserInfo({
+        departmentId: res.data.data.user.departmentId,
         role: res.data.data.user.role,
         email: res.data.data.user.email,
         name: res.data.data.user.name,
         loggedIn: true,
         id: res.data.data.user._id,
       });
+      console.log(res.data.data);
+      localStorage.setItem('token', res.data.data.token);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
