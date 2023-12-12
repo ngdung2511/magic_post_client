@@ -8,7 +8,7 @@ import { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 
 import { NavLink } from "react-router-dom";
-import { employees as data } from "../../mockData/employees.json";
+
 import CreateEmployeeModal from "./CreateEmployeeModal";
 const EmployeeAccountTable = () => {
   const searchInput = useRef(null);
@@ -226,7 +226,6 @@ const EmployeeAccountTable = () => {
       <Table
         rowKey={(row) => row.id}
         columns={columns}
-        dataSource={data}
         bordered
         scroll={{
           x: "calc(700px + 50%)",

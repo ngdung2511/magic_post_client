@@ -1,8 +1,15 @@
-import { Button, Input, Popconfirm, Space, Table, Typography } from "antd";
+import {
+  Button,
+  Input,
+  Popconfirm,
+  Space,
+  Table,
+  Typography,
+  message,
+} from "antd";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { collection_points as data } from "../../mockData/collectionPoint.json";
 import {
   DeleteOutlined,
   PlusOutlined,
@@ -11,14 +18,29 @@ import {
 import Highlighter from "react-highlight-words";
 import AddSiteModal from "./AddSiteModal";
 import { NavLink } from "react-router-dom";
-console.log(data);
+import { useStoreActions, useStoreState } from "../../store/hook";
+import { deleteDepartment } from "../../repository/department/department";
+import { deleteUserById } from "../../repository/user/user";
+
 const CollectionPointTable = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const searchInput = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Get all departments from API
+  const fetchDepartments = useStoreActions(
+    (actions) => actions.fetchDepartments
+  );
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+  const departments = useStoreState((state) => state.departments);
+
+  // Handle search in table
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -27,6 +49,23 @@ const CollectionPointTable = () => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+  // Handle delete department
+  const handleDelete = async (departmentId) => {
+    setIsLoading(true);
+    try {
+      const deleteDepRes = await deleteDepartment(departmentId);
+      // const deleteUserRes = await deleteUserById(departmentId);
+      // console.log(res);
+      if (deleteDepRes.status === 200) {
+        messageApi.success("Xóa thành công");
+        setIsLoading(false);
+        fetchDepartments();
+      }
+    } catch (error) {
+      // console.log(error);
+      messageApi.error("Đã có lỗi xảy ra");
+    }
   };
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -121,19 +160,18 @@ const CollectionPointTable = () => {
   });
   const columns = [
     {
-      title: "STT",
-      dataIndex: "id",
-      width: "6%",
-      className: "text-center font-bold",
-      sorter: (a, b) => a.id - b.id,
+      title: "ID",
+      dataIndex: "_id",
+      width: "3%",
+      className: "font-bold",
     },
     {
       title: "Tên điểm",
       dataIndex: "name",
-      width: "20%",
+      width: "6%",
       render: (value, record) => {
         return (
-          <NavLink to={`/boss/manage-sites/${record.id}`}>{value}</NavLink>
+          <NavLink to={`/boss/manage-sites/${record._id}`}>{value}</NavLink>
         );
       },
     },
@@ -161,67 +199,70 @@ const CollectionPointTable = () => {
       filterSearch: true,
       onFilter: (value, record) => {
         const address = record.address;
-        console.log(value, address.split(", "));
+
         return address.toLowerCase().includes(value.toLowerCase());
       },
 
-      width: "30%",
+      width: "5%",
     },
     {
       title: "Phân loại",
+
       dataIndex: "type",
+      render: (value) => {
+        return <span>{value === "Gathering" ? "Tập kết" : "Giao dịch"}</span>;
+      },
       filters: [
         {
           text: "Giao dịch",
-          value: "Giao Dịch",
+          value: "Transaction",
         },
         {
           text: "Tập kết",
-          value: "Tập Kết",
+          value: "Gathering",
         },
       ],
       onFilter: (value, record) => record.type.startsWith(value),
-      filterSearch: true,
-      width: "10%",
+      // filterSearch: true,
+      width: "2%",
     },
-    {
-      title: "Trưởng điểm",
-      dataIndex: "head_of_site",
-      width: "15%",
-      ...getColumnSearchProps("head_of_site"),
-    },
-    {
-      title: "Số lượng",
-      className: "text-center",
+    // {
+    //   title: "Trưởng điểm",
+    //   dataIndex: "head_of_site",
+    //   width: "15%",
+    //   ...getColumnSearchProps("head_of_site"),
+    // },
+    // {
+    //   title: "Số lượng",
+    //   className: "text-center",
 
-      children: [
-        {
-          title: "Nhân viên",
-          dataIndex: "number_of_staff",
-          key: "building",
-          width: "10%",
-          className: "text-center",
-        },
-        {
-          title: "Đơn hàng",
-          dataIndex: "number_of_goods",
-          key: "number",
-          width: "10%",
-          className: "text-center",
-        },
-      ],
-    },
+    //   children: [
+    //     {
+    //       title: "Nhân viên",
+    //       dataIndex: "number_of_staff",
+    //       key: "building",
+    //       width: "10%",
+    //       className: "text-center",
+    //     },
+    //     {
+    //       title: "Đơn hàng",
+    //       dataIndex: "number_of_goods",
+    //       key: "number",
+    //       width: "10%",
+    //       className: "text-center",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Tình trạng",
+    //   render: (_, record) => {
+    //     if (record.number_of_goods > 1000)
+    //       return <p className="font-semibold text-red-500">Quá tải</p>;
+    //     else return <p className="font-semibold text-green-500">Bình thường</p>;
+    //   },
+    //   width: "10%",
+    // },
     {
-      title: "Tình trạng",
-      render: (_, record) => {
-        if (record.number_of_goods > 1000)
-          return <p className="font-semibold text-red-500">Quá tải</p>;
-        else return <p className="font-semibold text-green-500">Bình thường</p>;
-      },
-      width: "10%",
-    },
-    {
-      title: "Hành động",
       className: "text-center",
       render: (_, record) => {
         return (
@@ -231,51 +272,54 @@ const CollectionPointTable = () => {
             okType="danger"
             okText="Xóa"
             cancelText="Hủy"
+            onConfirm={() => handleDelete(record._id)}
+            okButtonProps={{
+              loading: isLoading,
+            }}
           >
-            <span
-              onClick={() => console.log(record.id)}
-              className="text-lg cursor-pointer hover:text-red-600"
-            >
+            <span className="text-lg cursor-pointer hover:text-red-600">
               <DeleteOutlined />
             </span>
           </Popconfirm>
         );
       },
-      width: "10%",
+      width: "1%",
+      fixed: "right",
     },
   ];
   return (
-    <div className="w-full h-full py-4">
-      <Table
-        rowKey={(row) => row.id}
-        columns={columns}
-        dataSource={data}
-        bordered
-        scroll={{
-          x: "calc(700px + 50%)",
-        }}
-        pagination={{ pageSize: 3 }}
-        title={() => (
-          <div className="flex items-center justify-between">
-            <Typography.Title className="mb-0" level={3}>
-              Điểm Giao dịch và Tập kết
-            </Typography.Title>
-            <AddSiteModal
-              isModalOpen={isModalOpen}
-              setIsModalOpen={setIsModalOpen}
-            />
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              icon={<PlusOutlined />}
-              type="primary"
-              size="large"
-            >
-              Thêm điểm
-            </Button>
-          </div>
-        )}
-      />
-    </div>
+    <>
+      {contextHolder}
+      <div className="w-full h-full py-4">
+        <Table
+          rowKey={(row) => row._id}
+          columns={columns}
+          dataSource={departments}
+          bordered
+          scroll={{ x: 2000 }}
+          pagination={{ pageSize: 3 }}
+          title={() => (
+            <div className="flex items-center justify-between">
+              <Typography.Title className="mb-0" level={3}>
+                Điểm Giao dịch và Tập kết
+              </Typography.Title>
+              <AddSiteModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+              />
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                icon={<PlusOutlined />}
+                type="primary"
+                size="large"
+              >
+                Thêm điểm
+              </Button>
+            </div>
+          )}
+        />
+      </div>
+    </>
   );
 };
 

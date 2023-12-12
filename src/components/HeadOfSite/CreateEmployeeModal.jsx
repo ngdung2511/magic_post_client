@@ -4,6 +4,8 @@ import { useForm } from "antd/es/form/Form";
 
 const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   const [form] = useForm();
+
+  // Handle modal
   const handleOk = () => {
     setIsModalOpen(false);
     onHandleFinish();
@@ -14,6 +16,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   const onHandleFinish = (values) => {
     console.log(values);
   };
+
   const provinces = [
     "An Giang",
     "Bà Rịa-Vũng Tàu",
@@ -85,7 +88,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
       title={
         <>
           <h1 className="mb-[10px] text-3xl font-semibold">
-            <PlusCircleTwoTone style={{ color: "#e1ebfe" }} />
+            <PlusCircleTwoTone twoToneColor="#f15757" />
             <span className="ml-[10px]">Tạo nhân viên</span>
           </h1>
         </>

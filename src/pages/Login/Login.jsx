@@ -1,50 +1,50 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import Container from "../../components/Container";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { signin } from "../../repository/auth/auth";
 import { useStoreActions, useStoreState } from "../../store/hook";
-import Swal from "sweetalert2";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const Login = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   const setUserInfo = useStoreActions((actions) => actions.setUserInfo);
   const navigate = useNavigate();
-
+  const [messageApi, contextHolder] = message.useMessage();
   useEffect(() => {
     if (currentUser?.loggedIn) {
-      console.log("User has logged in:", currentUser?.loggedIn);
       navigate("/dashboard");
     }
   }, [currentUser?.loggedIn, navigate]);
 
   const onFinish = async (values) => {
+    setIsLoading(true);
     try {
       const res = await signin(values.email, values.password);
-      console.log(res.data.data);
-      setUserInfo({
-        email: res.data.data.user.email,
-        password: res.data.data.user.name,
-        loggedIn: true,
-      });
-
-      if (res.data.status === 200) {}
+      console.log(res);
+      if (res.status === 200) {
+        setUserInfo({
+          role: res.data.user.role,
+          email: res.data.user.email,
+          name: res.data.user.name,
+          loggedIn: true,
+          id: res.data.user._id,
+        });
+        setIsLoading(false);
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.log(error);
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Tên đăng nhập hoặc mật khẩu không đúng`,
-        showConfirmButton: true,
-      });
+      messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");
     }
   };
 
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <>
     <Container>
-      <div className="flex items-center justify-center mt-[100px] grow">
+      {contextHolder}
+
+      <div className="flex items-center justify-center mt-[100px]">
         <div>
           <h1 className="mb-4 text-4xl text-center">Đăng nhập vào hệ thống</h1>
           <Form
@@ -54,6 +54,8 @@ const Login = () => {
           >
             <Form.Item name="email">
               <Input
+                allowClear
+                prefix={<UserOutlined />}
                 size="large"
                 type="email"
                 placeholder="Nhập email của bạn"
@@ -61,6 +63,7 @@ const Login = () => {
             </Form.Item>
             <Form.Item name="password">
               <Input.Password
+                prefix={<LockOutlined />}
                 required
                 size="large"
                 type="password"
@@ -86,7 +89,6 @@ const Login = () => {
         </div>
       </div>
     </Container>
-    </>
   );
 };
 export default Login;
