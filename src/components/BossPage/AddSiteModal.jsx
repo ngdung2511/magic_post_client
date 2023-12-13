@@ -190,7 +190,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         title={
           <>
             <h1 className="mb-[10px] text-3xl font-semibold">
-              <PlusCircleTwoTone twoToneColor="#f15757" />
+              <PlusCircleTwoTone twoToneColor="#266191" />
               <span className="ml-[10px]">Thêm điểm</span>
             </h1>
           </>

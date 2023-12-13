@@ -182,7 +182,7 @@ const EditSiteModal = ({
         open={isOpenEditSiteModal}
         title={
           <h2 className="font-semibold">
-            <EditOutlined className="p-2 text-white rounded-full bg-[#f15757]" />{" "}
+            <EditOutlined className="p-2 text-white rounded-full bg-[#266191]" />{" "}
             Chỉnh sửa thông tin điểm
           </h2>
         }

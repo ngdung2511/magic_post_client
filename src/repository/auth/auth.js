@@ -3,9 +3,7 @@ import UtilConstants from "../../shared/constants";
 import api from '../index'
 
 export const signin = async (email, password) => {
-
     return api.post(UtilConstants.baseUrl + '/auth/login', { email, password });
-
 }
 
 export const forgetPassword = async (email) => {

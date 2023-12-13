@@ -13,13 +13,13 @@ const HeroInfo = () => {
       <div className="max-w[400px]">
         {currentUser?.loggedIn ? (
           <NavLink to="/dashboard">
-            <button className="cursor-pointer w-full py-5 px-8 md:py-4 text-2xl border border-black rounded-md hover:bg-[#f15757] transition hover:text-white bg-white">
+            <button className="cursor-pointer w-full py-5 px-8 md:py-4 text-2xl border border-black rounded-md hover:bg-[#266191] transition hover:text-white bg-white">
               Quản lý
             </button>
           </NavLink>
         ) : (
           <NavLink to="/home/login">
-            <button className="cursor-pointer w-full py-5 px-8 md:py-4 text-2xl border border-black rounded-md hover:bg-[#f15757] transition hover:text-white bg-white">
+            <button className="cursor-pointer w-full py-5 px-8 md:py-4 text-2xl border border-black rounded-md hover:bg-[#266191] transition hover:text-white bg-white">
               Đăng nhập
             </button>
           </NavLink>

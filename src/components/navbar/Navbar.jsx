@@ -61,7 +61,7 @@ const Navbar = ({ handleClick }) => {
       ),
     },
   ];
-
+  const test = "headGathering";
   return (
     <div className="w-full h-[64px] bg-white fixed top-0 right-0 left-0 z-50 mb-[64px] shadow-md">
       <Container>
@@ -107,17 +107,23 @@ const Navbar = ({ handleClick }) => {
                 </ul>
                 <h3 className="text-lg">Chức vụ</h3>
                 <p>{roleName}</p>
-                <h3 className="text-lg">Điểm giao dịch</h3>
-                <p>Số 120, đường Hoàng Quốc Việt, quận Cầu Giấy, Hà Nội</p>
+                {!currentUser?.role.includes("admin") && (
+                  <>
+                    <h3 className="text-lg">
+                      {currentUser?.role.includes("transaction") ||
+                      currentUser?.role.includes("Transaction")
+                        ? "Điểm giao dịch"
+                        : "Điểm tập kết"}
+                    </h3>
+                    <p>{currentUser?.workDepartment?.address}</p>
+                  </>
+                )}
               </Modal>
             </>
           ) : (
             <div className="flex items-center gap-4">
               <Button onClick={handleClick} type="ghost" size="large">
                 <span className="hover:underline">Tra cứu trạng thái</span>
-              </Button>
-              <Button type="ghost" size="large">
-                <span className="hover:underline">Giới thiệu</span>
               </Button>
             </div>
           )}

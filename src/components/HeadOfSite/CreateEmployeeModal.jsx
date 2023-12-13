@@ -88,7 +88,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
       title={
         <>
           <h1 className="mb-[10px] text-3xl font-semibold">
-            <PlusCircleTwoTone twoToneColor="#f15757" />
+            <PlusCircleTwoTone twoToneColor="#266191" />
             <span className="ml-[10px]">Tạo nhân viên</span>
           </h1>
         </>

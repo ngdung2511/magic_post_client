@@ -1,43 +1,106 @@
 import { PlusCircleTwoTone } from "@ant-design/icons";
-import { Button, Form, Input, InputNumber, Modal, Select } from "antd";
+import { Button, Form, Input, InputNumber, Modal, Select, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getDepartmentByCondition } from "../../../repository/department/department";
+import { useStoreState } from "../../../store/hook";
+import { createOrder } from "../../../repository/order/order";
 
-const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
+const CreateOrderModal = ({
+  isModalOpen,
+  setIsModalOpen,
+  setIsNewOrderCreated,
+  isNewOrderCreated,
+}) => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [transactionDep, setTransactionDep] = useState([]);
+  const currentUser = useStoreState((state) => state.currentUser);
+  const [messageApi, contextHolder] = message.useMessage();
   // Handle modal
   const handleOk = () => {
+    console.log("ok");
     setIsModalOpen(false);
     onHandleFinish();
   };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const onHandleFinish = (values) => {
+  // Handle call api create order
+  const onHandleFinish = async (values) => {
+    setIsLoading(true);
     console.log(values);
+    const data = {
+      sender: values.senderName,
+      senderPhone: values.senderPhone,
+      receiver: values.receiverName,
+      receiverPhone: values.receiverPhone,
+      send_department: currentUser.workDepartment._id,
+      receive_department: values.receiverDep,
+      current_department: currentUser.workDepartment._id,
+      next_department:
+        currentUser.workDepartment.linkDepartments[0].departmentId,
+      price: values.orderPrice,
+      weight: values.orderWeight,
+      description: values.orderDescription?.trim(),
+      type: values.orderType,
+    };
+    console.log("data:", data);
+    const res = await createOrder(data);
+    console.log("create order:", res);
+    if (res?.status === 201) {
+      messageApi.success("Tạo đơn hàng thành công");
+      setIsNewOrderCreated(!isNewOrderCreated);
+      setIsModalOpen(false);
+      form.resetFields();
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+      messageApi.error("Tạo đơn hàng thất bại");
+    }
   };
   const typeOptions = [
     {
       label: "Tài liệu",
-      value: "Document",
+      value: "document",
     },
     {
       label: "Hàng hóa",
-      value: "Goods",
-      checked: true,
+      value: "goods",
     },
   ];
-
+  useEffect(() => {
+    const getTransactionDep = async () => {
+      const condition = {
+        type: "Transaction",
+      };
+      const stringifiedCondition = JSON.stringify(condition);
+      const res = await getDepartmentByCondition(stringifiedCondition);
+      if (res.status === 200) {
+        setTransactionDep(res.data.departments);
+      }
+    };
+    getTransactionDep();
+  }, []);
+  // Format options for selecting receiver's department
+  const transactionDepOptions = transactionDep
+    .filter((item) => item._id !== currentUser.workDepartment._id)
+    .map((dep) => {
+      return {
+        label: dep.name,
+        value: dep._id,
+      };
+    });
   return (
     <>
+      {contextHolder}
       <Modal
         footer={null}
         open={isModalOpen}
         title={
           <>
             <h1 className="mb-[16px] text-3xl font-semibold">
-              <PlusCircleTwoTone twoToneColor="#f15757" />
+              <PlusCircleTwoTone twoToneColor="#266191" />
               <span className="ml-[10px]">Tạo đơn hàng gửi</span>
             </h1>
           </>
@@ -56,7 +119,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   name="senderName"
                   rules={[
                     {
-                      // required: true,
+                      required: true,
                       message: "Vui lòng nhập tên người gửi",
                     },
                   ]}
@@ -142,15 +205,17 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   ]}
                 >
                   <InputNumber
-                    min={0}
                     className="w-full"
                     addonAfter="VND"
                     size="large"
                     placeholder="Giá trị đơn hàng"
-                    formatter={(value) =>
-                      `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    // formatter={(value) =>
+                    //   `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    // }
+                    // parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    min="0"
+                    step="0.0"
+                    stringMode
                   />
                 </Form.Item>
 
@@ -169,10 +234,13 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                     addonAfter="KG"
                     size="large"
                     placeholder="Khối lượng đơn hàng"
-                    formatter={(value) =>
-                      `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    min="0"
+                    step="0.0"
+                    stringMode
+                    // formatter={(value) =>
+                    //   `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    // }
+                    // parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                   />
                 </Form.Item>
               </div>
@@ -192,7 +260,7 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                     size="large"
                     placeholder="Chọn Điểm giao dịch đích"
                     allowClear
-                    options={typeOptions}
+                    options={transactionDepOptions}
                   />
                 </Form.Item>
 
@@ -213,7 +281,15 @@ const CreateOrderModal = ({ isModalOpen, setIsModalOpen }) => {
                   />
                 </Form.Item>
               </div>
-              <Form.Item>
+              <Form.Item
+                name="orderDescription"
+                rules={[
+                  {
+                    // required: true,
+                    message: "Vui lòng chọn loại hàng hóa",
+                  },
+                ]}
+              >
                 <TextArea
                   showCount
                   maxLength={100}

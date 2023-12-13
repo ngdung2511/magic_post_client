@@ -29,6 +29,7 @@ const Login = () => {
           name: res.data.user.name,
           loggedIn: true,
           id: res.data.user._id,
+          workDepartment: res.data.user.departmentId,
         });
         setIsLoading(false);
         navigate("/dashboard");
