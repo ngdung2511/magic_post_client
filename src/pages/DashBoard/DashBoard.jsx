@@ -55,14 +55,7 @@ function DashBoard() {
       "Nhân viên",
       "sub1",
       <AppleOutlined />,
-      [
-        getItem(
-          <NavLink to="/employee/create-order">Tạo đơn hàng</NavLink>,
-          "3"
-        ),
-        // getItem("Bill", "4"),
-        // getItem("Alex", "5"),
-      ],
+      [getItem(<NavLink to="/employee/manage-orders">Đơn hàng</NavLink>, "3")],
       currentUser?.role !== "transactionStaff" &&
         currentUser?.role !== "gatheringStaff"
     ),
@@ -144,16 +137,16 @@ function DashBoard() {
           <Content
             style={{
               flexGrow: 1,
-              height: "100vh",
+              minHeight: "100vh",
               marginTop: "64px",
             }}
           >
             <div
-              className="no-scrollbar shadow-[0px_6px_18px_3px_#00000024]"
+              className="no-scrollbar shadow-[0px_6px_10px_3px_#00000024]"
               style={{
                 overflowY: "auto",
                 borderRadius: "10px",
-                height: "100vh",
+                minHeight: "100vh",
                 padding: 20,
                 background: colorBgContainer,
               }}

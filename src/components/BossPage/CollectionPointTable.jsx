@@ -297,7 +297,7 @@ const CollectionPointTable = () => {
           dataSource={departments}
           bordered
           scroll={{ x: 2000 }}
-          pagination={{ pageSize: 3 }}
+          pagination={{ pageSize: 10 }}
           title={() => (
             <div className="flex items-center justify-between">
               <Typography.Title className="mb-0" level={3}>

@@ -46,3 +46,11 @@ export const treeSelectData = [
     },
 ];
 
+export const orderStatusOptions = [
+
+    { label: "Đã giao", value: "delivered", color: "green" },
+    { label: "Chờ xác nhận", value: "processing", color: "yellow" },
+    { label: "Đã hủy", value: "rejected", color: 'red' },
+    { label: "Đã xác nhận", value: "accepted", color: 'blue' },
+
+]
