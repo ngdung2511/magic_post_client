@@ -37,6 +37,7 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");
+      setIsLoading(false);
     }
   };
 

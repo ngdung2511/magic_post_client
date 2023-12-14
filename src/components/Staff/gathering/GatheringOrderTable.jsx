@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import CreateOrderModal from "./CreateOrderModal";
 import { NavLink } from "react-router-dom";
 import StatusLabel from "../../statusLabel";
-import TrackingOrderInfo from "../../trackingOrderInfo/TrackingOrderInfo";
+
 import {
   deleteOrder,
   getOrderByDepartmentId,
@@ -179,10 +179,7 @@ const TransactionOrderTable = () => {
     },
     getCheckboxProps: (record) => ({
       // Disable check box when order is processing and being transported to another department
-      disabled:
-        record.status === "processing" ||
-        record.status === "delivered" ||
-        record.status === "accepted",
+      // disabled: record.status === "processing",
       // &&
       // record.next_department !== currentUser.workDepartment._id,
       // Column configuration not to be checked
