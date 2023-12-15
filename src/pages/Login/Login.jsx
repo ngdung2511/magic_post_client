@@ -31,6 +31,7 @@ const Login = () => {
           id: res.data.user._id,
           workDepartment: res.data.user.departmentId,
         });
+        localStorage.setItem('token', res.data.data.token);
         setIsLoading(false);
         navigate("/dashboard");
       }
