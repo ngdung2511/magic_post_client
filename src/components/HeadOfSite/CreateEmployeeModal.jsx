@@ -34,7 +34,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     
     const data = {
       name: values.employeeName,
-      departmentId: currentUser.departmentId,
+      departmentId: currentUser.workDepartment,
       email: values.employeeEmail,
       password: values.employeePassword,
       role: values.role,
@@ -44,7 +44,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     try {
       const res = await createEmployee(data);
       if (res.status === 201) {
-        fetchEmployees(currentUser.departmentId);
+        fetchEmployees(currentUser.workDepartment);
         messageApi.success("Tạo nhân viên thành công");
         setIsLoading(false);
         setIsModalOpen(false);
