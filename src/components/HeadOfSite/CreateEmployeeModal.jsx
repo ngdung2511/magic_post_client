@@ -1,9 +1,16 @@
 import { PlusCircleTwoTone } from "@ant-design/icons";
-import { Button, Divider, Form, Input, Modal, Select, Typography, message } from "antd";
+import { PlusOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Button, Divider, Form, Input, Modal, Select, Typography, Upload, message } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useState } from "react";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { createEmployee, getEmployeeById } from "../../repository/employee/employee";
+
+const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
 
 const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   const [form] = useForm();
@@ -18,29 +25,23 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     setIsModalOpen(false);
     onHandleFinish();
   };
-  
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
-
   const onHandleFinish = async (values) => {
     setIsLoading(true);
-    console.log(currentUser);
-    // console.log(values);
     currentUser.role === "headTransaction"
       ? (values.role = "transactionStaff")
       : (values.role = "gatheringStaff");
-    
     const data = {
       name: values.employeeName,
       departmentId: currentUser.departmentId,
       email: values.employeeEmail,
       password: values.employeePassword,
       role: values.role,
+      gender: values.employeeGender,
+      phone: values.employeePhoneNumber,
     };
-    // console.log(data);
-
     try {
       const res = await createEmployee(data);
       if (res.status === 201) {
@@ -63,72 +64,36 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     }
   };
 
-  const provinces = [
-    "An Giang",
-    "Bà Rịa-Vũng Tàu",
-    "Bạc Liêu",
-    "Bắc Giang",
-    "Bắc Kạn",
-    "Bắc Ninh",
-    "Bến Tre",
-    "Bình Dương",
-    "Bình Định",
-    "Bình Phước",
-    "Bình Thuận",
-    "Cà Mau",
-    "Cao Bằng",
-    "Cần Thơ",
-    "Đà Nẵng",
-    "Đắk Lắk",
-    "Đắk Nông",
-    "Điện Biên",
-    "Đồng Nai",
-    "Đồng Tháp",
-    "Gia Lai",
-    "Hà Giang",
-    "Hà Nam",
-    "Hà Nội",
-    "Hà Tĩnh",
-    "Hải Dương",
-    "Hải Phòng",
-    "Hậu Giang",
-    "Hòa Bình",
-    "Hưng Yên",
-    "Khánh Hòa",
-    "Kiên Giang",
-    "Kon Tum",
-    "Lai Châu",
-    "Lạng Sơn",
-    "Lào Cai",
-    "Lâm Đồng",
-    "Long An",
-    "Nam Định",
-    "Nghệ An",
-    "Ninh Bình",
-    "Ninh Thuận",
-    "Phú Thọ",
-    "Phú Yên",
-    "Quảng Bình",
-    "Quảng Nam",
-    "Quảng Ngãi",
-    "Quảng Ninh",
-    "Quảng Trị",
-    "Sóc Trăng",
-    "Sơn La",
-    "Tây Ninh",
-    "Thái Bình",
-    "Thái Nguyên",
-    "Thanh Hóa",
-    "Thừa Thiên Huế",
-    "Tiền Giang",
-    "TP Hồ Chí Minh",
-    "Trà Vinh",
-    "Tuyên Quang",
-    "Vĩnh Long",
-    "Vĩnh Phúc",
-    "Yên Bái",
-  ];
+  // Handle upload image
+  const [loading, setLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
+  const handlePreview = async (file) => {
+    console.log(file);
+  };
+  const handleChange = (info) => {
+    console.log(info);
+    getBase64(info.fileList[0].originFileObj, (imageUrl) => {
+      setPreviewImage(imageUrl);
+    });
+    
+  }
+  const beforeUpload = (file) => {
+    
+  }
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
 
+  // return 
   return (
   <>
     {contextHolder}
@@ -150,6 +115,24 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
       <div className="w-full h-full pb-6">
         <Form form={form} onFinish={onHandleFinish}>
           <h2 className="py-3 text-xl font-semibold">Thông tin nhân viên</h2>
+          <Upload
+          name="avatar"
+          listType="picture-circle"
+          className="avatar-uploader"
+          showUploadList={false}
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+          onPreview={handlePreview}>
+          {previewImage ? (
+          <img
+            src={previewImage}
+            alt="avatar"
+            style={{
+              width: '100%',
+            }}
+          />) : (uploadButton)}
+          </Upload>
+          <h3 className="py-3 text-xl font-semibold">Nơi làm việc: {currentUser.departmentId.address}</h3>
           <div className="grid w-full col-span-8 gap-x-6">
             <div className="col-span-4">
               <Form.Item name="employeeName">
@@ -171,7 +154,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
             </div>
             <div className="col-span-4 col-start-5">
               <Form.Item name="employeeAddress">
-                <Input size="large" placeholder="Địa chỉ nơi làm" type="text" />
+                <Input size="large" placeholder="Địa chỉ nơi cư trú" type="text" />
               </Form.Item>
               <Form.Item
                 name="employeePhoneNumber"

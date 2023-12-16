@@ -146,37 +146,35 @@ const EmployeeAccountTable = () => {
   });
   const columns = [
     {
-      title: "STT",
+      key: "1",
+      title: "id",
       dataIndex: "_id",
       width: "6%",
       className: "text-center font-bold",
       sorter: (a, b) => a.id - b.id,
     },
     {
+      key: "2",
       title: "Tên nhân viên",
       dataIndex: "name",
       width: "20%",
       render: (value, record) => {
-        console.log(record.id);
+        console.log(record);
         return (
-          <NavLink to={`/head/collection-point/manage-account/${record.id}`}>
+          <NavLink to={`/head/manage-account/${record._id}`}>
             {value}
           </NavLink>
         );
       },
     },
     {
+      key: "3",
       title: "Email",
       dataIndex: "email",
       width: "20%",
     },
     {
-      title: "Mật khẩu",
-      dataIndex: "password",
-      width: "15%",
-    },
-
-    {
+      key: "4",
       title: "Địa chỉ nơi làm việc",
       dataIndex: "departmentId",
       filters: [
@@ -207,24 +205,7 @@ const EmployeeAccountTable = () => {
       width: "30%",
     },
     {
-      title: "Phân loại",
-      dataIndex: "role",
-      filters: [
-        {
-          text: "Giao dịch",
-          value: "giao dịch",
-        },
-        {
-          text: "Tập kết",
-          value: "tập kết",
-        },
-      ],
-      onFilter: (value, record) => record.employee_type.includes(value),
-      filterSearch: true,
-      width: "10%",
-    },
-
-    {
+      key: "5",
       title: "Hành động",
       className: "text-center",
       render: (_, record) => {
