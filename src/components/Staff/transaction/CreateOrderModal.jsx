@@ -83,6 +83,7 @@ const CreateOrderModal = ({
     };
     getTransactionDep();
   }, []);
+
   // Format options for selecting receiver's department
   const transactionDepOptions = transactionDep
     .filter((item) => item._id !== currentUser.workDepartment._id)

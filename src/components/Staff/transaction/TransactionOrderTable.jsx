@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import CreateOrderModal from "./CreateOrderModal";
 import { NavLink } from "react-router-dom";
 import StatusLabel from "../../statusLabel";
-import TrackingOrderInfo from "../../trackingOrderInfo/TrackingOrderInfo";
+
 import {
   deleteOrder,
   getOrderByDepartmentId,
@@ -100,8 +100,7 @@ const TransactionOrderTable = () => {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      render: (value, record) => {
-        console.log(record);
+      render: (value) => {
         return <StatusLabel status={value} />;
       },
       width: "20%",
@@ -196,26 +195,28 @@ const TransactionOrderTable = () => {
         <div className="w-full p-3 flex items-center">
           <div className="w-full flex items-center gap-x-3">
             <p className="font-semibold text-xl text-[#266191]">Bộ lọc</p>
-            <Form.Item noStyle className="w-full" name="filterValue">
-              <Select
-                placeholder="Chọn trạng thái"
-                size="large"
-                options={[
-                  {
-                    value: "jack",
-                    label: "Chờ xác nhận",
-                  },
-                  {
-                    value: "lucy",
-                    label: "Đã đến điểm Giao dịch đích",
-                  },
-                  {
-                    value: "tom",
-                    label: "Giao đơn thất bại",
-                  },
-                ]}
-              />
-            </Form.Item>
+            <Form>
+              <Form.Item noStyle className="w-full" name="filterValue">
+                <Select
+                  placeholder="Chọn trạng thái"
+                  size="large"
+                  options={[
+                    {
+                      value: "jack",
+                      label: "Chờ xác nhận",
+                    },
+                    {
+                      value: "lucy",
+                      label: "Đã đến điểm Giao dịch đích",
+                    },
+                    {
+                      value: "tom",
+                      label: "Giao đơn thất bại",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </Form>
           </div>
           <Input.Search
             className="max-w-[42%] w-full"

@@ -120,7 +120,10 @@ const OrderDetailPage = () => {
     {
       key: "8",
       label: "Địa điểm tiếp theo",
-      children: next_department?.name,
+      children:
+        next_department === null
+          ? "Chưa chọn điểm đến tiếp theo"
+          : next_department?.name,
     },
   ];
   return (

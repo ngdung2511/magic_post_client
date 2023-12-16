@@ -1,4 +1,5 @@
 import { Checkbox } from "antd";
+import StatusLabel from "../../statusLabel";
 
 const OrderInfoTable = () => {
   const options = [
@@ -115,9 +116,7 @@ const OrderInfoTable = () => {
               Trạng thái hiện tại:
             </td>
             <td className="px-6 py-3 border-b border-gray-200">
-              <span className="px-4 py-2 text-white bg-sky-800 rounded-xl">
-                Đang vận chuyển
-              </span>
+              <StatusLabel />
             </td>
             <td className="px-6 py-3 border-b border-r border-gray-200">
               Tổng thu:
