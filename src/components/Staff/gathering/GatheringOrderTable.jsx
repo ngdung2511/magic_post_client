@@ -33,74 +33,27 @@ const GatheringOrderTable = () => {
   const [filterValue, setFilterValue] = useState("incoming orders");
   const [ordersData, setOrdersData] = useState([]);
   const [isOrderUpdated, setIsOrderUpdated] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
 
-  console.log("selectedRows: ", selectedRows);
-  // Handle format selected orders to send to server
-  const handleFormatConfirmOrders = (selectedRows) => {
-    const formattedOrders = selectedRows.map((order) => {
-      if (
-        order.status === "processing" &&
-        order.next_department === currentUser.workDepartment._id
-      ) {
-        return {
-          orderId: order._id,
-          current_department: currentUser.workDepartment._id,
-          description: `Đơn hàng đã đến ${currentUser.workDepartment.name}`,
-        };
-      }
-    });
-    return {
-      type: "confirm",
-      orders: [...formattedOrders],
-    };
-  };
-  const handleFormatTransferOrders = (selectedRows) => {
-    const formattedOrders = selectedRows.map((order) => {
-      if (
-        order.status === "accepted" &&
-        order.current_department === currentUser.workDepartment._id
-      ) {
-        return {
-          orderId: order._id,
-          next_department: null,
-          description: `Đơn hàng đang đến chua biet :(`,
-        };
-      }
-    });
-    return {
-      type: "transfer",
-      orders: [...formattedOrders],
-    };
-  };
-  useEffect(() => {
-    if (ordersData.length === 0 && ordersData.type !== "transfer") {
-      const ordersData = handleFormatTransferOrders(selectedRows);
-      setOrdersData(ordersData.orders);
-    }
-  }, [selectedRows]);
-  // Handle when user clicks confirm button
   const handleOnConfirm = async () => {
-    // setIsLoading(true);
-    if (filterValue === "incoming orders") {
-      const ordersData = handleFormatConfirmOrders(selectedRows);
-      setOrdersData(ordersData.orders);
-      console.log(ordersData);
-      if (ordersData.orders.length > 0 && ordersData.type === "confirm") {
-        const res = await updateOrder(ordersData);
-        console.log("update order: ", res);
-        if (res.status === 200) {
-          messageApi.success("Xác nhận đơn hàng thành công");
-          setIsLoading(false);
-          setIsOrderUpdated(!isOrderUpdated);
-        } else {
-          messageApi.error("Xác nhận đơn hàng thất bại");
-          setIsLoading(false);
-        }
-      }
-    } else if (filterValue === "outgoing orders") {
-      console.log(ordersData);
-    }
+    console.log('confirm');
+    console.log('Selected Order IDs:', selectedOrderIds);
+    const filteredSelectedRows = selectedRows.map(({ _id, next_department }) => ({
+      _id,
+      next_department,
+    }));
+  
+    console.log('Filtered Selected Rows:', filteredSelectedRows);
+    const data = {
+      orders: filteredSelectedRows,
+      type: "confirm",
+    };
+  
+    console.log('Data:', data);
+    // Perform any additional actions with the selected order IDs
   };
+  
+
   // Fetch all orders by department id that have current department as this department
   useEffect(() => {
     const fetchOrderByGatheringDep = async (data) => {
@@ -207,6 +160,7 @@ const GatheringOrderTable = () => {
       fixed: "right",
     },
   ];
+
   const linkedDepOptions = currentUser?.workDepartment.linkDepartments?.map(
     (dep) => {
       return {
@@ -215,7 +169,7 @@ const GatheringOrderTable = () => {
       };
     }
   );
-  console.log(linkedDepOptions);
+  
   if (filterValue === "outgoing orders") {
     columns.splice(1, 0, {
       title: "Điểm đến tiếp theo",
@@ -226,20 +180,21 @@ const GatheringOrderTable = () => {
         return (
           <Form>
             <Form.Item>
-              <Select
-                onSelect={(selectedNextDep) => {
-                  console.log(ordersData);
-                  // Add next department to each order when user selects from input
-                  ordersData.map((order) => {
-                    if (order.orderId === record._id) {
-                      order.next_department = selectedNextDep;
-                    }
-                  });
-                }}
-                size="large"
-                options={linkedDepOptions}
-                placeholder="Chọn điểm chuyển tiếp"
-              />
+            <Select
+            onSelect={(selectedNextDep) => {
+              // Update the next_department property for selected rows
+              const updatedRows = selectedRows.map((row) => {
+                if (row._id === record._id) {
+                  return { ...row, next_department: selectedNextDep };
+                }
+                return row;
+              });
+              setSelectedRows(updatedRows);
+            }}
+            size="large"
+            options={linkedDepOptions}
+            placeholder="Chọn điểm chuyển tiếp"
+          />
             </Form.Item>
           </Form>
         );
@@ -250,6 +205,8 @@ const GatheringOrderTable = () => {
   // Handle select rows of orders in table
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedOrderIds(selectedRowKeys);
+
       if (selectedRows.length > 0) {
         setIsRowSelected(true);
         setSelectedRows(selectedRows);
@@ -266,17 +223,13 @@ const GatheringOrderTable = () => {
       );
     },
     getCheckboxProps: (record) => ({
-      // Disable check box when order is processing and being transported to another department
       disabled:
         record.status === "processing" &&
         record.next_department !== currentUser.workDepartment._id,
-      // || record.next_department === null,
-      // &&
-      // record.next_department !== currentUser.workDepartment._id,
-      // Column configuration not to be checked
       status: record.status,
     }),
   };
+
   return (
     <>
       {contextHolder}
