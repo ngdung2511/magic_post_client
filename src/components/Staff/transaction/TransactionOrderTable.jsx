@@ -1,4 +1,9 @@
-import { DeleteOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  SendOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -17,11 +22,15 @@ import StatusLabel from "../../statusLabel";
 
 import {
   deleteOrder,
+  getOrderByCondition,
   getOrderByDepartmentId,
+  updateOrder,
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
+import { getDepartmentById } from "../../../repository/department/department";
 
 const TransactionOrderTable = () => {
+  const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRowSelected, setIsRowSelected] = useState(false);
@@ -31,6 +40,111 @@ const TransactionOrderTable = () => {
   const [isNewOrderCreated, setIsNewOrderCreated] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [filterValue, setFilterValue] = useState("outgoing orders");
+  const [currentDepInfo, setCurrentDepInfo] = useState(null);
+  const [ordersData, setOrdersData] = useState([]);
+  const [isOrderUpdated, setIsOrderUpdated] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
+  useEffect(() => {
+    const fetchCurrentDepInfo = async () => {
+      const res = await getDepartmentById(currentUser.workDepartment._id);
+      if (res?.status === 200) {
+        setCurrentDepInfo(res.data.data.gatherPoint);
+      }
+    };
+    fetchCurrentDepInfo();
+  }, []);
+  console.log(currentDepInfo);
+
+  // Fetch all orders by department id that have current department as this department
+  useEffect(() => {
+    const fetchOrderByDepId = async (depId) => {
+      setIsLoading(true);
+      const res = await getOrderByDepartmentId(depId);
+      console.log(res);
+      if (res?.status === 200) {
+        setAllOrders(res.data.orders);
+        setIsLoading(false);
+        setIsReloading(false);
+      }
+    };
+    if (filterValue === "outgoing orders") {
+      fetchOrderByDepId(currentUser.workDepartment._id);
+    }
+  }, [
+    filterValue,
+    currentUser.workDepartment._id,
+    isNewOrderCreated,
+    isOrderUpdated,
+    isReloading,
+  ]);
+
+  console.log(allOrders);
+
+  // Fetch orders based on filter value
+  useEffect(() => {
+    const fetchOrderByTransactionDep = async (data) => {
+      setIsLoading(true);
+      const res = await getOrderByCondition(data);
+      console.log(res);
+      if (res?.status === 200) {
+        setAllOrders(res.data.orders);
+        setIsLoading(false);
+        setIsReloading(false);
+      }
+    };
+    if (filterValue === "incoming orders") {
+      const data = {
+        condition: {
+          next_department: currentUser.workDepartment._id,
+          status: "processing",
+        },
+      };
+      fetchOrderByTransactionDep(data);
+    }
+  }, [filterValue, currentUser.workDepartment._id, isReloading]);
+
+  // Handle format selected orders to send to server
+  const handleFormatResendOrder = () => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "rejected" &&
+        order.next_department._id ===
+          currentDepInfo?.linkDepartments[0].departmentId
+      ) {
+        return {
+          orderId: order._id,
+          description: `Đơn hàng đang đến ${currentDepInfo?.linkDepartments[0]?.name}`,
+        };
+      }
+    });
+    return {
+      type: "resend",
+      orders: [...formattedOrders],
+    };
+  };
+
+  const handleOnConfirm = async () => {
+    setIsLoading(true);
+    console.log("order data", ordersData);
+    if (filterValue === "outgoing orders") {
+      const ordersData = handleFormatResendOrder();
+      setOrdersData(ordersData.orders);
+      if (ordersData.orders.length > 0 && ordersData.type === "resend") {
+        const res = await updateOrder(ordersData);
+        console.log("update order: ", res);
+        if (res?.status === 200) {
+          messageApi.success("Xác nhận đơn hàng thành công");
+          setIsLoading(false);
+          setIsOrderUpdated((prevState) => !prevState);
+        } else {
+          messageApi.error("Xác nhận đơn hàng thất bại");
+          setIsLoading(false);
+        }
+      }
+    }
+  };
+
   // Handle delete order
   const handleDelete = async (orderId) => {
     setIsLoading(true);
@@ -54,20 +168,6 @@ const TransactionOrderTable = () => {
     console.log(orderId);
   };
 
-  // Fetch all orders by department id that have current department as this department
-  useEffect(() => {
-    const fetchOrderByDepId = async (depId) => {
-      const res = await getOrderByDepartmentId(depId);
-      console.log(res);
-      if (res?.status === 200) {
-        setAllOrders(res.data.orders);
-      }
-    };
-    fetchOrderByDepId(currentUser.workDepartment._id);
-  }, [currentUser.workDepartment._id, isNewOrderCreated]);
-
-  console.log(allOrders);
-
   const columns = [
     {
       title: "Mã đơn hàng",
@@ -75,7 +175,19 @@ const TransactionOrderTable = () => {
       key: "orderCode",
       render: (value, record) => {
         return (
-          <NavLink to={`/employee/order-detail/${record._id}`}>{value}</NavLink>
+          <Tooltip
+            title={
+              // Check if order is rejected and is in transit to linked department
+              record.status === "rejected" &&
+              record.next_department._id ===
+                currentDepInfo?.linkDepartments[0]?.departmentId &&
+              "Chọn đơn để giao lại!"
+            }
+          >
+            <NavLink to={`/employee/order-detail/${record._id}`}>
+              {value}
+            </NavLink>
+          </Tooltip>
         );
       },
     },
@@ -83,7 +195,7 @@ const TransactionOrderTable = () => {
       title: "Người gửi",
       dataIndex: "sender",
       key: "senderName",
-      width: "20%",
+      width: "14%",
       filteredValue: [searchValue],
       onFilter: (value, record) =>
         String(record.sender).toLowerCase().includes(value.toLowerCase()) ||
@@ -94,7 +206,7 @@ const TransactionOrderTable = () => {
       title: "Người nhận",
       dataIndex: "receiver",
       key: "receiverName",
-      width: "20%",
+      width: "14%",
     },
     {
       title: "Trạng thái",
@@ -118,44 +230,25 @@ const TransactionOrderTable = () => {
     {
       key: "action",
       render: (value, record) => (
-        console.log(record),
-        (
-          <div
-            className={`flex items-center ${
-              record.status === "rejected"
-                ? "justify-between"
-                : "justify-center"
-            }`}
+        <div className="flex items-center justify-center">
+          <Popconfirm
+            title="Xác nhận"
+            description="Bạn chắc chắn muốn xóa dữ liệu này?"
+            okType="danger"
+            okText="Xóa"
+            cancelText="Hủy"
+            onConfirm={() => handleDelete(record._id)}
+            okButtonProps={{
+              loading: isLoading,
+            }}
           >
-            <Popconfirm
-              title="Xác nhận"
-              description="Bạn chắc chắn muốn xóa dữ liệu này?"
-              okType="danger"
-              okText="Xóa"
-              cancelText="Hủy"
-              onConfirm={() => handleDelete(record._id)}
-              okButtonProps={{
-                loading: isLoading,
-              }}
-            >
-              <span className="text-lg cursor-pointer hover:text-red-600">
-                <DeleteOutlined />
-              </span>
-            </Popconfirm>
-            {record?.status === "rejected" && (
-              <Tooltip
-                title={<span className="text-lg text-black">Gửi lại</span>}
-                color="white"
-              >
-                <span className="text-lg cursor-pointer hover:text-[#1e91cf]">
-                  <SendOutlined />
-                </span>
-              </Tooltip>
-            )}
-          </div>
-        )
+            <span className="text-lg cursor-pointer hover:text-red-600">
+              <DeleteOutlined />
+            </span>
+          </Popconfirm>
+        </div>
       ),
-      width: "8%",
+      width: "6%",
       fixed: "right",
     },
   ];
@@ -195,19 +288,25 @@ const TransactionOrderTable = () => {
         <div className="w-full p-3 flex items-center">
           <div className="w-full flex items-center gap-x-3">
             <p className="font-semibold text-xl text-[#266191]">Bộ lọc</p>
-            <Form>
+            <Form
+              form={form}
+              initialValues={{
+                filterValue: "outgoing orders",
+              }}
+            >
               <Form.Item noStyle className="w-full" name="filterValue">
                 <Select
+                  onChange={(value) => setFilterValue(value)}
                   placeholder="Chọn trạng thái"
                   size="large"
                   options={[
                     {
-                      value: "jack",
-                      label: "Chờ xác nhận",
+                      value: "outgoing orders",
+                      label: "Đơn gốc từ điểm",
                     },
                     {
-                      value: "lucy",
-                      label: "Đã đến điểm Giao dịch đích",
+                      value: "incoming orders",
+                      label: "Đơn hàng đến",
                     },
                     {
                       value: "tom",
@@ -227,7 +326,7 @@ const TransactionOrderTable = () => {
           />
         </div>
         <Table
-          loading={false}
+          loading={isLoading}
           rowSelection={{
             ...rowSelection,
           }}
@@ -239,10 +338,15 @@ const TransactionOrderTable = () => {
           pagination={{ pageSize: 10, position: ["bottomCenter"] }}
           title={() => (
             <div className="flex items-center justify-between">
-              <Typography.Title className="mb-0" level={3}>
-                Danh sách đơn hàng
-              </Typography.Title>
-
+              <div className="flex items-center">
+                <span
+                  onClick={() => setIsReloading(!isReloading)}
+                  className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
+                >
+                  <SyncOutlined spin={isReloading} className="text-[18px]" />
+                </span>
+                <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+              </div>
               <CreateOrderModal
                 isNewOrderCreated={isNewOrderCreated}
                 setIsNewOrderCreated={setIsNewOrderCreated}
@@ -261,9 +365,16 @@ const TransactionOrderTable = () => {
           )}
         />
         {/* <TrackingOrderInfo /> */}
-        <div className="w-full">
-          <p className="font-semibold text-xl text-[#266191]">{`Đã chọn: ${selectedRows.length}`}</p>
+        <div className="w-full flex items-center justify-between my-2">
+          <p className="font-semibold text-xl text-[#266191] bg-neutral-300 p-2 rounded-lg">
+            Đã chọn:{" "}
+            <span className="text-orange-600">
+              {selectedRows.length}/{allOrders.length}
+            </span>
+          </p>
           <Button
+            loading={isLoading}
+            onClick={handleOnConfirm}
             htmlType="submit"
             className="float-right"
             type="primary"

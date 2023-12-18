@@ -1,4 +1,4 @@
-import { SendOutlined } from "@ant-design/icons";
+import { SendOutlined, SyncOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -15,7 +15,7 @@ import { NavLink } from "react-router-dom";
 import StatusLabel from "../../statusLabel";
 
 import {
-  getOrderByGatheringDep,
+  getOrderByCondition,
   updateOrder,
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
@@ -26,6 +26,7 @@ const GatheringOrderTable = () => {
   const [form] = Form.useForm();
   const [isRowSelected, setIsRowSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
   const currentUser = useStoreState((state) => state.currentUser);
   const [allOrders, setAllOrders] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -35,7 +36,6 @@ const GatheringOrderTable = () => {
   const [ordersData, setOrdersData] = useState([]);
   const [isOrderUpdated, setIsOrderUpdated] = useState(false);
   const [currentDepInfo, setCurrentDepInfo] = useState({});
-  const [description, setDescription] = useState("");
 
   useEffect(() => {
     const fetchCurrentDepInfo = async () => {
@@ -47,6 +47,7 @@ const GatheringOrderTable = () => {
     fetchCurrentDepInfo();
   }, []);
   console.log("selectedRows: ", selectedRows);
+
   // Handle format selected orders to send to server
   const handleFormatConfirmOrders = (selectedRows) => {
     const formattedOrders = selectedRows.map((order) => {
@@ -70,18 +71,40 @@ const GatheringOrderTable = () => {
   const handleFormatTransferOrders = (selectedRows) => {
     const formattedOrders = selectedRows.map((order) => {
       if (
-        order.status === "accepted" &&
-        order.current_department._id === currentUser.workDepartment._id
+        (order.status === "accepted" &&
+          order.current_department._id === currentUser.workDepartment._id) ||
+        (order.status === "rejected" &&
+          order.current_department._id === currentUser.workDepartment._id)
       ) {
         return {
           orderId: order._id,
-          next_department: order.next_department,
-          description: `Đơn hàng đang đến ${order.description}`,
+          next_department: order.next_department._id || order.next_department,
+          description: `Đơn hàng đang đến ${
+            order.next_department.name || order.description
+          }`,
         };
       }
     });
     return {
       type: "transfer",
+      orders: [...formattedOrders],
+    };
+  };
+
+  const handleFormatRejectOrders = (selectedRows) => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "processing" &&
+        order.next_department._id === currentUser.workDepartment._id
+      ) {
+        return {
+          orderId: order._id,
+          description: `Đơn hàng giao đến ${currentUser.workDepartment.name} thất bại`,
+        };
+      }
+    });
+    return {
+      type: "reject",
       orders: [...formattedOrders],
     };
   };
@@ -111,7 +134,7 @@ const GatheringOrderTable = () => {
       if (ordersData.orders.length > 0 && ordersData.type === "transfer") {
         const res = await updateOrder(ordersData);
         console.log("update order: ", res);
-        if (res.status === 200) {
+        if (res?.status === 200) {
           messageApi.success("Xác nhận đơn hàng thành công");
           setIsLoading(false);
           setIsOrderUpdated(!isOrderUpdated);
@@ -124,20 +147,41 @@ const GatheringOrderTable = () => {
     }
   };
 
+  // Handle when user clicks reject button
+  const handleOnReject = async () => {
+    setIsLoading(true);
+    const ordersData = handleFormatRejectOrders(selectedRows);
+    console.log(ordersData);
+    if (ordersData.orders.length > 0 && ordersData.type === "reject") {
+      const res = await updateOrder(ordersData);
+      console.log("update order: ", res);
+      if (res?.status === 200) {
+        messageApi.success("Từ chối đơn hàng thành công");
+        setIsLoading(false);
+        setIsOrderUpdated(!isOrderUpdated);
+      } else {
+        messageApi.error("Từ chối đơn hàng thất bại");
+        setIsLoading(false);
+      }
+    }
+  };
+
   // Fetch all orders by department id that have current department as this department
   useEffect(() => {
     const fetchOrderByGatheringDep = async (data) => {
       setIsLoading(true);
-      const res = await getOrderByGatheringDep(data);
+      const res = await getOrderByCondition(data);
 
       if (res?.status === 200) {
         setIsLoading(false);
+        setIsReloading(false);
         setAllOrders(res.data.orders);
         setIsRowSelected(false);
         setSelectedRows([]);
         setSelectedRowKeys([]);
       } else {
         setIsLoading(false);
+        setIsReloading(false);
         messageApi.error("Lấy danh sách đơn hàng thất bại");
       }
     };
@@ -158,7 +202,13 @@ const GatheringOrderTable = () => {
       };
       fetchOrderByGatheringDep(data);
     }
-  }, [currentUser.workDepartment._id, messageApi, isOrderUpdated, filterValue]);
+  }, [
+    currentUser.workDepartment._id,
+    messageApi,
+    isOrderUpdated,
+    filterValue,
+    isReloading,
+  ]);
 
   const columns = [
     {
@@ -215,29 +265,29 @@ const GatheringOrderTable = () => {
       },
       width: "16%",
     },
-    {
-      key: "action",
-      render: (value, record) => (
-        <div
-          className={`flex items-center ${
-            record.status === "rejected" ? "justify-between" : "justify-center"
-          }`}
-        >
-          {record?.status === "rejected" && (
-            <Tooltip
-              title={<span className="text-lg text-black">Gửi lại</span>}
-              color="white"
-            >
-              <span className="text-lg cursor-pointer hover:text-[#1e91cf]">
-                <SendOutlined />
-              </span>
-            </Tooltip>
-          )}
-        </div>
-      ),
-      width: "3%",
-      fixed: "right",
-    },
+    // {
+    //   key: "action",
+    //   render: (value, record) => (
+    //     <div
+    //       className={`flex items-center ${
+    //         record.status === "rejected" ? "justify-between" : "justify-center"
+    //       }`}
+    //     >
+    //       {record?.status === "rejected" && (
+    //         <Tooltip
+    //           title={<span className="text-lg text-black">Gửi lại</span>}
+    //           color="white"
+    //         >
+    //           <span className="text-lg cursor-pointer hover:text-[#1e91cf]">
+    //             <SendOutlined />
+    //           </span>
+    //         </Tooltip>
+    //       )}
+    //     </div>
+    //   ),
+    //   width: "3%",
+    //   fixed: "right",
+    // },
   ];
 
   // Handle format linked departments so they don't include send department of order
@@ -262,8 +312,9 @@ const GatheringOrderTable = () => {
       render: (value, record) => {
         return (
           <Form>
-            <Form.Item>
+            <Form.Item noStyle>
               <Select
+                className="w-full"
                 disabled={
                   !selectedRows.map((order) => order._id).includes(record._id)
                 }
@@ -326,6 +377,7 @@ const GatheringOrderTable = () => {
             !newSelectedRows.some((newRow) => oldRow._id === newRow._id)
         );
 
+        console.log("removedRows", removedRows);
         // Return the new selected rows, excluding the removed rows
         return prevSelectedRows
           .concat(addedRows)
@@ -334,7 +386,6 @@ const GatheringOrderTable = () => {
       setSelectedRowKeys(selectedRowKeys);
       if (selectedRows.length > 0) {
         setIsRowSelected(true);
-        // setSelectedRows(selectedRows);
       } else {
         setIsRowSelected(false);
         setSelectedRows([]);
@@ -345,10 +396,9 @@ const GatheringOrderTable = () => {
       // Disable check box when order is processing and being transported to another department
       disabled:
         record.status === "processing" &&
-        record.next_department !== currentUser.workDepartment._id,
-      // || record.next_department === null,
-      // &&
-      // record.next_department !== currentUser.workDepartment._id,
+        record.next_department !== currentUser.workDepartment._id &&
+        filterValue === "outgoing orders",
+
       // Column configuration not to be checked
       status: record.status,
     }),
@@ -374,7 +424,7 @@ const GatheringOrderTable = () => {
                   options={[
                     {
                       value: "incoming orders",
-                      label: "Chờ xác nhận",
+                      label: "Đơn đang đến",
                     },
                     {
                       value: "outgoing orders",
@@ -406,10 +456,14 @@ const GatheringOrderTable = () => {
           scroll={{ x: 1600 }}
           pagination={{ pageSize: 10, position: ["bottomCenter"] }}
           title={() => (
-            <div className="flex items-center justify-between">
-              <Typography.Title className="mb-0" level={3}>
-                Danh sách đơn hàng
-              </Typography.Title>
+            <div className="flex items-center">
+              <span
+                onClick={() => setIsReloading(!isReloading)}
+                className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
+              >
+                <SyncOutlined spin={isReloading} className="text-[18px]" />
+              </span>
+              <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
             </div>
           )}
         />
@@ -421,20 +475,42 @@ const GatheringOrderTable = () => {
               {selectedRows.length}/{allOrders.length}
             </span>
           </p>
-          <Button
-            loading={isLoading}
-            onClick={handleOnConfirm}
-            htmlType="submit"
-            className="float-right"
-            type="primary"
-            disabled={
-              !isRowSelected ||
-              selectedRows.map((item) => item?.next_department).includes(null)
-            }
-            size="large"
-          >
-            Xác nhận
-          </Button>
+          <div className="flex items-center gap-x-3">
+            {filterValue === "incoming orders" && (
+              <Button
+                // loading={isLoading}
+                onClick={handleOnReject}
+                htmlType="submit"
+                className="float-right"
+                type="primary"
+                danger
+                disabled={
+                  !isRowSelected ||
+                  selectedRows
+                    .map((item) => item?.next_department)
+                    .includes(null)
+                }
+                size="large"
+              >
+                Từ chối
+              </Button>
+            )}
+
+            <Button
+              loading={isLoading && ordersData.type === "confirm"}
+              onClick={handleOnConfirm}
+              htmlType="submit"
+              className="float-right"
+              type="primary"
+              disabled={
+                !isRowSelected ||
+                selectedRows.map((item) => item?.next_department).includes(null)
+              }
+              size="large"
+            >
+              Xác nhận
+            </Button>
+          </div>
         </div>
       </div>
     </>

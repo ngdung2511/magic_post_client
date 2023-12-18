@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import StatusLabel from "../statusLabel";
 import { useEffect, useState } from "react";
 import { getOrderById } from "../../repository/order/order";
-import TrackingOrderInfo from "../trackingOrderInfo/TrackingOrderInfo";
+
 const OrderDetailPage = () => {
   const [orderData, setOrderData] = useState(null);
   const { id: orderId } = useParams();
@@ -168,7 +168,6 @@ const OrderDetailPage = () => {
           items={orderInfo}
         />
       </div>
-      <TrackingOrderInfo />
     </div>
   );
 };

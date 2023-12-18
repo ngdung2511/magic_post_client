@@ -160,7 +160,7 @@ const OrderInfoTable = ({ orderInfo }) => {
           </tr>
           <tr>
             <td className="px-6 py-3 border-b border-r border-gray-200">
-              Thời gian gửi hàng:
+              Ngày gửi hàng:
             </td>
             <td className="px-6 py-3 border-b border-gray-200">
               {formatTime(createdAt)}
@@ -168,7 +168,7 @@ const OrderInfoTable = ({ orderInfo }) => {
           </tr>
           <tr>
             <td className="px-6 py-3 border-b border-r border-gray-200">
-              Thời gian gửi hàng:
+              Ngày giao hàng dự kiến:
             </td>
             <td className="px-6 py-3 border-b border-gray-200">
               {formatTime(expectedDate)}
