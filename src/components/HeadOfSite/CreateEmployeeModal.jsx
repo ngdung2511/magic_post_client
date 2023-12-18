@@ -16,6 +16,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(false);
+  const [image, setImage] = useState(null);
   const currentUser = useStoreState((state) => state.currentUser);
   // Get all employees from API
   const fetchEmployees = useStoreActions((actions) => actions.fetchEmployeesByDepartment);
@@ -43,12 +44,14 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
       phone: values.employeePhoneNumber,
     };
     try {
-      const res = await createEmployee(data);
+      const res = await createEmployee(data, image);
       if (res.status === 201) {
         fetchEmployees(currentUser.departmentId);
         messageApi.success("Tạo nhân viên thành công");
         setIsLoading(false);
         setIsModalOpen(false);
+        setImage(null);
+        setPreviewImage('');
         form.resetFields();
       }
     } catch (error) {
@@ -65,24 +68,20 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
   };
 
   // Handle upload image
-  const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const handlePreview = async (file) => {
     console.log(file);
   };
   const handleChange = (info) => {
     console.log(info);
+    setImage(info.fileList[0].originFileObj);
+    console.log(image);
     getBase64(info.fileList[0].originFileObj, (imageUrl) => {
       setPreviewImage(imageUrl);
     });
-    
-  }
-  const beforeUpload = (file) => {
-    
   }
   const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
       <div
         style={{
           marginTop: 8,
@@ -120,7 +119,6 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
           listType="picture-circle"
           className="avatar-uploader"
           showUploadList={false}
-          beforeUpload={beforeUpload}
           onChange={handleChange}
           onPreview={handlePreview}>
           {previewImage ? (

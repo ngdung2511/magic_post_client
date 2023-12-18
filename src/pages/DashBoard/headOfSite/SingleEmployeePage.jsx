@@ -4,7 +4,7 @@ import {
     ShoppingCartOutlined,
     TeamOutlined,
   } from "@ant-design/icons";
-  import { Button, Card, Descriptions, Divider, Spin, Statistic } from "antd";
+  import { Button, Card, Descriptions, Divider, Spin, Statistic, Avatar } from "antd";
   import { useEffect, useState } from "react";
   import { Link, useParams } from "react-router-dom";
   import EditEmployeeModal from "../../../components/HeadOfSite/EditEmployeeModal";
@@ -54,8 +54,8 @@ import {
       },
       {
         key: "3",
-        label: "Địa chỉ",
-        children: currentEmployee.address,
+        label: "Giới tính",
+        children: currentEmployee.gender === 'male' ? "Nam" : "Nữ",
       },
       {
         key: "4",
@@ -99,21 +99,14 @@ import {
           </div>
         </div>
         <Divider />
+        <Avatar
+          size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
+          src={currentEmployee.avatarUrl? currentEmployee.avatarUrl : "https://i.imgur.com/9AZ2Xze.png"}
+        />
         <div className="w-full">
           <div>
             <div className="w-full">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                <Card>
-                  <Statistic
-                    
-                    title={
-                      <p className="text-lg font-medium text-neutral-600">
-                        Chức vụ
-                      </p>
-                    }
-                    value={currentEmployee?.role === "gatheringStaff" ? "Nhân viên tập kết" : "Nhân viên giao dịch"}
-                  />
-                </Card>
                 <Card>
                   <Statistic
                     prefix={

@@ -3,12 +3,24 @@ import UtilConstants from "../../shared/constants";
 import { utilFuncs } from "../../utils/utils";
 import { useStoreActions, useStoreState } from "../../store/hook";
 
-export const createEmployee = async (user) => {
+export const createEmployee = async (user, image) => {
     try {
+        const formData = new FormData();
+        formData.append('image', image);
+        formData.append('name', user.name);
+        formData.append('email', user.email);
+        formData.append('phone', user.phone);
+        formData.append('role', user.role);
+        formData.append('departmentId', user.departmentId._id);
+        formData.append('password', user.password);
+        formData.append('gender', user.gender);
+
         const header = {
-            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`,
+            'Content-Type': 'multipart/form-data'
         }
-        const res = await axios.post(UtilConstants.baseUrl + '/user', user, { headers: header });
+        
+        const res = await axios.post(UtilConstants.baseUrl + '/user', formData, { headers: header });
 
         return res;
     } catch (error) {
@@ -24,15 +36,12 @@ export const getEmployees = async () => {
         throw error;
     }
 }
-export const getEmployeeByDepartmentId = async (departmentId) => {
+export const getEmployeeByDepartmentId = async (department) => {
     try {
-        const query = {
-            condition: {
-                departmentId: departmentId 
-            }
+        const condition = {
+           departmentId : department._id
         };
-        
-        return await axios.get(UtilConstants.baseUrl + `/users`, { params: query });
+        return await axios.get(UtilConstants.baseUrl + `/users?condition=${JSON.stringify(condition)}`);
     } catch (error) {
         console.log('Error:', error);
         throw error;

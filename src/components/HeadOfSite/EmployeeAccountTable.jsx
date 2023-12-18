@@ -38,7 +38,8 @@ const EmployeeAccountTable = () => {
     clearFilters();
     setSearchText("");
   };
-  // Handle delete department
+
+  // Handle delete employee
   const handleDelete = async (id) => {
     setIsLoading(true);
     try {
@@ -49,7 +50,6 @@ const EmployeeAccountTable = () => {
         fetchEmployees(currentUser.departmentId);
       }
     } catch (error) {
-      // console.log(error);
       messageApi.error("Đã có lỗi xảy ra");
     }
   };
@@ -146,18 +146,9 @@ const EmployeeAccountTable = () => {
   });
   const columns = [
     {
-      key: "1",
-      title: "id",
-      dataIndex: "_id",
-      width: "6%",
-      className: "text-center font-bold",
-      sorter: (a, b) => a.id - b.id,
-    },
-    {
-      key: "2",
       title: "Tên nhân viên",
       dataIndex: "name",
-      width: "20%",
+      width: "15%",
       render: (value, record) => {
         console.log(record);
         return (
@@ -168,45 +159,25 @@ const EmployeeAccountTable = () => {
       },
     },
     {
-      key: "3",
+      title: "Giới tính",
+      dataIndex: "gender",
+      render: (value) => {
+        return <p>{value === 'male' ? 'Nam' : 'Nữ'}</p>;
+      },
+      width: "8%",
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      width: "10%",
+    },
+    {
       title: "Email",
       dataIndex: "email",
-      width: "20%",
+      width: "15%",
     },
     {
-      key: "4",
-      title: "Địa chỉ nơi làm việc",
-      dataIndex: "departmentId",
-      filters: [
-        {
-          text: "Hồ Chí Minh",
-          value: "Thành phố Hồ Chí Minh",
-          children: [
-            {
-              text: "Quận 1",
-              value: "Quận 1",
-            },
-          ],
-        },
-        {
-          text: "Hà Nội",
-          value: "Thành phố Hà Nội",
-        },
-      ],
-
-      filterMode: "tree",
-      filterSearch: true,
-      onFilter: (value, record) => {
-        const address = record.address;
-        console.log(value, address.split(", "));
-        return address.includes(value);
-      },
-
-      width: "30%",
-    },
-    {
-      key: "5",
-      title: "Hành động",
+      fixed: "right",
       className: "text-center",
       render: (_, record) => {
         return (
@@ -227,7 +198,7 @@ const EmployeeAccountTable = () => {
           </Popconfirm>
         );
       },
-      width: "10%",
+      width: "4%",
     },
   ];
   return (
@@ -261,6 +232,7 @@ const EmployeeAccountTable = () => {
           </div>
         )}
       />
+      <span className="text-2xl font-semibold">Điểm {currentUser.role === 'headTransaction' ? 'Giao Dịch' : 'Tập Kết'} {currentUser.departmentId.address} </span>
     </div>
   );
 };
