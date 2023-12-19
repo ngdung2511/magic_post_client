@@ -259,7 +259,7 @@ const EmployeeAccountTable = () => {
         )}
       />
       
-      <span className="text-2xl font-semibold">Điểm {currentUser.role === 'headTransaction' ? 'Giao Dịch' : 'Tập Kết'} {currentUser.departmentId.address} </span>
+      <span className="text-2xl font-semibold">Điểm {currentUser.role === 'headTransaction' ? 'Giao Dịch' : 'Tập Kết'} {currentUser.workDepartment.address} </span>
     </div>
   );
 };

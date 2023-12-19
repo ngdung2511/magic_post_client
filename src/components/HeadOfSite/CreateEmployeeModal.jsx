@@ -130,7 +130,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
             }}
           />) : (uploadButton)}
           </Upload>
-          <h3 className="py-3 text-xl font-semibold">Nơi làm việc: {currentUser.departmentId.address}</h3>
+          <h3 className="py-3 text-xl font-semibold">Nơi làm việc: {currentUser.workDepartment.address}</h3>
           <div className="grid w-full col-span-8 gap-x-6">
             <div className="col-span-4">
               <Form.Item name="employeeName">

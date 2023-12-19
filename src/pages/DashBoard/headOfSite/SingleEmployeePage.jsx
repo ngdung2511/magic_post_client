@@ -98,7 +98,7 @@ import {
               
             </h1>
             <Button
-              disabled={currentUser.departmentId._id !== currentEmployee.departmentId._id}
+              disabled={currentUser.workDepartment._id !== currentEmployee.departmentId._id}
               type="primary"
               size="large"
               icon={<EditOutlined />}
