@@ -12,7 +12,6 @@ import {
   Select,
   Table,
   Tooltip,
-  Typography,
   message,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -102,7 +101,12 @@ const TransactionOrderTable = () => {
       };
       fetchOrderByTransactionDep(data);
     }
-  }, [filterValue, currentUser.workDepartment._id, isReloading]);
+  }, [
+    filterValue,
+    currentUser.workDepartment._id,
+    isReloading,
+    isOrderUpdated,
+  ]);
 
   // Handle format selected orders to send to server
   const handleFormatResendOrder = () => {
@@ -124,6 +128,24 @@ const TransactionOrderTable = () => {
     };
   };
 
+  const handleFormatRejectOrders = (selectedRows) => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "processing" &&
+        order.next_department._id === currentUser.workDepartment._id
+      ) {
+        return {
+          orderId: order._id,
+          description: `Đơn hàng giao đến ${currentUser.workDepartment.name} thất bại`,
+        };
+      }
+    });
+    return {
+      type: "reject",
+      orders: [...formattedOrders],
+    };
+  };
+
   const handleOnConfirm = async () => {
     setIsLoading(true);
     console.log("order data", ordersData);
@@ -141,6 +163,27 @@ const TransactionOrderTable = () => {
           messageApi.error("Xác nhận đơn hàng thất bại");
           setIsLoading(false);
         }
+      }
+    }
+  };
+
+  // Handle when user clicks reject button
+  const handleOnReject = async () => {
+    setIsLoading(true);
+    const ordersData = handleFormatRejectOrders(selectedRows);
+    console.log(ordersData);
+    if (ordersData.orders.length > 0 && ordersData.type === "reject") {
+      const res = await updateOrder(ordersData);
+      console.log("update order: ", res);
+      if (res?.status === 200) {
+        messageApi.success("Từ chối đơn hàng thành công");
+        setIsLoading(false);
+        setIsOrderUpdated((prevState) => !prevState);
+        setIsRowSelected(false);
+        setSelectedRows([]);
+      } else {
+        messageApi.error("Từ chối đơn hàng thất bại");
+        setIsLoading(false);
       }
     }
   };
@@ -272,7 +315,8 @@ const TransactionOrderTable = () => {
     getCheckboxProps: (record) => ({
       // Disable check box when order is processing and being transported to another department
       disabled:
-        record.status === "processing" ||
+        (record.status === "processing" &&
+          record.next_department._id !== currentDepInfo._id) ||
         record.status === "delivered" ||
         record.status === "accepted",
       // &&
@@ -306,7 +350,7 @@ const TransactionOrderTable = () => {
                     },
                     {
                       value: "incoming orders",
-                      label: "Đơn hàng đến",
+                      label: "Đơn đang đến",
                     },
                     {
                       value: "tom",
@@ -372,17 +416,38 @@ const TransactionOrderTable = () => {
               {selectedRows.length}/{allOrders.length}
             </span>
           </p>
-          <Button
-            loading={isLoading}
-            onClick={handleOnConfirm}
-            htmlType="submit"
-            className="float-right"
-            type="primary"
-            disabled={!isRowSelected}
-            size="large"
-          >
-            Xác nhận
-          </Button>
+          <div className="flex items-center gap-x-3">
+            {filterValue === "incoming orders" && (
+              <Button
+                // loading={isLoading}
+                onClick={handleOnReject}
+                htmlType="submit"
+                className="float-right"
+                type="primary"
+                danger
+                disabled={
+                  !isRowSelected ||
+                  selectedRows
+                    .map((item) => item?.next_department)
+                    .includes(null)
+                }
+                size="large"
+              >
+                Từ chối
+              </Button>
+            )}
+            <Button
+              // loading={isLoading}
+              onClick={handleOnConfirm}
+              htmlType="submit"
+              className="float-right"
+              type="primary"
+              disabled={!isRowSelected}
+              size="large"
+            >
+              Xác nhận
+            </Button>
+          </div>
         </div>
       </div>
     </>

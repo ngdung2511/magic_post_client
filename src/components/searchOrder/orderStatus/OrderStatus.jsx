@@ -11,9 +11,17 @@ const OrderStatus = ({ orderInfo }) => {
   const { description, status } = orderInfo;
   const formatOrderDesc = (description) => {
     const res = description.map((item) => {
+      let color = "";
+      if (item.description.includes("đã")) {
+        color = "green";
+      } else if (item.description.includes("đang")) {
+        color = "blue";
+      } else if (item.description.includes("thất bại")) {
+        color = "red";
+      }
       return {
         label: <p className="font-semibold text-lg">{formatTime(item.date)}</p>,
-        color: "green",
+        color,
         children: (
           <>
             <p className="text-[16px]">{item.description}</p>

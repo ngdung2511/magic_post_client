@@ -217,7 +217,19 @@ const GatheringOrderTable = () => {
       key: "orderCode",
       render: (value, record) => {
         return (
-          <NavLink to={`/employee/order-detail/${record._id}`}>{value}</NavLink>
+          <Tooltip
+            title={
+              // Check if order is rejected and is in transit to linked department
+              record.status === "rejected" &&
+              record.next_department._id ===
+                currentDepInfo?.linkDepartments[0]?.departmentId &&
+              "Chọn đơn để giao lại!"
+            }
+          >
+            <NavLink to={`/employee/order-detail/${record._id}`}>
+              {value}
+            </NavLink>
+          </Tooltip>
         );
       },
     },
