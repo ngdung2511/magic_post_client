@@ -13,26 +13,50 @@ const EditEmployeeModal = ({
 }) => {
   
   const [form] = Form.useForm();
-  // Handle form logic
-  const employeeForm = Form.useWatch("employeeForm", {
-    form,
-    preserve: true,
-  });
-  
-  const inputRef = useRef(null);
   const [messageApi, contextHolder] = message.useMessage();
+  const [departmentLocation, setDepartmentLocation] = useState(currentEmployee.departmentId.address);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataChanged, setIsDataChanged] = useState(false);
-
+  // Get all departments from API
+  const fetchDepartments = useStoreActions(
+    (actions) => actions.fetchDepartments
+  );
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+  const departments = useStoreState((state) => state.departments);
+  // Format departments to options for Select input
+  let formattedDepOptions = [];
+    formattedDepOptions = departments
+      .map((item) => {
+        return {
+          label: item.name,
+          value: item._id,
+          type: item.type,
+        };
+      });
+  // Handle 
+  const handleDepartmentChange = (value) => {
+    let depart = departments.filter((item) => {
+      return item._id === value
+    })
+    setIsDataChanged(true);
+    setDepartmentLocation(depart[0].address);
+  };
   // Handle submit form
   const onHandleFinish = async (values) => {
-    console.log(values);
+    //validation info here
+
+    let depart = formattedDepOptions.filter(o => {
+      return o.value === values.departmentId
+    })
     setIsLoading(true);
     const data = {
       name: values.name,
       email: values.email,
       phone: values.phone,
-      role: values.role === "Nhân viên tập kết" ? "gatheringStaff" : "transactionStaff",
+      departmentId: values.departmentId,
+      role: depart[0].type === "Gathering" ? "gatheringStaff" : "transactionStaff",
       gender: values.employeeGender === 'Nam' ? 'male' : 'female',
     };
     try {
@@ -83,38 +107,7 @@ const EditEmployeeModal = ({
                 >
                   <Input size="large" placeholder="Tên nhân viên" type="text" />
                 </Form.Item>
-                <Form.Item
-                  initialValue={currentEmployee.role === "gatheringStaff" ? "Nhân viên tập kết" : "Nhân viên giao dịch"}
-                  name="role"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng chọn chức vụ",
-                    },
-                  ]}
-                >
-                  <Select
-                    size="large"
-                    placeholder="Chức vụ"
-                    allowClear
-                    options={[
-                      {
-                        value: "gatheringStaff",
-                        label: "Nhân viên tập kết",
-                      },
-                      {
-                        value: "transactionStaff",
-                        label: "Nhân viên giao dịch",
-                      },
-                    ]}
-                  />
-                </Form.Item>
-              </div>
-              <div className="flex items-center gap-x-3">
-              <Form.Item name="employeeAddress" className="grow" initialValue={currentEmployee.address}>
-                <Input size="large" placeholder="Địa chỉ nơi cư trú" type="text" />
-              </Form.Item>
-              <Form.Item name="employeeGender" rules={[{ required: true }]} 
+                <Form.Item onChange={() => setIsDataChanged(true)} name="employeeGender" rules={[{ required: true }]} 
                 initialValue={currentEmployee.gender === 'male' ? "Nam" : "Nữ"}>
                 <Select
                   size="large"
@@ -137,7 +130,17 @@ const EditEmployeeModal = ({
               </Form.Item>
               </div>
               <div className="flex items-center gap-x-3">
+              <Form.Item 
+                onChange={() => setIsDataChanged(true)} 
+                name="employeeAddress" 
+                className="grow" 
+                initialValue={currentEmployee.address}>
+                <Input size="large" placeholder="Địa chỉ nơi cư trú" type="text" />
+              </Form.Item>
+              </div>
+              <div className="flex items-center gap-x-3">
                 <Form.Item
+                  onChange={() => setIsDataChanged(true)}
                   initialValue={currentEmployee.phone}
                   name="phone"
                   rules={[
@@ -150,6 +153,7 @@ const EditEmployeeModal = ({
                   <Input size="large" placeholder="Nhập số điện thoại" />
                 </Form.Item>
                 <Form.Item
+                  onChange={() => setIsDataChanged(true)}
                   initialValue={currentEmployee.email}
                   name="email"
                   rules={[
@@ -164,8 +168,9 @@ const EditEmployeeModal = ({
               </div>
               <div className="flex items-center gap-x-3">
                 <Form.Item
-                  initialValue={currentEmployee.departmentId.address}
-                  name="nơi làm việc"
+                  onChange={() => setIsDataChanged(true)}
+                  initialValue={currentEmployee.departmentId.name}
+                  name="departmentId"
                   rules={[
                     {
                       required: true,
@@ -173,8 +178,20 @@ const EditEmployeeModal = ({
                     },
                   ]}
                 >
-                  <Input size="large" placeholder="Nơi làm" type="text" />
+                  <Select
+                  onChange={handleDepartmentChange}
+                  size="large"
+                  placeholder={"Chọn điểm làm việc"}
+                  optionFilterProp="children"
+                  options={formattedDepOptions}
+                />
                 </Form.Item>  
+                <Form.Item
+                  name="departmentLocation"
+                  className="grow"
+                >
+                  {departmentLocation}
+                </Form.Item>
               </div>
             </div>
 

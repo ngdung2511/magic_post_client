@@ -1,15 +1,16 @@
 import {
   DeleteOutlined,
+  LoadingOutlined,
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Input, Popconfirm, Space, Table, Typography, message } from "antd";
+import { Button, Input, Popconfirm, Space, Table, Typography, Upload, message } from "antd";
 import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import { NavLink } from "react-router-dom";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import CreateEmployeeModal from "./CreateEmployeeModal";
-import { deleteEmployee } from "../../repository/employee/employee";
+import { deleteEmployee, createEmployeeFromFile } from "../../repository/employee/employee";
 
 const EmployeeAccountTable = () => {
   const currentUser = useStoreState((state) => state.currentUser);
@@ -38,6 +39,22 @@ const EmployeeAccountTable = () => {
     clearFilters();
     setSearchText("");
   };
+  const handleUpload = async (file) => {
+    setIsLoading(true);
+    console.log(file);
+    try {
+      const res = await createEmployeeFromFile(file);
+      if (res.status === 201) {
+        messageApi.success("Thêm nhân viên thành công");
+        setIsLoading(false);
+        fetchEmployees(currentUser.departmentId);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+      messageApi.error("Đã có lỗi xảy ra");
+    }
+  }
 
   // Handle delete employee
   const handleDelete = async (id) => {
@@ -150,7 +167,6 @@ const EmployeeAccountTable = () => {
       dataIndex: "name",
       width: "15%",
       render: (value, record) => {
-        console.log(record);
         return (
           <NavLink to={`/head/manage-account/${record._id}`}>
             {value}
@@ -221,17 +237,28 @@ const EmployeeAccountTable = () => {
               isModalOpen={isModalOpen}
               setIsModalOpen={setIsModalOpen}
             />
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              icon={<PlusOutlined />}
-              type="primary"
-              size="large"
-            >
-              Thêm nhân viên
-            </Button>
+            <div className="flex items-center gap-x-3">
+              <Upload action={handleUpload} fileList={null}>
+                <Button
+                icon={isLoading ? <LoadingOutlined/> : <PlusOutlined />}
+                type="primary"
+                size="large">
+                Import file
+                </Button>
+              </Upload>
+            
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                icon={<PlusOutlined />}
+                type="primary"
+                size="large">
+                Thêm nhân viên
+              </Button>
+            </div>
           </div>
         )}
       />
+      
       <span className="text-2xl font-semibold">Điểm {currentUser.role === 'headTransaction' ? 'Giao Dịch' : 'Tập Kết'} {currentUser.departmentId.address} </span>
     </div>
   );

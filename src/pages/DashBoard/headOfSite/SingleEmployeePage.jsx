@@ -4,17 +4,20 @@ import {
     ShoppingCartOutlined,
     TeamOutlined,
   } from "@ant-design/icons";
-  import { Button, Card, Descriptions, Divider, Spin, Statistic, Avatar } from "antd";
+  import { Button, Card, Descriptions, Divider, Spin, Statistic, Avatar, Upload } from "antd";
   import { useEffect, useState } from "react";
   import { Link, useParams } from "react-router-dom";
   import EditEmployeeModal from "../../../components/HeadOfSite/EditEmployeeModal";
   import { useStoreActions, useStoreState } from "../../../store/hook";
+  import { updateEmployee } from "../../../repository/employee/employee";
   
   const SingleEmployeePage = () => {
     const { id: employeeId } = useParams();
     const [isOpenEditEmployeeModal, setIsOpenEditEmployeeModal] = useState(false);
     const [currentEmployee, setCurrentEmployee] = useState(null);
-    console.log("employee: ", currentEmployee);
+    const [isEmployeeChanged, setIsEmployeeChanged] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const currentUser = useStoreState((state) => state.currentUser);
     // Get department by id
     const fetchUserById = useStoreActions(
       (actions) => actions.fetchUserById
@@ -23,18 +26,25 @@ import {
       async function fetchData() {
         const res = await fetchUserById(employeeId);
         setCurrentEmployee(res.user);
+        setIsEmployeeChanged(false);
       }
       fetchData();
-    }, [employeeId, fetchUserById]);
+    }, [employeeId, fetchUserById, isEmployeeChanged]);
   
-    // Get all departments from API
-    const fetchDepartments = useStoreActions(
-      (actions) => actions.fetchDepartments
-    );
-    useEffect(() => {
-      fetchDepartments();
-    }, []);
-    const departments = useStoreState((state) => state.departments);
+    const changeAvatar = async (file) => {
+      setIsLoading(true);
+      try {
+        const res = await updateEmployee(currentEmployee._id, currentEmployee, file);
+        if (res.status === 200) {
+          setIsLoading(false);
+          console.log(res);
+          setIsEmployeeChanged(true);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        console.log('co loi', error);
+      }
+    };
     if (!currentEmployee)
     return (
       <div className="flex items-center justify-center w-full h-screen">
@@ -73,7 +83,6 @@ import {
         children: currentEmployee.department,
       }
     ];
-  
     return (
       <div className="w-full h-full">
         <div className="flex items-center w-full">
@@ -89,6 +98,7 @@ import {
               
             </h1>
             <Button
+              disabled={currentUser.departmentId._id !== currentEmployee.departmentId._id}
               type="primary"
               size="large"
               icon={<EditOutlined />}
@@ -99,10 +109,12 @@ import {
           </div>
         </div>
         <Divider />
-        <Avatar
-          size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-          src={currentEmployee.avatarUrl? currentEmployee.avatarUrl : "https://i.imgur.com/9AZ2Xze.png"}
-        />
+        <Upload action={changeAvatar} fileList={null}>
+          <Avatar
+          size={{ xs: 24, sm: 48, md: 60, lg: 80, xl: 120, xxl: 300 }}
+          src={!isLoading? currentEmployee.avatarUrl : "https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca.gif"}/>
+        </Upload>
+        
         <div className="w-full">
           <div>
             <div className="w-full">
@@ -138,6 +150,7 @@ import {
               currentEmployee={currentEmployee}
               isOpenEditEmployeeModal={isOpenEditEmployeeModal}
               setIsOpenEditEmployeeModal={setIsOpenEditEmployeeModal}
+              setIsEmployeeChanged={setIsEmployeeChanged}
             />
           </div>
         </div>

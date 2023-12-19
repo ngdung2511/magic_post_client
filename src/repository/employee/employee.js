@@ -28,6 +28,22 @@ export const createEmployee = async (user, image) => {
         throw error;
     }
 }
+export const createEmployeeFromFile = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`,
+            'Content-Type': 'multipart/form-data'
+        }
+        const res = await axios.post(UtilConstants.baseUrl + '/users/import', formData, { headers: header });
+
+        return res;
+    } catch (error) {
+        console.log('Error:', error);
+        throw error;
+    }
+}
 export const getEmployees = async () => {
     try {
         return await axios.get(UtilConstants.baseUrl + '/users');
@@ -63,9 +79,20 @@ export const deleteEmployee = async (userId) => {
         throw error;
     }
 }
-export const updateEmployee = async (userId, userData) => {
+export const updateEmployee = async (userId, user, image) => {
     try {
-        return await axios.put(`${UtilConstants.baseUrl}/user/${userId}`, userData);
+        const formData = new FormData();
+        if(image){
+            formData.append('image', image);
+        }
+        formData.append('name', user.name);
+        formData.append('email', user.email);
+        formData.append('phone', user.phone);
+        formData.append('role', user.role);
+        formData.append('departmentId', user.departmentId._id);
+        formData.append('password', user.password);
+        formData.append('gender', user.gender);
+        return await axios.put(`${UtilConstants.baseUrl}/user/${userId}`, formData);
     } catch (error) {
         console.log('Error:', error);
         throw error;
