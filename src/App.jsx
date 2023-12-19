@@ -12,7 +12,9 @@ import SingleEmployeePage from "./pages/DashBoard/headOfSite/SingleEmployeePage"
 import Home from "./pages/Home/Home";
 import Hero from "./components/hero/Hero";
 import ForgetPassword from "./pages/forgetPass/ForgetPassword";
-import CreateOrderPage from "./pages/DashBoard/employee/CreateOrderPage";
+
+import OrderDetailPage from "./components/Staff/OrderDetailPage";
+import ManageOrderPage from "./pages/DashBoard/employee/ManageOrderPage";
 
 function App() {
   const ROUTE = [
@@ -66,16 +68,22 @@ function App() {
             />
           </Route>
           <Route path="/" element={<DashBoard />}>
-            <Route path="employee/create-order" element={<CreateOrderPage />} />
             <Route
-              path="head/goods-inventory"
-              element={<GoodsInventoryPage />}
+              path="employee/manage-orders"
+              element={<ManageOrderPage />}
+            />
+            <Route
+              path="employee/order-detail/:id"
+              element={<OrderDetailPage />}
             />
           </Route>
           <Route path="/home" element={<Home />}>
             <Route index element={<Hero />} />
             <Route path="/home/login" element={<Login />} />
             <Route path="/home/forget-password" element={<ForgetPassword />} />
+          </Route>
+          <Route path="/home/tracking/:id" element={<Home />}>
+            <Route index element={<Hero />} />
           </Route>
         </Routes>
       </BrowserRouter>

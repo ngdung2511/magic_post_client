@@ -29,6 +29,7 @@ export const store = createStore({
   fetchDepartments: thunk(async (actions) => {
     try {
       const res = await getDepartments();
+      console.log(res);
       actions.setDepartments(res.data.data.departments);
     } catch (error) {
       console.log(error);

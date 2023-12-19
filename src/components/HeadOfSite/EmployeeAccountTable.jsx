@@ -26,7 +26,7 @@ const EmployeeAccountTable = () => {
   const fetchEmployees = useStoreActions((actions) => actions.fetchEmployeesByDepartment);
 
   useEffect(() => {
-    fetchEmployees(currentUser.departmentId);
+    fetchEmployees(currentUser.workDepartment);
   }, []);
   const employees = useStoreState((state) => state.employees);
 
@@ -64,7 +64,7 @@ const EmployeeAccountTable = () => {
       if (res.status === 200) {
         messageApi.success("Xóa thành công");
         setIsLoading(false);
-        fetchEmployees(currentUser.departmentId);
+        fetchEmployees(currentUser.workDepartment);
       }
     } catch (error) {
       messageApi.error("Đã có lỗi xảy ra");

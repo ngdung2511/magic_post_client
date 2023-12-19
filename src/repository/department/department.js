@@ -1,5 +1,6 @@
 import axios from "axios";
 import UtilConstants from "../../shared/constants";
+import api from '../index'
 
 export const createDepartment = async (department) => {
     try {
@@ -40,4 +41,8 @@ export const updateDepartment = async (departmentId, departmentData) => {
         console.log('Error:', error);
         throw error;
     }
+
+}
+export const getDepartmentByCondition = async (condition) => {
+    return api.get(UtilConstants.baseUrl + '/department', { params: { condition } });
 }

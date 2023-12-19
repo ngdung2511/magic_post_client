@@ -46,3 +46,11 @@ export const treeSelectData = [
     },
 ];
 
+export const orderStatusOptions = [
+
+    { text: "Đã giao", value: "delivered" },
+    { text: "Chờ xác nhận", value: "processing" },
+    { text: "Đã hủy", value: "rejected" },
+    { text: "Đã xác nhận", value: "accepted" },
+
+]

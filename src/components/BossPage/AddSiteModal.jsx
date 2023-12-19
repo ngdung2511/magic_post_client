@@ -25,6 +25,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   const inputRef = useRef(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
   // Handle form logic
   const [form] = useForm();
@@ -104,7 +105,19 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     lookup[item.value] = item.type;
     return lookup;
   }, {});
-
+  const uploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList([...fileList, file]);
+      return false;
+    },
+    fileList,
+  };
   // Handle modal
   const handleOk = () => {
     setIsModalOpen(false);
@@ -152,36 +165,38 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         email: values.headOfSiteEmail,
         password: values.headOfSitePassword,
         role: values.role,
+        avatarUrl: values.avatarImg?.[0]?.response?.url,
       },
     };
     console.log(data);
 
-    try {
-      const res = await createDepartment(data);
-      if (res.status === 201) {
-        fetchDepartments();
+    // try {
+    //   const res = await createDepartment(data);
+    //   if (res.status === 201) {
+    //     fetchDepartments();
 
-        messageApi.success("Tạo điểm thành công");
-        setIsLoading(false);
-        setIsModalOpen(false);
-        form.resetFields();
-      }
-    } catch (error) {
-      if (error.response.data.message === "this user existed") {
-        messageApi.error("Email đã tồn tại");
-      } else if (
-        error.response.data.message === "this gathering point already exists"
-      ) {
-        messageApi.error("Điểm đã tồn tại");
-      } else messageApi.error("Đã có lỗi xảy ra");
-      setIsLoading(false);
-      console.log(error.response.data.message);
-    }
+    //     messageApi.success("Tạo điểm thành công");
+    //     setIsLoading(false);
+    //     setIsModalOpen(false);
+    //     form.resetFields();
+    //   }
+    // } catch (error) {
+    //   if (error.response.data.message === "this user existed") {
+    //     messageApi.error("Email đã tồn tại");
+    //   } else if (
+    //     error.response.data.message === "this gathering point already exists"
+    //   ) {
+    //     messageApi.error("Điểm đã tồn tại");
+    //   } else messageApi.error("Đã có lỗi xảy ra");
+    //   setIsLoading(false);
+    //   console.log(error.response.data.message);
+    // }
   };
 
   const filterOption = (input, option) => {
     return (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
   };
+
   return (
     <>
       {contextHolder}
@@ -189,7 +204,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         title={
           <>
             <h1 className="mb-[10px] text-3xl font-semibold">
-              <PlusCircleTwoTone twoToneColor="#f15757" />
+              <PlusCircleTwoTone twoToneColor="#266191" />
               <span className="ml-[10px]">Thêm điểm</span>
             </h1>
           </>
@@ -350,19 +365,24 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                   />
                 </Form.Item>
               </div>
-
-              <Upload
-                action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-                listType="picture"
-              >
-                <Button size="large" icon={<UploadOutlined />}>
-                  Tải lên ảnh đại diện
-                </Button>
-              </Upload>
+              <Form.Item className="mb-3" name="avatarImg">
+                <Upload
+                  {...uploadProps}
+                  // action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+                  listType="picture"
+                >
+                  <Button
+                    disabled={fileList.length > 0}
+                    size="large"
+                    icon={<UploadOutlined />}
+                  >
+                    Tải lên ảnh đại diện
+                  </Button>
+                </Upload>
+              </Form.Item>
             </div>
             <Form.Item noStyle>
               <Button
-                size="large"
                 loading={isLoading}
                 type="primary"
                 htmlType="submit"

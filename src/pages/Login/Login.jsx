@@ -10,6 +10,7 @@ const Login = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   const setUserInfo = useStoreActions((actions) => actions.setUserInfo);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   useEffect(() => {
     if (currentUser?.loggedIn) {
@@ -19,27 +20,27 @@ const Login = () => {
 
   const onFinish = async (values) => {
     setIsLoading(true);
-    try {
-      const res = await signin(values.email, values.password);
-      console.log(res);
+
+    const res = await signin(values.email, values.password);
+    console.log(res);
+    if (res.status === 200) {
       setUserInfo({
-        departmentId: res.data.data.user.departmentId,
-        role: res.data.data.user.role,
-        email: res.data.data.user.email,
-        name: res.data.data.user.name,
+        role: res.data.user.role,
+        email: res.data.user.email,
+        name: res.data.user.name,
         loggedIn: true,
-        id: res.data.data.user._id,
+        id: res.data.user._id,
+        workDepartment: res.data.user.departmentId,
       });
-      console.log(res.data.data);
-      localStorage.setItem('token', res.data.data.token);
+      localStorage.setItem("token", res.data.token);
       setIsLoading(false);
-    } catch (error) {
-      console.log(error);
+      navigate("/dashboard");
+    } else {
+      setIsLoading(false);
       messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");
     }
   };
 
-  const [isLoading, setIsLoading] = useState(false);
   return (
     <Container>
       {contextHolder}

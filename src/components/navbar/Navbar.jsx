@@ -1,13 +1,14 @@
 import { Avatar, Button, Dropdown, Image, Modal } from "antd";
 import Container from "../Container";
 import { useEffect, useState } from "react";
-import { LogoutOutlined } from "@ant-design/icons";
+import { HomeOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 
 import logo from "../../assets/logo.svg";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { useNavigate } from "react-router";
 
 import defaultAvatar from "../../assets/placeholder.jpg";
+// eslint-disable-next-line react/prop-types
 const Navbar = ({ handleClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleName, setRoleName] = useState("");
@@ -25,7 +26,7 @@ const Navbar = ({ handleClick }) => {
         setRoleName("Trưởng điểm Tập kết");
       } else if (currentUser?.role === "headTransaction") {
         setRoleName("Trưởng điểm Giao dịch");
-      } else if (currentUser?.role === "tracsactionStaff") {
+      } else if (currentUser?.role === "transactionStaff") {
         setRoleName("Nhân viên Giao dịch");
       } else if (currentUser?.role === "gatheringStaff") {
         setRoleName("Nhân viên Tập kết");
@@ -60,7 +61,7 @@ const Navbar = ({ handleClick }) => {
       ),
     },
   ];
-
+  const test = "headGathering";
   return (
     <div className="w-full h-[64px] bg-white fixed top-0 right-0 left-0 z-50 mb-[64px] shadow-md">
       <Container>
@@ -92,10 +93,10 @@ const Navbar = ({ handleClick }) => {
               >
                 <ul className="font-semibold list-none">
                   <li>
-                    Họ và tên: <span>Nguyễn Huy Dũng</span>
+                    Họ và tên: <span>{currentUser.name}</span>
                   </li>
                   <li>
-                    Email: <span>huydung.jp@gmail.com</span>
+                    Email: <span>{currentUser.email}</span>
                   </li>
                   <li>
                     Ngày sinh: <span>25/11/1969</span>
@@ -104,19 +105,30 @@ const Navbar = ({ handleClick }) => {
                     Số điện thoại <span>0989989989</span>
                   </li>
                 </ul>
-                <h3 className="text-lg">Chức vụ</h3>
+                <h3 className="text-lg">
+                  <UserOutlined className="mr-2" />
+                  Chức vụ
+                </h3>
                 <p>{roleName}</p>
-                <h3 className="text-lg">Điểm giao dịch</h3>
-                <p>Số 120, đường Hoàng Quốc Việt, quận Cầu Giấy, Hà Nội</p>
+                {!currentUser?.role.includes("admin") && (
+                  <>
+                    <h3 className="text-lg">
+                      {/* {currentUser?.role.includes("transaction") ||
+                      currentUser?.role.includes("Transaction")
+                        ? "Điểm giao dịch"
+                        : "Điểm tập kết"} */}
+                      <HomeOutlined className="mr-2" />
+                      {currentUser?.workDepartment?.name}
+                    </h3>
+                    <p>{currentUser?.workDepartment?.address}</p>
+                  </>
+                )}
               </Modal>
             </>
           ) : (
             <div className="flex items-center gap-4">
               <Button onClick={handleClick} type="ghost" size="large">
                 <span className="hover:underline">Tra cứu trạng thái</span>
-              </Button>
-              <Button type="ghost" size="large">
-                <span className="hover:underline">Giới thiệu</span>
               </Button>
             </div>
           )}

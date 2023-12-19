@@ -1,10 +1,11 @@
-import { Button, Layout, Menu, Modal, theme } from "antd";
+import { Button, Image, Layout, Menu, Modal, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
-import { Content } from "antd/es/layout/layout";
+import { Content, Header } from "antd/es/layout/layout";
 
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
+import logo from "../../assets/logo.svg";
 import {
   AppleOutlined,
   DashboardOutlined,
@@ -41,20 +42,13 @@ function DashBoard() {
   }
   const items = [
     getItem(
-      <NavLink to="/">{"Dashboard"}</NavLink>,
-      "1",
-      <DashboardOutlined />
+      "Nhân viên",
+      "sub1",
+      <AppleOutlined />,
+      [getItem(<NavLink to="/employee/manage-orders">Đơn hàng</NavLink>, "1")],
+      currentUser?.role !== "transactionStaff" &&
+        currentUser?.role !== "gatheringStaff"
     ),
-    getItem(
-      <NavLink to="/inventory">{"Inventory"}</NavLink>,
-      "2",
-      <AppleOutlined />
-    ),
-    getItem("Nhân viên", "sub1", <AppleOutlined />, [
-      getItem(<NavLink to="/employee/create-order">Tạo đơn hàng</NavLink>, "3"),
-      // getItem("Bill", "4"),
-      // getItem("Alex", "5"),
-    ]),
 
     getItem(
       "Trưởng điểm",
@@ -63,11 +57,11 @@ function DashBoard() {
       [
         getItem(
           <NavLink to="/head/manage-accounts">Quản lý tài khoản</NavLink>,
-          "6"
+          "2"
         ),
         getItem(
           <NavLink to="/head/goods-inventory">Thống kê hàng hóa</NavLink>,
-          "7"
+          "3"
         ),
       ],
       currentUser?.role !== "headTransaction" &&
@@ -78,10 +72,10 @@ function DashBoard() {
       "sub3",
       <UserOutlined />,
       [
-        getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "8"),
+        getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "4"),
         getItem(
           <NavLink to="/boss/goods-stats">Thống kê hàng hóa</NavLink>,
-          "9"
+          "5"
         ),
       ],
       currentUser?.role !== "admin"
@@ -97,7 +91,7 @@ function DashBoard() {
       >
         <Sider
           style={{
-            overflow: "auto",
+            overflowX: "hidden",
             height: "100vh",
             position: "sticky",
             left: 0,
@@ -111,8 +105,11 @@ function DashBoard() {
           breakpoint="md"
           collapsedWidth="60"
         >
+          <Header style={{ background: "#f6f8fc" }}>
+            <Image src={logo} preview={false} />
+          </Header>
           <Menu
-            className="overflow-y-auto bg-[#f2f3f5]"
+            className="overflow-y-auto bg-[#f6f8fc]"
             theme="light"
             defaultSelectedKeys={selectedKey}
             mode="inline"
@@ -130,16 +127,16 @@ function DashBoard() {
           <Content
             style={{
               flexGrow: 1,
-              height: "100vh",
+              minHeight: "100vh",
               marginTop: "64px",
             }}
           >
             <div
-              className="no-scrollbar"
+              className="no-scrollbar shadow-[0px_6px_10px_3px_#00000024]"
               style={{
                 overflowY: "auto",
                 borderRadius: "10px",
-                height: "100vh",
+                minHeight: "100vh",
                 padding: 20,
                 background: colorBgContainer,
               }}

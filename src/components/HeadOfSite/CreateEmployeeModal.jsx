@@ -36,7 +36,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
       : (values.role = "gatheringStaff");
     const data = {
       name: values.employeeName,
-      departmentId: currentUser.departmentId,
+      departmentId: currentUser.workDepartment,
       email: values.employeeEmail,
       password: values.employeePassword,
       role: values.role,
@@ -46,7 +46,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     try {
       const res = await createEmployee(data, image);
       if (res.status === 201) {
-        fetchEmployees(currentUser.departmentId);
+        fetchEmployees(currentUser.workDepartment);
         messageApi.success("Tạo nhân viên thành công");
         setIsLoading(false);
         setIsModalOpen(false);
@@ -100,7 +100,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
       title={
         <>
           <h1 className="mb-[10px] text-3xl font-semibold">
-            <PlusCircleTwoTone twoToneColor="#f15757" />
+            <PlusCircleTwoTone twoToneColor="#266191" />
             <span className="ml-[10px]">Tạo nhân viên</span>
           </h1>
         </>
