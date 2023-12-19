@@ -30,6 +30,15 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
     setIsModalOpen(false);
   };
   const onHandleFinish = async (values) => {
+    //validation info here
+    
+    if (values.employeePassword !== values.employeeRePassword) {
+      messageApi.error("Mật khẩu không khớp");
+      return;
+    }
+
+
+
     setIsLoading(true);
     currentUser.role === "headTransaction"
       ? (values.role = "transactionStaff")
@@ -133,13 +142,20 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
           <h3 className="py-3 text-xl font-semibold">Nơi làm việc: {currentUser.workDepartment.address}</h3>
           <div className="grid w-full col-span-8 gap-x-6">
             <div className="col-span-4">
-              <Form.Item name="employeeName">
+              <Form.Item name="employeeName" rules={[
+                  {required: true, message: "Vui lòng nhập tên nhân viên"},
+                ]}>
                 <Input size="large" placeholder="Tên nhân viên" type="text" />
               </Form.Item>
-              <Form.Item name="employeeEmail">
+              <Form.Item name="employeeEmail" rules={[
+                  {required: true, message: "Vui lòng nhập email"}
+                ]}>
                 <Input size="large" placeholder="Nhập email" type="email" />
               </Form.Item>
-              <Form.Item name="employeePassword">
+              <Form.Item name="employeePassword" rules={[
+                  {required: true, message: "Vui lòng nhập mật khẩu"},
+                  { max: 14, min: 6, message: "Mật khẩu phải có độ dài 6-14 kí tự" },
+                ]}>
                 <Input size="large" placeholder="Nhập mật khẩu" type="text" />
               </Form.Item>
               <Form.Item name="employeeRePassword">
@@ -157,6 +173,7 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
               <Form.Item
                 name="employeePhoneNumber"
                 rules={[
+                  {required: true, message: "Vui lòng nhập số điện thoại"},
                   { max: 10, min: 10, message: "Sai định dạng số điện thoại" },
                 ]}
               >
