@@ -1,50 +1,33 @@
 import {
-  DeleteOutlined,
-  PlusOutlined,
-  SendOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 import {
-  Button,
   Form,
   Input,
-  Popconfirm,
   Select,
   Table,
-  Tooltip,
-  Typography,
-  message,
+  DatePicker,
 } from "antd";
 import { useEffect, useState } from "react";
-
-import { NavLink } from "react-router-dom";
 import StatusLabel from "../../../components/StatusLabel";
 
 import {
-  deleteOrder,
   getOrderByCondition,
   getOrderByDepartmentId,
-  updateOrder,
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
 
 const TransactionPage = () => {
   const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isRowSelected, setIsRowSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const currentUser = useStoreState((state) => state.currentUser);
   const [allOrders, setAllOrders] = useState([]);
-  const [isNewOrderCreated, setIsNewOrderCreated] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState("outgoing orders");
   const [currentDepInfo, setCurrentDepInfo] = useState(null);
-  const [ordersData, setOrdersData] = useState([]);
-  const [isOrderUpdated, setIsOrderUpdated] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
+  const { RangePicker } = DatePicker;
   useEffect(() => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(currentUser.workDepartment._id);
@@ -54,14 +37,14 @@ const TransactionPage = () => {
     };
     fetchCurrentDepInfo();
   }, []);
-  console.log(currentDepInfo);
+  console.log('current depart', currentDepInfo);
 
   // Fetch all orders by department id that have current department as this department
   useEffect(() => {
     const fetchOrderByDepId = async (depId) => {
       setIsLoading(true);
       const res = await getOrderByDepartmentId(depId);
-      console.log(res);
+      console.log('fetch order res', res);
       if (res?.status === 200) {
         setAllOrders(res.data.orders);
         setIsLoading(false);
@@ -74,19 +57,17 @@ const TransactionPage = () => {
   }, [
     filterValue,
     currentUser.workDepartment._id,
-    isNewOrderCreated,
-    isOrderUpdated,
     isReloading,
   ]);
 
-  console.log(allOrders);
+  console.log('all order', allOrders);
 
   // Fetch orders based on filter value
   useEffect(() => {
     const fetchOrderByTransactionDep = async (data) => {
       setIsLoading(true);
       const res = await getOrderByCondition(data);
-      console.log(res);
+      console.log('fetch order by depart', res);
       if (res?.status === 200) {
         setAllOrders(res.data.orders);
         setIsLoading(false);
@@ -104,92 +85,14 @@ const TransactionPage = () => {
     }
   }, [filterValue, currentUser.workDepartment._id, isReloading]);
 
-  // Handle format selected orders to send to server
-  const handleFormatResendOrder = () => {
-    const formattedOrders = selectedRows.map((order) => {
-      if (
-        order.status === "rejected" &&
-        order.next_department._id ===
-          currentDepInfo?.linkDepartments[0].departmentId
-      ) {
-        return {
-          orderId: order._id,
-          description: `Đơn hàng đang đến ${currentDepInfo?.linkDepartments[0]?.name}`,
-        };
-      }
-    });
-    return {
-      type: "resend",
-      orders: [...formattedOrders],
-    };
-  };
-
-  const handleOnConfirm = async () => {
-    setIsLoading(true);
-    console.log("order data", ordersData);
-    if (filterValue === "outgoing orders") {
-      const ordersData = handleFormatResendOrder();
-      setOrdersData(ordersData.orders);
-      if (ordersData.orders.length > 0 && ordersData.type === "resend") {
-        const res = await updateOrder(ordersData);
-        console.log("update order: ", res);
-        if (res?.status === 200) {
-          messageApi.success("Xác nhận đơn hàng thành công");
-          setIsLoading(false);
-          setIsOrderUpdated((prevState) => !prevState);
-        } else {
-          messageApi.error("Xác nhận đơn hàng thất bại");
-          setIsLoading(false);
-        }
-      }
-    }
-  };
-
-  // Handle delete order
-  const handleDelete = async (orderId) => {
-    setIsLoading(true);
-    const res = await deleteOrder(orderId);
-    if (res.status === 200) {
-      messageApi.success("Xóa đơn hàng thành công");
-      setIsLoading(false);
-      const fetchOrderByDepId = async (depId) => {
-        const res = await getOrderByDepartmentId(depId);
-
-        console.log(res);
-        if (res?.status === 200) {
-          setAllOrders(res.data.orders);
-        }
-      };
-      fetchOrderByDepId(currentUser.workDepartment._id);
-    } else {
-      setIsLoading(false);
-      messageApi.error("Xóa đơn hàng thất bại");
-    }
-    console.log(orderId);
-  };
-
   const columns = [
     {
       title: "Mã đơn hàng",
       dataIndex: "_id",
       key: "orderCode",
-      render: (value, record) => {
-        return (
-          <Tooltip
-            title={
-              // Check if order is rejected and is in transit to linked department
-              record.status === "rejected" &&
-              record.next_department._id ===
-                currentDepInfo?.linkDepartments[0]?.departmentId &&
-              "Chọn đơn để giao lại!"
-            }
-          >
-            <NavLink to={`/employee/order-detail/${record._id}`}>
-              {value}
-            </NavLink>
-          </Tooltip>
-        );
-      },
+      render: value => {
+        return <>{value}</>
+      }
     },
     {
       title: "Người gửi",
@@ -227,63 +130,15 @@ const TransactionPage = () => {
       },
       width: "16%",
     },
-    {
-      key: "action",
-      render: (value, record) => (
-        <div className="flex items-center justify-center">
-          <Popconfirm
-            title="Xác nhận"
-            description="Bạn chắc chắn muốn xóa dữ liệu này?"
-            okType="danger"
-            okText="Xóa"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record._id)}
-            okButtonProps={{
-              loading: isLoading,
-            }}
-          >
-            <span className="text-lg cursor-pointer hover:text-red-600">
-              <DeleteOutlined />
-            </span>
-          </Popconfirm>
-        </div>
-      ),
-      width: "6%",
-      fixed: "right",
-    },
   ];
 
-  // Handle select rows of orders in table
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      if (selectedRows.length > 0) {
-        setIsRowSelected(true);
-        setSelectedRows(selectedRows);
-      } else {
-        setIsRowSelected(false);
-        setSelectedRows([]);
-      }
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      // Disable check box when order is processing and being transported to another department
-      disabled:
-        record.status === "processing" ||
-        record.status === "delivered" ||
-        record.status === "accepted",
-      // &&
-      // record.next_department !== currentUser.workDepartment._id,
-      // Column configuration not to be checked
-      status: record.status,
-    }),
+  // Handle date
+  const handleDateChange = (value, dateString) => {
+    console.log("Selected Time: ", value);
+    console.log("Formatted Selected Time: ", dateString);
   };
   return (
     <>
-      {contextHolder}
       <div className="w-full h-full">
         <div className="w-full p-3 flex items-center">
           <div className="w-full flex items-center gap-x-3">
@@ -291,7 +146,7 @@ const TransactionPage = () => {
             <Form
               form={form}
               initialValues={{
-                filterValue: "outgoing orders",
+                filterValue: "new orders",
               }}
             >
               <Form.Item noStyle className="w-full" name="filterValue">
@@ -301,19 +156,26 @@ const TransactionPage = () => {
                   size="large"
                   options={[
                     {
-                      value: "outgoing orders",
-                      label: "Đơn gốc từ điểm",
+                      value: "new orders",
+                      label: "Đơn hàng mới nhận",
                     },
                     {
-                      value: "incoming orders",
-                      label: "Đơn hàng đến",
+                      value: "success orders",
+                      label: "Đơn hàng giao thành công",
                     },
                     {
-                      value: "tom",
-                      label: "Giao đơn thất bại",
+                      value: "sending orders",
+                      label: "Đơn hàng đang chuyển đi",
+                    },
+                    {
+                      value: "failed orders",
+                      label: "Đơn hàng chuyển đi thất bại",
                     },
                   ]}
                 />
+              </Form.Item>
+              <Form.Item noStyle className="w-full" name="dateFilter">
+                <RangePicker onChange={handleDateChange}/>
               </Form.Item>
             </Form>
           </div>
@@ -327,9 +189,6 @@ const TransactionPage = () => {
         </div>
         <Table
           loading={isLoading}
-          rowSelection={{
-            ...rowSelection,
-          }}
           rowKey={(row) => row._id}
           columns={columns}
           dataSource={allOrders}
@@ -350,26 +209,7 @@ const TransactionPage = () => {
             </div>
           )}
         />
-        {/* <TrackingOrderInfo /> */}
-        <div className="w-full flex items-center justify-between my-2">
-          <p className="font-semibold text-xl text-[#266191] bg-neutral-300 p-2 rounded-lg">
-            Đã chọn:{" "}
-            <span className="text-orange-600">
-              {selectedRows.length}/{allOrders.length}
-            </span>
-          </p>
-          <Button
-            loading={isLoading}
-            onClick={handleOnConfirm}
-            htmlType="submit"
-            className="float-right"
-            type="primary"
-            disabled={!isRowSelected}
-            size="large"
-          >
-            Xác nhận
-          </Button>
-        </div>
+        
       </div>
     </>
   );

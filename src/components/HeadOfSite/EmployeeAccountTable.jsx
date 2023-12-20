@@ -221,7 +221,9 @@ const EmployeeAccountTable = () => {
     <div className="w-full h-full py-4">
       <Table
         dataSource={employees}
-        rowKey={(row) => row.id}
+        rowKey={(row) =>{
+          return row._id
+        }}
         columns={columns}
         bordered
         scroll={{

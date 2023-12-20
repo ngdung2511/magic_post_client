@@ -158,13 +158,6 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
                 ]}>
                 <Input size="large" placeholder="Nhập mật khẩu" type="text" />
               </Form.Item>
-              <Form.Item name="employeeRePassword">
-                <Input
-                  size="large"
-                  placeholder="Nhập lại mật khẩu"
-                  type="text"
-                />
-              </Form.Item>
             </div>
             <div className="col-span-4 col-start-5">
               <Form.Item
@@ -194,6 +187,13 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
                       label: "Khác",
                     },
                   ]}
+                />
+              </Form.Item>
+              <Form.Item name="employeeRePassword">
+                <Input
+                  size="large"
+                  placeholder="Nhập lại mật khẩu"
+                  type="text"
                 />
               </Form.Item>
             </div>

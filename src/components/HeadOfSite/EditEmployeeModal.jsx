@@ -110,6 +110,7 @@ const EditEmployeeModal = ({
                       required: true,
                       message: "Vui lòng nhập số điện thoại",
                     },
+                    { max: 10, min: 10, message: "Sai định dạng số điện thoại" },
                   ]}
                 >
                   <Input size="large" placeholder="Nhập số điện thoại" />
