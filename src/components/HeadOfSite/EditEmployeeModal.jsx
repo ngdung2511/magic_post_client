@@ -17,50 +17,21 @@ const EditEmployeeModal = ({
   const [departmentLocation, setDepartmentLocation] = useState(currentEmployee.departmentId.address);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataChanged, setIsDataChanged] = useState(false);
-  // Get all departments from API
-  const fetchDepartments = useStoreActions(
-    (actions) => actions.fetchDepartments
-  );
-  useEffect(() => {
-    fetchDepartments();
-  }, []);
-  const departments = useStoreState((state) => state.departments);
-  // Format departments to options for Select input
-  let formattedDepOptions = [];
-    formattedDepOptions = departments
-      .map((item) => {
-        return {
-          label: item.name,
-          value: item._id,
-          type: item.type,
-        };
-      });
-  // Handle 
-  const handleDepartmentChange = (value) => {
-    let depart = departments.filter((item) => {
-      return item._id === value
-    })
-    setIsDataChanged(true);
-    setDepartmentLocation(depart[0].address);
-  };
+  
   // Handle submit form
   const onHandleFinish = async (values) => {
     //validation info here
 
-    let depart = formattedDepOptions.filter(o => {
-      return o.value === values.departmentId
-    })
     setIsLoading(true);
     const data = {
       name: values.name,
       email: values.email,
-      phone: values.phone,
-      departmentId: values.departmentId,
-      role: depart[0].type === "Gathering" ? "gatheringStaff" : "transactionStaff",
+      phone: values.phone,  
       gender: values.employeeGender === 'Nam' ? 'male' : 'female',
     };
     try {
-      const res = await updateEmployee(currentEmployee._id, data);
+      console.log(currentEmployee._id);
+      const res = await updateEmployee(currentEmployee._id, data, null);
       if (res.status === 200) {
         messageApi.success("Cập nhật thành công");
         setIsLoading(false);
@@ -130,15 +101,6 @@ const EditEmployeeModal = ({
               </Form.Item>
               </div>
               <div className="flex items-center gap-x-3">
-              <Form.Item 
-                onChange={() => setIsDataChanged(true)} 
-                name="employeeAddress" 
-                className="grow" 
-                initialValue={currentEmployee.address}>
-                <Input size="large" placeholder="Địa chỉ nơi cư trú" type="text" />
-              </Form.Item>
-              </div>
-              <div className="flex items-center gap-x-3">
                 <Form.Item
                   onChange={() => setIsDataChanged(true)}
                   initialValue={currentEmployee.phone}
@@ -166,32 +128,7 @@ const EditEmployeeModal = ({
                   <Input size="large" placeholder="Nhập email" type="email" />
                 </Form.Item>
               </div>
-              <div className="flex items-center gap-x-3">
-                <Form.Item
-                  onChange={() => setIsDataChanged(true)}
-                  initialValue={currentEmployee.departmentId.name}
-                  name="departmentId"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng chọn nơi làm việc",
-                    },
-                  ]}
-                >
-                  <Select
-                  onChange={handleDepartmentChange}
-                  size="large"
-                  placeholder={"Chọn điểm làm việc"}
-                  optionFilterProp="children"
-                  options={formattedDepOptions}
-                />
-                </Form.Item>  
-                <Form.Item
-                  name="departmentLocation"
-                  className="grow"
-                >
-                  {departmentLocation}
-                </Form.Item>
+              <div className="flex items-center gap-x-3"> 
               </div>
             </div>
 

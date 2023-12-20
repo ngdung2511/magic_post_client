@@ -9,6 +9,7 @@ import GoodsStatsPage from "./pages/DashBoard/boss/GoodsStatsPage";
 import ManageAccountPage from "./pages/DashBoard/headOfSite/ManageAccountPage";
 import GoodsInventoryPage from "./pages/DashBoard/headOfSite/GoodsInventoryPage";
 import SingleEmployeePage from "./pages/DashBoard/headOfSite/SingleEmployeePage"
+import StatisticPage from "./pages/DashBoard/headOfSite/StatisticPage";
 import Home from "./pages/Home/Home";
 import Hero from "./components/hero/Hero";
 import ForgetPassword from "./pages/forgetPass/ForgetPassword";
@@ -64,7 +65,7 @@ function App() {
             />
             <Route
               path="head/goods-inventory"
-              element={<GoodsInventoryPage />}
+              element={<StatisticPage />}
             />
           </Route>
           <Route path="/" element={<DashBoard />}>

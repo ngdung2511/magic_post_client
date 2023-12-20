@@ -88,9 +88,6 @@ export const updateEmployee = async (userId, user, image) => {
         formData.append('name', user.name);
         formData.append('email', user.email);
         formData.append('phone', user.phone);
-        formData.append('role', user.role);
-        formData.append('departmentId', user.departmentId._id);
-        formData.append('password', user.password);
         formData.append('gender', user.gender);
         return await axios.put(`${UtilConstants.baseUrl}/user/${userId}`, formData);
     } catch (error) {

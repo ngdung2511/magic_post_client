@@ -51,6 +51,8 @@ import {
         <Spin />
       </div>
     );
+    let adrs = currentEmployee.departmentId.address;
+    const location = currentEmployee.departmentId.type === 'Transaction' ? 'Điểm giao dịch ' + adrs : 'Điểm tập kết ' + adrs;
     const employeeInfo = [
       {
         key: "1",
@@ -79,8 +81,8 @@ import {
       },
       {
         key: "6",
-        label: "Phòng ban",
-        children: currentEmployee.department,
+        label: "Điểm",
+        children: location,
       }
     ];
     return (

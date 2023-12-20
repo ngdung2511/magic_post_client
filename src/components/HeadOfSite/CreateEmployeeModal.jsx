@@ -167,9 +167,6 @@ const CreateEmployeeModal = ({ isModalOpen, setIsModalOpen }) => {
               </Form.Item>
             </div>
             <div className="col-span-4 col-start-5">
-              <Form.Item name="employeeAddress">
-                <Input size="large" placeholder="Địa chỉ nơi cư trú" type="text" />
-              </Form.Item>
               <Form.Item
                 name="employeePhoneNumber"
                 rules={[
