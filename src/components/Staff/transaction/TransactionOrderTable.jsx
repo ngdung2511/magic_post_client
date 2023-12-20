@@ -1,11 +1,7 @@
-import {
-  DeleteOutlined,
-  PlusOutlined,
-  SendOutlined,
-  SyncOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined, SyncOutlined } from "@ant-design/icons";
 import {
   Button,
+  DatePicker,
   Form,
   Input,
   Popconfirm,
@@ -27,6 +23,7 @@ import {
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
+import moment from "moment";
 
 const TransactionOrderTable = () => {
   const [form] = Form.useForm();
@@ -44,6 +41,7 @@ const TransactionOrderTable = () => {
   const [ordersData, setOrdersData] = useState([]);
   const [isOrderUpdated, setIsOrderUpdated] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
+  const [dates, setDates] = useState([]);
   useEffect(() => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(currentUser.workDepartment._id);
@@ -109,12 +107,13 @@ const TransactionOrderTable = () => {
   ]);
 
   // Handle format selected orders to send to server
-  const handleFormatResendOrder = () => {
+  const handleFormatResendOrder = (selectedRows) => {
+    console.log(selectedRows);
     const formattedOrders = selectedRows.map((order) => {
       if (
         order.status === "rejected" &&
         order.next_department._id ===
-          currentDepInfo?.linkDepartments[0].departmentId
+          currentDepInfo?.linkDepartments[0]?.departmentId
       ) {
         return {
           orderId: order._id,
@@ -145,13 +144,31 @@ const TransactionOrderTable = () => {
       orders: [...formattedOrders],
     };
   };
-
+  const handleFormatConfirmOrders = (selectedRows) => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "processing" &&
+        order.next_department._id === currentUser.workDepartment._id
+      ) {
+        return {
+          orderId: order._id,
+          current_department: currentUser.workDepartment._id,
+          description: `Đơn hàng đã đến ${currentUser.workDepartment.name}`,
+        };
+      }
+    });
+    return {
+      type: "confirm",
+      orders: [...formattedOrders],
+    };
+  };
   const handleOnConfirm = async () => {
-    setIsLoading(true);
-    console.log("order data", ordersData);
+    // setIsLoading(true);
+
     if (filterValue === "outgoing orders") {
-      const ordersData = handleFormatResendOrder();
+      const ordersData = handleFormatResendOrder(selectedRows);
       setOrdersData(ordersData.orders);
+      console.log(ordersData);
       if (ordersData.orders.length > 0 && ordersData.type === "resend") {
         const res = await updateOrder(ordersData);
         console.log("update order: ", res);
@@ -159,11 +176,32 @@ const TransactionOrderTable = () => {
           messageApi.success("Xác nhận đơn hàng thành công");
           setIsLoading(false);
           setIsOrderUpdated((prevState) => !prevState);
+          setIsRowSelected(false);
+          setSelectedRows([]);
         } else {
           messageApi.error("Xác nhận đơn hàng thất bại");
           setIsLoading(false);
         }
       }
+    } else if (filterValue === "incoming orders") {
+      console.log("incoming orders");
+      const ordersData = handleFormatConfirmOrders(selectedRows);
+      setOrdersData(ordersData.orders);
+      if (ordersData.orders.length > 0 && ordersData.type === "confirm") {
+        const res = await updateOrder(ordersData);
+        console.log("update order: ", res);
+        if (res?.status === 200) {
+          messageApi.success("Xác nhận đơn hàng thành công");
+          setIsLoading(false);
+          setIsOrderUpdated((prevState) => !prevState);
+          setIsRowSelected(false);
+          setSelectedRows([]);
+        } else {
+          messageApi.error("Xác nhận đơn hàng thất bại");
+          setIsLoading(false);
+        }
+      }
+      console.log(ordersData);
     }
   };
 
@@ -238,18 +276,38 @@ const TransactionOrderTable = () => {
       title: "Người gửi",
       dataIndex: "sender",
       key: "senderName",
-      width: "14%",
+      width: "17%",
       filteredValue: [searchValue],
       onFilter: (value, record) =>
         String(record.sender).toLowerCase().includes(value.toLowerCase()) ||
         String(record.receiver).toLowerCase().includes(value.toLowerCase()) ||
         String(record._id).toLowerCase().includes(value.toLowerCase()),
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.send_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Người nhận",
       dataIndex: "receiver",
       key: "receiverName",
-      width: "14%",
+      width: "17%",
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.receive_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Trạng thái",
@@ -268,7 +326,18 @@ const TransactionOrderTable = () => {
       render: (value) => {
         return <div>{new Date(value).toLocaleDateString("vi-VN")}</div>;
       },
-      width: "16%",
+      width: "14%",
+      filteredValue: [dates],
+      onFilter: (value, record) => {
+        if (dates.length > 0) {
+          return moment(record.createdAt).isBetween(
+            dates[0],
+            dates[1],
+            undefined,
+            "[]"
+          );
+        } else return record;
+      },
     },
     {
       key: "action",
@@ -315,8 +384,12 @@ const TransactionOrderTable = () => {
     getCheckboxProps: (record) => ({
       // Disable check box when order is processing and being transported to another department
       disabled:
+        // Disable orders that are going out from current dep and are processing
         (record.status === "processing" &&
-          record.next_department._id !== currentDepInfo._id) ||
+          record?.next_department?._id !== currentDepInfo?._id) ||
+        // Disable orders that are rejected and are not in current dep
+        (record.status === "rejected" &&
+          record?.current_department?._id !== currentDepInfo?._id) ||
         record.status === "delivered" ||
         record.status === "accepted",
       // &&
@@ -382,21 +455,37 @@ const TransactionOrderTable = () => {
           pagination={{ pageSize: 10, position: ["bottomCenter"] }}
           title={() => (
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <span
-                  onClick={() => setIsReloading(!isReloading)}
-                  className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
-                >
-                  <SyncOutlined spin={isReloading} className="text-[18px]" />
-                </span>
-                <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center w-full">
+                  <span
+                    onClick={() => setIsReloading(!isReloading)}
+                    className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
+                  >
+                    <SyncOutlined spin={isReloading} className="text-[18px]" />
+                  </span>
+                  <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+                </div>
+
+                <div className="xl:w-[100%]">
+                  <DatePicker.RangePicker
+                    className="w-full"
+                    size="large"
+                    format={"DD/MM/YYYY"}
+                    onChange={(value, dateString) => {
+                      console.log(value, dateString);
+                      if (value === null) return setDates([]);
+                      else {
+                        const formattedDates = value.map((date) => {
+                          return moment(date.$d, "DD/MM/YYYY");
+                        });
+                        console.log(formattedDates);
+                        setDates(formattedDates);
+                      }
+                    }}
+                  />
+                </div>
               </div>
-              <CreateOrderModal
-                isNewOrderCreated={isNewOrderCreated}
-                setIsNewOrderCreated={setIsNewOrderCreated}
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-              />
+
               <Button
                 onClick={() => setIsModalOpen(true)}
                 icon={<PlusOutlined />}
@@ -405,6 +494,12 @@ const TransactionOrderTable = () => {
               >
                 Tạo đơn
               </Button>
+              <CreateOrderModal
+                isNewOrderCreated={isNewOrderCreated}
+                setIsNewOrderCreated={setIsNewOrderCreated}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+              />
             </div>
           )}
         />
