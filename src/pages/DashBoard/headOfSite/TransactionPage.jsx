@@ -24,7 +24,8 @@ const TransactionPage = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   const [allOrders, setAllOrders] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [filterValue, setFilterValue] = useState("outgoing orders");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [locationFilter, setLocationFilter] = useState("all");
   const [currentDepInfo, setCurrentDepInfo] = useState(null);
   const [isReloading, setIsReloading] = useState(false);
   const { RangePicker } = DatePicker;
@@ -39,7 +40,7 @@ const TransactionPage = () => {
   }, []);
   console.log('current depart', currentDepInfo);
 
-  // Fetch all orders by department id that have current department as this department
+  // Fetch all orders that have this department as field
   useEffect(() => {
     const fetchOrderByDepId = async (depId) => {
       setIsLoading(true);
@@ -51,22 +52,14 @@ const TransactionPage = () => {
         setIsReloading(false);
       }
     };
-    if (filterValue === "outgoing orders") {
-      fetchOrderByDepId(currentUser.workDepartment._id);
-    }
-  }, [
-    filterValue,
-    currentUser.workDepartment._id,
-    isReloading,
-  ]);
-
-  console.log('all order', allOrders);
+    fetchOrderByDepId(currentUser.workDepartment._id);
+  }, [currentUser.workDepartment._id, isReloading]);
 
   // Fetch orders based on filter value
   useEffect(() => {
-    const fetchOrderByTransactionDep = async (data) => {
+    const fetchOrderWithCondition = async (condition) => {
       setIsLoading(true);
-      const res = await getOrderByCondition(data);
+      const res = await getOrderByCondition(condition);
       console.log('fetch order by depart', res);
       if (res?.status === 200) {
         setAllOrders(res.data.orders);
@@ -74,16 +67,28 @@ const TransactionPage = () => {
         setIsReloading(false);
       }
     };
-    if (filterValue === "incoming orders") {
-      const data = {
-        condition: {
-          next_department: currentUser.workDepartment._id,
-          status: "processing",
-        },
-      };
-      fetchOrderByTransactionDep(data);
+
+    const filter = {
+      condition: {}
+    };
+
+    if (statusFilter !== "all") {
+      filter.condition.status = statusFilter;
     }
-  }, [filterValue, currentUser.workDepartment._id, isReloading]);
+    
+    if (locationFilter !== "all") {
+      if (locationFilter === "current") {
+        filter.condition.current_department = currentUser.workDepartment._id;
+      } else if (locationFilter === "send") {
+        filter.condition.send_department = currentUser.workDepartment._id;
+      } else if (locationFilter === "receive") {
+        filter.condition.receive_department = currentUser.workDepartment._id;
+      }
+    }
+
+    console.log('filter', filter);
+    fetchOrderWithCondition(filter);
+  }, [statusFilter, locationFilter, currentUser.workDepartment._id, isReloading]);
 
   const columns = [
     {
@@ -146,38 +151,71 @@ const TransactionPage = () => {
             <Form
               form={form}
               initialValues={{
-                filterValue: "new orders",
+                statusFilter: "all",
               }}
             >
-              <Form.Item noStyle className="w-full" name="filterValue">
+              <Form.Item noStyle className="w-full" name="statusFilter">
                 <Select
-                  onChange={(value) => setFilterValue(value)}
+                  onChange={(value) => setStatusFilter(value)}
                   placeholder="Chọn trạng thái"
                   size="large"
                   options={[
                     {
-                      value: "new orders",
-                      label: "Đơn hàng mới nhận",
+                      value: "all",
+                      label: "Tất cả",
                     },
                     {
-                      value: "success orders",
-                      label: "Đơn hàng giao thành công",
+                      value: "accepted",
+                      label: "Đã xác nhận",
                     },
                     {
-                      value: "sending orders",
-                      label: "Đơn hàng đang chuyển đi",
+                      value: "delivered",
+                      label: "Đã giao",
                     },
                     {
-                      value: "failed orders",
-                      label: "Đơn hàng chuyển đi thất bại",
+                      value: "processing",
+                      label: "Chờ xác nhận",
+                    },
+                    {
+                      value: "rejected",
+                      label: "Chuyển tiếp thất bại",
                     },
                   ]}
                 />
               </Form.Item>
-              <Form.Item noStyle className="w-full" name="dateFilter">
-                <RangePicker onChange={handleDateChange}/>
+            </Form>
+            <Form
+              form={form}
+              initialValues={{
+                locationFilter: "all",
+              }}
+            >
+              <Form.Item noStyle className="w-full" name="locationFilter">
+                <Select
+                  onChange={(value) => setLocationFilter(value)}
+                  size="large"
+                  options={[
+                    {
+                      value: "all",
+                      label: "Tất cả",
+                    },
+                    {
+                      value: "current",
+                      label: "Đang ở đây",
+                    },
+                    {
+                      value: "send",
+                      label: "Được gửi từ đây",
+                    },
+                    {
+                      value: "receive",
+                      label: "Được nhận tại đây",
+                    },
+                  ]}
+                />
               </Form.Item>
             </Form>
+            
           </div>
           <Input.Search
             className="max-w-[42%] w-full"

@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { NavLink } from "react-router-dom";
-import StatusLabel from "../../statusLabel";
+import StatusLabel from "../../StatusLabel";
 
 import {
   getOrderByCondition,
