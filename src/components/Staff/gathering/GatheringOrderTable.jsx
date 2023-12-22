@@ -519,7 +519,7 @@ const GatheringOrderTable = () => {
         />
 
         <div className="w-full flex items-center justify-between my-6">
-          <p className="font-semibold text-xl text-[#266191] bg-neutral-300 p-2 rounded-lg">
+          <p className="font-semibold text-xl text-[#266191] bg-neutral-200 p-2 rounded-lg">
             Đã chọn:{" "}
             <span className="text-orange-600">
               {selectedRows.length}/{allOrders.length}

@@ -1,12 +1,9 @@
-import { CheckCircleOutlined } from "@ant-design/icons";
 import { Image, Timeline } from "antd";
+import moment from "moment";
 
 const OrderStatus = ({ orderInfo }) => {
   const formatTime = (time) => {
-    const date = new Date(time);
-    return `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
-      date.getMonth() + 1
-    }/${date.getFullYear()}`;
+    return moment(time).format("DD/MM/YYYY HH:mm");
   };
   const { description, status } = orderInfo;
   const formatOrderDesc = (description) => {

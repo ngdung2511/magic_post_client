@@ -80,6 +80,7 @@ const SearchOrder = () => {
     key: item.title,
     title: item.title,
   }));
+  const isOrderDelivered = orderInfo?.status === "delivered";
   return (
     <>
       {contextHolder}
@@ -105,7 +106,7 @@ const SearchOrder = () => {
       </Form>
       {orderInfo && !isUrlChanged ? (
         <div className="w-full min-h-[480px] shadow-[0px_3px_20px_0px_#00000024] rounded-xl py-6 px-4">
-          <Steps current={current} items={items} />
+          <Steps current={isOrderDelivered ? "3" : current} items={items} />
           <div>{steps[current].content}</div>
         </div>
       ) : isLoading ? (
