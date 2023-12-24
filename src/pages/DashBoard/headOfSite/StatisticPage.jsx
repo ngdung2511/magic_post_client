@@ -10,18 +10,24 @@ import TransactionPage from "./TransactionPage";
 const StatisticPage = () => {
     const currentUser = useStoreState((state) => state.currentUser);
     const department = currentUser.workDepartment;
-    const [orders, setOrders] = useState([]);
-    const [employees, setEmployees] = useState([]);
+    const [orders, setOrders] = useState(0);
+    const [employees, setEmployees] = useState(0);
     useEffect(() => {
-        async function fetchData() {
+        const fetchOrder = async() => {
             const res = await getOrderByDepartmentId(department._id);
-            const res2 = await getEmployeeByDepartmentId(department._id);
-            console.log(res2);
-            setOrders(res.data.orders);
-            setEmployees(res2.data.data.users);
+            console.log('order number', department._id, res);
+            setOrders(res.data.orders.length);
         }
-        fetchData();
-    }, [department._id]);
+
+        const fetchEmployee = async() => {
+            const res = await getEmployeeByDepartmentId(department);
+            console.log('employ nums', res);
+            setEmployees(res.data.data.users.length - 1);
+        }
+        fetchOrder();
+        fetchEmployee();
+        
+    }, [department]);
   return (
     <div className="w-full h-full">
       <Typography.Title className="mb-0" level={1}>
@@ -34,14 +40,14 @@ const StatisticPage = () => {
             <Statistic
               prefix={<ShoppingCartOutlined size={20} />}
               title="Số đơn hàng"
-              value={orders.length}
+              value={orders}
             />
           </Card>
           <Card>
             <Statistic
               prefix={<ShoppingCartOutlined size={20} />}
               title="Nhân viên"
-              value={employees.length}
+              value={employees}
             />
           </Card>
         </div>

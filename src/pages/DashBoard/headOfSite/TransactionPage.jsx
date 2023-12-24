@@ -25,35 +25,11 @@ const TransactionPage = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [locationFilter, setLocationFilter] = useState("all");
-  const [currentDepInfo, setCurrentDepInfo] = useState(null);
+  const [locationFilter, setLocationFilter] = useState("send");
   const [isReloading, setIsReloading] = useState(false);
   const { RangePicker } = DatePicker;
-  useEffect(() => {
-    const fetchCurrentDepInfo = async () => {
-      const res = await getDepartmentById(currentUser.workDepartment._id);
-      if (res?.status === 200) {
-        setCurrentDepInfo(res.data.data.gatherPoint);
-      }
-    };
-    fetchCurrentDepInfo();
-  }, []);
-  console.log('current depart', currentDepInfo);
-
-  // Fetch all orders that have this department as field
-  useEffect(() => {
-    const fetchOrderByDepId = async (depId) => {
-      setIsLoading(true);
-      const res = await getOrderByDepartmentId(depId);
-      console.log('fetch order res', res);
-      if (res?.status === 200) {
-        setAllOrders(res.data.orders);
-        setIsLoading(false);
-        setIsReloading(false);
-      }
-    };
-    fetchOrderByDepId(currentUser.workDepartment._id);
-  }, [currentUser.workDepartment._id, isReloading]);
+  const [minDate, setMinDate] = useState("fack");
+  const [maxDate, setMaxDate] = useState("fack");
 
   // Fetch orders based on filter value
   useEffect(() => {
@@ -71,24 +47,14 @@ const TransactionPage = () => {
     const filter = {
       condition: {}
     };
-
-    if (statusFilter !== "all") {
-      filter.condition.status = statusFilter;
-    }
-    
-    if (locationFilter !== "all") {
-      if (locationFilter === "current") {
-        filter.condition.current_department = currentUser.workDepartment._id;
-      } else if (locationFilter === "send") {
-        filter.condition.send_department = currentUser.workDepartment._id;
-      } else if (locationFilter === "receive") {
-        filter.condition.receive_department = currentUser.workDepartment._id;
-      }
-    }
-
-    console.log('filter', filter);
-    fetchOrderWithCondition(filter);
-  }, [statusFilter, locationFilter, currentUser.workDepartment._id, isReloading]);
+    //location [send, receive, current, next]
+    if (locationFilter === "receive") {
+      filter.condition.receive_department = currentUser.workDepartment._id;
+    } else if (locationFilter === "send") {
+      filter.condition.send_department = currentUser.workDepartment._id;
+    } 
+    fetchOrderWithCondition(filter)
+  }, [locationFilter, currentUser.workDepartment._id, isReloading]);
 
   const columns = [
     {
@@ -117,15 +83,48 @@ const TransactionPage = () => {
       width: "14%",
     },
     {
+      title: "Điểm gửi hàng",
+      dataIndex: "send_department",
+      key: "sendDepartment",
+      render: (value) => {
+        return <div>{value.name}</div>;
+      },
+      width: "14%",
+    },
+    {
+      title: "Đơn hàng đang ở",
+      dataIndex: "current_department",
+      key: "currentDepartment",
+      render: (value) => {
+        return <div>{value.name}</div>;
+      },
+      width: "14%",
+    },
+    {
+      title: "Điểm nhận hàng",
+      dataIndex: "receive_department",
+      key: "receiveDepartment",
+      render: (value) => {
+        return <div>{value.name}</div>;
+      },
+      width: "14%",
+    },
+    {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (value) => {
         return <StatusLabel status={value} />;
       },
+      filteredValue: [statusFilter],
+      onFilter: (value, record) => {
+        if (value === "all") {
+          return true;
+        }
+        return String(record.status) === value;
+      },
       width: "20%",
     },
-
     {
       title: "Ngày gửi hàng",
       dataIndex: "createdAt",
@@ -133,14 +132,23 @@ const TransactionPage = () => {
       render: (value) => {
         return <div>{new Date(value).toLocaleDateString("vi-VN")}</div>;
       },
+      filteredValue: [minDate, maxDate],
+      onFilter: (value, record) => {
+        if (minDate === "fack" || maxDate === "fack") {
+          return true;
+        }
+        const date = new Date(record.createdAt).getTime();
+        console.log(new Date(minDate), new Date(maxDate));
+        return date >= new Date(minDate).getTime() && date <= new Date(maxDate).getTime();
+      },
       width: "16%",
-    },
+    }, 
   ];
 
   // Handle date
   const handleDateChange = (value, dateString) => {
-    console.log("Selected Time: ", value);
-    console.log("Formatted Selected Time: ", dateString);
+    setMinDate(dateString[0]);
+    setMaxDate(dateString[1]);
   };
   return (
     <>
@@ -187,7 +195,7 @@ const TransactionPage = () => {
             <Form
               form={form}
               initialValues={{
-                locationFilter: "all",
+                locationFilter: "send",
               }}
             >
               <Form.Item noStyle className="w-full" name="locationFilter">
@@ -196,26 +204,25 @@ const TransactionPage = () => {
                   size="large"
                   options={[
                     {
-                      value: "all",
-                      label: "Tất cả",
-                    },
-                    {
-                      value: "current",
-                      label: "Đang ở đây",
-                    },
-                    {
                       value: "send",
-                      label: "Được gửi từ đây",
+                      label: "Được gửi từ điểm này",
                     },
                     {
                       value: "receive",
-                      label: "Được nhận tại đây",
+                      label: "Được nhận tại điểm này",
                     },
                   ]}
                 />
               </Form.Item>
             </Form>
-            
+            <div className="xl:w-[30%] w-[60%] md:w-[40%]">
+                <RangePicker
+                  className="w-full"
+                  size="large"
+                  format={"DD-MM-YYYY"}
+                  onChange={handleDateChange}
+                />
+              </div>
           </div>
           <Input.Search
             className="max-w-[42%] w-full"
