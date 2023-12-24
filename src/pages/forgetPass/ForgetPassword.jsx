@@ -11,7 +11,7 @@ const ForgetPassword = () => {
   const [form] = useForm();
   const navigate = useNavigate();
   const onFinish = async (values) => {
-    if (values.email === undefined) {
+    if (values.email === undefined && current === 0) {
       messageApi.error("Vui lòng nhập email");
       return;
     }
