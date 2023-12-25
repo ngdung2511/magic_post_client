@@ -1,4 +1,4 @@
-import { SendOutlined, SyncOutlined } from "@ant-design/icons";
+import { SyncOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -6,7 +6,7 @@ import {
   Select,
   Table,
   Tooltip,
-  Typography,
+  DatePicker,
   message,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -21,7 +21,10 @@ import {
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
 
+import moment from "moment";
+
 const GatheringOrderTable = () => {
+  const { RangePicker } = DatePicker;
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const [isRowSelected, setIsRowSelected] = useState(false);
@@ -36,6 +39,7 @@ const GatheringOrderTable = () => {
   const [ordersData, setOrdersData] = useState([]);
   const [isOrderUpdated, setIsOrderUpdated] = useState(false);
   const [currentDepInfo, setCurrentDepInfo] = useState({});
+  const [dates, setDates] = useState([]);
 
   useEffect(() => {
     const fetchCurrentDepInfo = async () => {
@@ -217,35 +221,73 @@ const GatheringOrderTable = () => {
       key: "orderCode",
       render: (value, record) => {
         return (
-          <NavLink to={`/employee/order-detail/${record._id}`}>{value}</NavLink>
+          <Tooltip
+            title={
+              // Check if order is rejected and is in transit to linked department
+              record.status === "rejected" &&
+              record.next_department._id ===
+                currentDepInfo?.linkDepartments[0]?.departmentId &&
+              "Chọn đơn để giao lại!"
+            }
+          >
+            <NavLink to={`/employee/order-detail/${record._id}`}>
+              {value}
+            </NavLink>
+          </Tooltip>
         );
       },
     },
     {
-      title: "Điểm đích",
-      dataIndex: "receive_department",
-      key: "receiveDepartment",
-      render: (value) => {
-        return <div>{value.name}</div>;
+      title: "Điểm tiếp theo",
+      dataIndex: "next_department",
+      key: "nextDepartment",
+      render: (data) => {
+        return (
+          <div className="text-orange-600 font-semibold">
+            {data?.name || (
+              <span className="text-gray-600">Chưa chọn điểm</span>
+            )}
+          </div>
+        );
       },
-      width: "15%",
+      width: "16%",
     },
     {
       title: "Người gửi",
       dataIndex: "sender",
       key: "senderName",
-      width: "12%",
+      width: "17%",
       filteredValue: [searchValue],
       onFilter: (value, record) =>
         String(record.sender).toLowerCase().includes(value.toLowerCase()) ||
         String(record.receiver).toLowerCase().includes(value.toLowerCase()) ||
         String(record._id).toLowerCase().includes(value.toLowerCase()),
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.send_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Người nhận",
       dataIndex: "receiver",
       key: "receiverName",
-      width: "12%",
+      width: "17%",
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record.senderPhone} - {record.receive_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Trạng thái",
@@ -263,31 +305,19 @@ const GatheringOrderTable = () => {
       render: (value) => {
         return <div>{new Date(value).toLocaleDateString("vi-VN")}</div>;
       },
+      filteredValue: [dates],
+      onFilter: (value, record) => {
+        if (dates.length > 0) {
+          return moment(record.createdAt).isBetween(
+            dates[0],
+            dates[1],
+            undefined,
+            "[]"
+          );
+        } else return record;
+      },
       width: "16%",
     },
-    // {
-    //   key: "action",
-    //   render: (value, record) => (
-    //     <div
-    //       className={`flex items-center ${
-    //         record.status === "rejected" ? "justify-between" : "justify-center"
-    //       }`}
-    //     >
-    //       {record?.status === "rejected" && (
-    //         <Tooltip
-    //           title={<span className="text-lg text-black">Gửi lại</span>}
-    //           color="white"
-    //         >
-    //           <span className="text-lg cursor-pointer hover:text-[#1e91cf]">
-    //             <SendOutlined />
-    //           </span>
-    //         </Tooltip>
-    //       )}
-    //     </div>
-    //   ),
-    //   width: "3%",
-    //   fixed: "right",
-    // },
   ];
 
   // Handle format linked departments so they don't include send department of order
@@ -339,11 +369,6 @@ const GatheringOrderTable = () => {
                         : order
                     );
                   });
-
-                  // const tmp = linkedDepOptions(record.send_department._id);
-                  // const des = tmp.find((item) => item.value === selectedNextDep).label;
-                  // console.log(des);
-                  // setDescription(des.label);
                 }}
                 size="large"
                 options={linkedDepOptions(record.send_department._id)}
@@ -397,17 +422,19 @@ const GatheringOrderTable = () => {
       disabled:
         record.status === "processing" &&
         record.next_department !== currentUser.workDepartment._id &&
-        filterValue === "outgoing orders",
+        filterValue === "outgoing orders" &&
+        record.next_department !== null,
 
       // Column configuration not to be checked
       status: record.status,
     }),
   };
+  console.log(dates);
   return (
     <>
       {contextHolder}
       <div className="w-full h-full">
-        <div className="w-full p-3 flex items-center">
+        <div className="w-full p-3 flex items-center justify-between">
           <div className="w-full flex items-center gap-x-3">
             <p className="font-semibold text-xl text-[#266191]">Bộ lọc</p>
             <Form
@@ -435,13 +462,16 @@ const GatheringOrderTable = () => {
               </Form.Item>
             </Form>
           </div>
-          <Input.Search
-            className="max-w-[42%] w-full"
-            size="large"
-            placeholder="Nhập mã đơn hàng, tên người gửi, người nhận"
-            onSearch={(value) => setSearchValue(value)}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
+
+          <div className="w-[60%]">
+            <Input.Search
+              className="w-full"
+              size="large"
+              placeholder="Nhập mã đơn hàng, tên người gửi, người nhận"
+              onSearch={(value) => setSearchValue(value)}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
         </div>
         <Table
           loading={isLoading}
@@ -456,20 +486,40 @@ const GatheringOrderTable = () => {
           scroll={{ x: 1600 }}
           pagination={{ pageSize: 10, position: ["bottomCenter"] }}
           title={() => (
-            <div className="flex items-center">
-              <span
-                onClick={() => setIsReloading(!isReloading)}
-                className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
-              >
-                <SyncOutlined spin={isReloading} className="text-[18px]" />
-              </span>
-              <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span
+                  onClick={() => setIsReloading(!isReloading)}
+                  className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
+                >
+                  <SyncOutlined spin={isReloading} className="text-[18px]" />
+                </span>
+                <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+              </div>
+              <div className="xl:w-[30%] w-[60%] md:w-[40%]">
+                <RangePicker
+                  className="w-full"
+                  size="large"
+                  format={"DD/MM/YYYY"}
+                  onChange={(value, dateString) => {
+                    console.log(value, dateString);
+                    if (value === null) return setDates([]);
+                    else {
+                      const formattedDates = value.map((date) => {
+                        return moment(date.$d, "DD/MM/YYYY");
+                      });
+                      console.log(formattedDates);
+                      setDates(formattedDates);
+                    }
+                  }}
+                />
+              </div>
             </div>
           )}
         />
 
         <div className="w-full flex items-center justify-between my-6">
-          <p className="font-semibold text-xl text-[#266191] bg-neutral-300 p-2 rounded-lg">
+          <p className="font-semibold text-xl text-[#266191] bg-neutral-200 p-2 rounded-lg">
             Đã chọn:{" "}
             <span className="text-orange-600">
               {selectedRows.length}/{allOrders.length}

@@ -1,14 +1,17 @@
 import { LeftOutlined, VerticalAlignTopOutlined } from "@ant-design/icons";
-import { Button, Descriptions, Divider, Spin } from "antd";
+import { Button, Descriptions, Divider, Spin, message } from "antd";
 import { Link, useParams } from "react-router-dom";
 import StatusLabel from "../statusLabel";
 import { useEffect, useState } from "react";
-import { getOrderById } from "../../repository/order/order";
+import { getOrderById, getOrderPdf } from "../../repository/order/order";
+import { useStoreState } from "../../store/hook";
 
 const OrderDetailPage = () => {
   const [orderData, setOrderData] = useState(null);
   const { id: orderId } = useParams();
-
+  const currentUser = useStoreState((state) => state.currentUser);
+  const [isLoading, setIsLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
   useEffect(() => {
     const fetchOrderById = async (orderId) => {
       const res = await getOrderById(orderId);
@@ -26,11 +29,33 @@ const OrderDetailPage = () => {
       </div>
     );
   }
+  const handleExportReceipt = async () => {
+    const data = {
+      orderId: orderData._id,
+    };
+    setIsLoading(true);
+    const res = await getOrderPdf(data);
+    if (res) {
+      setIsLoading(false);
+      const url = window.URL.createObjectURL(new Blob([res]), {
+        type: "application/pdf",
+      });
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", "order-receipt.pdf");
+      document.body.appendChild(link);
+      link.click();
+    } else {
+      setIsLoading(false);
+      messageApi.error("Có lỗi xảy ra, vui lòng thử lại sau");
+    }
+  };
   const {
     sender,
     receiver,
     status,
-
+    COD,
     weight,
     price,
     type,
@@ -114,11 +139,19 @@ const OrderDetailPage = () => {
     },
     {
       key: "7",
+      label: "Cước COD",
+      children: new Intl.NumberFormat("de-DE", {
+        style: "currency",
+        currency: "VND",
+      }).format(COD),
+    },
+    {
+      key: "8",
       label: "Địa điểm hiện tại",
       children: current_department?.name,
     },
     {
-      key: "8",
+      key: "9",
       label: "Địa điểm tiếp theo",
       children:
         next_department === null
@@ -127,48 +160,56 @@ const OrderDetailPage = () => {
     },
   ];
   return (
-    <div className="w-full h-full">
-      <div className="flex items-center w-full">
-        <Link
-          to="/employee/manage-orders"
-          className="p-2 text-black hover:text-black"
-        >
-          <LeftOutlined className="text-md hover:text-neutral-500" />
-        </Link>
-        <Divider type="vertical" />
-        <div className="flex items-center justify-between w-full">
-          <h1 className="font-semibold text-md">Chi tiết đơn hàng</h1>
-          <Button
-            icon={<VerticalAlignTopOutlined className="text-md" />}
-            size="large"
-            type="primary"
+    <>
+      {contextHolder}
+
+      <div className="w-full h-full">
+        <div className="flex items-center w-full">
+          <Link
+            to="/employee/manage-orders"
+            className="p-2 text-black hover:text-black"
           >
-            In vận đơn
-          </Button>
+            <LeftOutlined className="text-md hover:text-neutral-500" />
+          </Link>
+          <Divider type="vertical" />
+          <div className="flex items-center justify-between w-full">
+            <h1 className="font-semibold text-md">Chi tiết đơn hàng</h1>
+            {currentUser?.role === "transactionStaff" && (
+              <Button
+                loading={isLoading}
+                onClick={handleExportReceipt}
+                icon={<VerticalAlignTopOutlined className="text-md" />}
+                size="large"
+                type="primary"
+              >
+                In vận đơn
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-[16px]">
+          <Descriptions
+            title={<h2 className="font-semibold">Người gửi</h2>}
+            layout="vertical"
+            bordered
+            items={senderInfo}
+          />
+          <Descriptions
+            title={<h2 className="mt-3 font-semibold ">Người nhận</h2>}
+            layout="vertical"
+            bordered
+            items={receiverInfo}
+          />
+          <Descriptions
+            title={<h2 className="mt-3 font-semibold">Thông tin Đơn hàng</h2>}
+            layout="vertical"
+            bordered
+            items={orderInfo}
+          />
         </div>
       </div>
-
-      <div className="mt-[16px]">
-        <Descriptions
-          title={<h2 className="font-semibold">Người gửi</h2>}
-          layout="vertical"
-          bordered
-          items={senderInfo}
-        />
-        <Descriptions
-          title={<h2 className="mt-3 font-semibold ">Người nhận</h2>}
-          layout="vertical"
-          bordered
-          items={receiverInfo}
-        />
-        <Descriptions
-          title={<h2 className="mt-3 font-semibold">Thông tin Đơn hàng</h2>}
-          layout="vertical"
-          bordered
-          items={orderInfo}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 
