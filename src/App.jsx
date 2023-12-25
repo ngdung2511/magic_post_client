@@ -11,9 +11,10 @@ import GoodsInventoryPage from "./pages/DashBoard/headOfSite/GoodsInventoryPage"
 import Home from "./pages/Home/Home";
 import Hero from "./components/hero/Hero";
 import ForgetPassword from "./pages/forgetPass/ForgetPassword";
-
+import { OrdersListPage } from "./pages/DashBoard/boss/OrdersListPage";
 import OrderDetailPage from "./components/Staff/OrderDetailPage";
 import ManageOrderPage from "./pages/DashBoard/employee/ManageOrderPage";
+import ManagePointOrders from "./pages/DashBoard/boss/ManagePointOrders";
 
 function App() {
   const ROUTE = [
@@ -51,6 +52,8 @@ function App() {
             <Route path="boss/manage-sites" element={<ManageSitePage />} />
             <Route path="boss/manage-sites/:id" element={<SingleSitePage />} />
             <Route path="boss/goods-stats" element={<GoodsStatsPage />} />
+            <Route path="boss/order-list/:id" element={<OrdersListPage />} /> 
+            <Route path="boss/points-order" element={<ManagePointOrders />} />
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route
