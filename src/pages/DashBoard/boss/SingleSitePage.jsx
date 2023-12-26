@@ -1,10 +1,5 @@
-import {
-  EditOutlined,
-  LeftOutlined,
-  ShoppingCartOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
-import { Button, Card, Descriptions, Divider, Spin, Statistic } from "antd";
+import { EditOutlined, LeftOutlined } from "@ant-design/icons";
+import { Button, Descriptions, Divider, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -135,65 +130,27 @@ const SingleSitePage = () => {
       </div>
       <Divider />
       <div className="w-full">
-        <div>
-          <div className="w-full">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-              <Card>
-                <Statistic
-                  prefix={
-                    <TeamOutlined
-                      size={20}
-                      className="p-2 text-white bg-green-500 rounded-full"
-                    />
-                  }
-                  title={
-                    <p className="text-lg font-medium text-neutral-600">
-                      Nhân viên
-                    </p>
-                  }
-                  value={112893}
-                />
-              </Card>
-              <Card>
-                <Statistic
-                  prefix={
-                    <ShoppingCartOutlined
-                      size={20}
-                      className="p-2 text-white bg-orange-500 rounded-full"
-                    />
-                  }
-                  title={
-                    <p className="text-lg font-medium text-neutral-600">
-                      Đơn hàng
-                    </p>
-                  }
-                  value={112893}
-                />
-              </Card>
-            </div>
-          </div>
-          <div className="mt-[12px]">
-            <Descriptions
-              title={<h2 className="font-semibold">Thông tin chi tiết</h2>}
-              layout="vertical"
-              bordered
-              items={siteInfo}
-            />
-            <Descriptions
-              title={<h2 className="mt-2 font-semibold">Trưởng điểm</h2>}
-              layout="vertical"
-              bordered
-              items={headOfSiteInfo}
-            />
-          </div>
-
-          <EditSiteModal
-            setIsDepChanged={setIsDepChanged}
-            currentDepartment={currentDepartment}
-            isOpenEditSiteModal={isOpenEditSiteModal}
-            setIsOpenEditSiteModal={setIsOpenEditSiteModal}
+        <div className="mt-[12px]">
+          <Descriptions
+            title={<h2 className="font-semibold">Thông tin chi tiết</h2>}
+            layout="vertical"
+            bordered
+            items={siteInfo}
+          />
+          <Descriptions
+            title={<h2 className="mt-2 font-semibold">Trưởng điểm</h2>}
+            layout="vertical"
+            bordered
+            items={headOfSiteInfo}
           />
         </div>
+
+        <EditSiteModal
+          setIsDepChanged={setIsDepChanged}
+          currentDepartment={currentDepartment}
+          isOpenEditSiteModal={isOpenEditSiteModal}
+          setIsOpenEditSiteModal={setIsOpenEditSiteModal}
+        />
       </div>
     </div>
   );

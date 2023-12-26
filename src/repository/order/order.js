@@ -7,6 +7,10 @@ export const createOrder = async (order) => {
 export const getOrderByDepartmentId = async (departmentId) => {
     return api.get(`${UtilConstants.baseUrl}/orders/department/${departmentId}`)
 }
+export const getAllOrders = async () => {
+    return api.get(`${UtilConstants.baseUrl}/orders`)
+
+}
 export const deleteOrder = async (orderId) => {
     return api.delete(`${UtilConstants.baseUrl}/orders/${orderId}`)
 }

@@ -1,8 +1,8 @@
 import axios from "axios";
 import UtilConstants from "../../shared/constants";
 import { utilFuncs } from "../../utils/utils";
-import { useStoreActions, useStoreState } from "../../store/hook";
 
+import api from '../index'
 export const createEmployee = async (user) => {
     try {
         const header = {
@@ -28,10 +28,10 @@ export const getEmployeeByDepartmentId = async (departmentId) => {
     try {
         const query = {
             condition: {
-                departmentId: departmentId 
+                departmentId: departmentId
             }
         };
-        
+
         return await axios.get(UtilConstants.baseUrl + `/users`, { params: query });
     } catch (error) {
         console.log('Error:', error);
@@ -61,4 +61,7 @@ export const updateEmployee = async (userId, userData) => {
         console.log('Error:', error);
         throw error;
     }
+}
+export const getEmployeeByCondition = (condition) => {
+    return api.get(`${UtilConstants.baseUrl}/users`, { params: { condition } });
 }

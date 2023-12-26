@@ -6,7 +6,7 @@ const ManagePointOrders = () => {
   return (
     <div className="w-full h-full">
       <Typography.Title className="mb-0" level={1}>
-        Quản lý điểm kho
+        Thống kê hàng hóa
       </Typography.Title>
       <Divider />
       <div className="w-full">
