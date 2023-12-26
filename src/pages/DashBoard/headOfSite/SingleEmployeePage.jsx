@@ -10,6 +10,7 @@ import {
   import EditEmployeeModal from "../../../components/HeadOfSite/EditEmployeeModal";
   import { useStoreActions, useStoreState } from "../../../store/hook";
   import { updateEmployee } from "../../../repository/employee/employee";
+import { current } from "@reduxjs/toolkit";
   
   const SingleEmployeePage = () => {
     const { id: employeeId } = useParams();
@@ -85,6 +86,9 @@ import {
         children: location,
       }
     ];
+    if(currentEmployee.avatarUrl === '') {
+      currentEmployee.avatarUrl = "https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png";
+    }
     return (
       <div className="w-full h-full">
         <div className="flex items-center w-full">
@@ -119,26 +123,6 @@ import {
         
         <div className="w-full">
           <div>
-            <div className="w-full">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                <Card>
-                  <Statistic
-                    prefix={
-                      <ShoppingCartOutlined
-                        size={20}
-                        className="p-2 text-white bg-orange-500 rounded-full"
-                      />
-                    }
-                    title={
-                      <p className="text-lg font-medium text-neutral-600">
-                        Đơn hàng đã hoàn thành
-                      </p>
-                    }
-                    value={112893}
-                  />
-                </Card>
-              </div>
-            </div>
             <div className="mt-[12px]">
               <Descriptions
                 title={<h2 className="font-semibold">Thông tin chi tiết</h2>}

@@ -17,6 +17,8 @@ import {
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
+import { data } from "autoprefixer";
+import moment from "moment";
 
 const TransactionPage = () => {
   const [form] = Form.useForm();
@@ -28,8 +30,7 @@ const TransactionPage = () => {
   const [locationFilter, setLocationFilter] = useState("send");
   const [isReloading, setIsReloading] = useState(false);
   const { RangePicker } = DatePicker;
-  const [minDate, setMinDate] = useState("fack");
-  const [maxDate, setMaxDate] = useState("fack");
+  const [dates, setDates] = useState([]);
 
   // Fetch orders based on filter value
   useEffect(() => {
@@ -132,24 +133,20 @@ const TransactionPage = () => {
       render: (value) => {
         return <div>{new Date(value).toLocaleDateString("vi-VN")}</div>;
       },
-      filteredValue: [minDate, maxDate],
+      filteredValue: [dates],
       onFilter: (value, record) => {
-        if (minDate === "fack" || maxDate === "fack") {
-          return true;
+        if(dates.length > 0){
+          return moment(record.createdAt).isBetween(dates[0], dates[1], undefined, '[]');
+        } else {
+          return record;
         }
-        const date = new Date(record.createdAt).getTime();
-        console.log(new Date(minDate), new Date(maxDate));
-        return date >= new Date(minDate).getTime() && date <= new Date(maxDate).getTime();
       },
       width: "16%",
     }, 
   ];
 
   // Handle date
-  const handleDateChange = (value, dateString) => {
-    setMinDate(dateString[0]);
-    setMaxDate(dateString[1]);
-  };
+  
   return (
     <>
       <div className="w-full h-full">
@@ -219,8 +216,17 @@ const TransactionPage = () => {
                 <RangePicker
                   className="w-full"
                   size="large"
-                  format={"DD-MM-YYYY"}
-                  onChange={handleDateChange}
+                  format={"DD/MM/YYYY"}
+                  onChange={(value, dateString) => {
+                    if (value === null) {
+                      return setDates([]);
+                    } else {
+                      const formatDates = value.map((date) => {
+                        return moment(date.$d, 'DD/MM/YYYY');
+                      });
+                      setDates(formatDates);
+                    }
+                  }}
                 />
               </div>
           </div>

@@ -17,6 +17,7 @@ import {
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
+import moment from "moment";
 
 const GatheringPage = () => {
   const [form] = Form.useForm();
@@ -28,8 +29,7 @@ const GatheringPage = () => {
   const [locationFilter, setLocationFilter] = useState("send");
   const [isReloading, setIsReloading] = useState(false);
   const { RangePicker } = DatePicker;
-  const [minDate, setMinDate] = useState("fack");
-  const [maxDate, setMaxDate] = useState("fack");
+  const [dates, setDates] = useState([]);
 
   // Fetch orders based on filter value
   useEffect(() => {
@@ -132,14 +132,13 @@ const GatheringPage = () => {
       render: (value) => {
         return <div>{new Date(value).toLocaleDateString("vi-VN")}</div>;
       },
-      filteredValue: [minDate, maxDate],
+      filteredValue: [dates],
       onFilter: (value, record) => {
-        if (minDate === "fack" || maxDate === "fack") {
-          return true;
+        if(dates.length > 0){
+          return moment(record.createdAt).isBetween(dates[0], dates[1], undefined, '[]');
+        } else {
+          return record;
         }
-        const date = new Date(record.createdAt).getTime();
-        console.log(new Date(minDate), new Date(maxDate));
-        return date >= new Date(minDate).getTime() && date <= new Date(maxDate).getTime();
       },
       width: "16%",
     }, 
@@ -216,14 +215,23 @@ const GatheringPage = () => {
               </Form.Item>
             </Form>
             <div className="xl:w-[30%] w-[60%] md:w-[40%]">
-                <RangePicker
+              <RangePicker
                   className="w-full"
                   size="large"
-                  format={"DD-MM-YYYY"}
-                  onChange={handleDateChange}
+                  format={"DD/MM/YYYY"}
+                  onChange={(value, dateString) => {
+                    if (value === null) {
+                      return setDates([]);
+                    } else {
+                      const formatDates = value.map((date) => {
+                        return moment(date.$d, 'DD/MM/YYYY');
+                      });
+                      setDates(formatDates);
+                    }
+                  }}
                 />
               </div>
-          </div>
+            </div>
           <Input.Search
             className="max-w-[42%] w-full"
             size="large"
