@@ -485,7 +485,7 @@ const TransactionOrderTable = () => {
                   options={[
                     {
                       value: "outgoing orders",
-                      label: "Đơn gốc từ điểm",
+                      label: "Đơn gửi từ điểm",
                     },
                     {
                       value: "incoming orders",
@@ -493,7 +493,7 @@ const TransactionOrderTable = () => {
                     },
                     {
                       value: "at destination",
-                      label: "Điểm đích tại đây",
+                      label: "Đơn nhận tại điểm",
                     },
                   ]}
                 />
