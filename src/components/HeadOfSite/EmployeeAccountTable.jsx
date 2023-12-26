@@ -4,13 +4,25 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Input, Popconfirm, Space, Table, Typography, Upload, message } from "antd";
+import {
+  Button,
+  Input,
+  Popconfirm,
+  Space,
+  Table,
+  Typography,
+  Upload,
+  message,
+} from "antd";
 import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import { NavLink } from "react-router-dom";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import CreateEmployeeModal from "./CreateEmployeeModal";
-import { deleteEmployee, createEmployeeFromFile } from "../../repository/employee/employee";
+import {
+  deleteEmployee,
+  createEmployeeFromFile,
+} from "../../repository/employee/employee";
 
 const EmployeeAccountTable = () => {
   const currentUser = useStoreState((state) => state.currentUser);
@@ -23,7 +35,9 @@ const EmployeeAccountTable = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Get all employees from API
-  const fetchEmployees = useStoreActions((actions) => actions.fetchEmployeesByDepartment);
+  const fetchEmployees = useStoreActions(
+    (actions) => actions.fetchEmployeesByDepartment
+  );
 
   useEffect(() => {
     fetchEmployees(currentUser.workDepartment);
@@ -54,7 +68,7 @@ const EmployeeAccountTable = () => {
       console.log(error);
       messageApi.error("Đã có lỗi xảy ra");
     }
-  }
+  };
 
   // Handle delete employee
   const handleDelete = async (id) => {
@@ -168,9 +182,7 @@ const EmployeeAccountTable = () => {
       width: "15%",
       render: (value, record) => {
         return (
-          <NavLink to={`/head/manage-account/${record._id}`}>
-            {value}
-          </NavLink>
+          <NavLink to={`/head/manage-account/${record._id}`}>{value}</NavLink>
         );
       },
     },
@@ -178,7 +190,7 @@ const EmployeeAccountTable = () => {
       title: "Giới tính",
       dataIndex: "gender",
       render: (value) => {
-        return <p>{value === 'male' ? 'Nam' : 'Nữ'}</p>;
+        return <p>{value === "male" ? "Nam" : "Nữ"}</p>;
       },
       width: "8%",
     },
@@ -219,17 +231,18 @@ const EmployeeAccountTable = () => {
   ];
   return (
     <div className="w-full h-full py-4">
+      {contextHolder}
       <Table
         dataSource={employees}
-        rowKey={(row) =>{
-          return row._id
+        rowKey={(row) => {
+          return row._id;
         }}
         columns={columns}
         bordered
         scroll={{
           x: "calc(700px + 50%)",
         }}
-        pagination={{ pageSize: 3 }}
+        pagination={{ pageSize: 10 }}
         title={() => (
           <div className="flex items-center justify-between">
             <Typography.Title className="mb-0" level={3}>
@@ -242,26 +255,31 @@ const EmployeeAccountTable = () => {
             <div className="flex items-center gap-x-3">
               <Upload action={handleUpload} fileList={null}>
                 <Button
-                icon={isLoading ? <LoadingOutlined/> : <PlusOutlined />}
-                type="primary"
-                size="large">
-                Import file
+                  icon={isLoading ? <LoadingOutlined /> : <PlusOutlined />}
+                  type="primary"
+                  size="large"
+                >
+                  Import file
                 </Button>
               </Upload>
-            
+
               <Button
                 onClick={() => setIsModalOpen(true)}
                 icon={<PlusOutlined />}
                 type="primary"
-                size="large">
+                size="large"
+              >
                 Thêm nhân viên
               </Button>
             </div>
           </div>
         )}
       />
-      
-      <span className="text-2xl font-semibold">Điểm {currentUser.role === 'headTransaction' ? 'Giao Dịch' : 'Tập Kết'} {currentUser.workDepartment.address} </span>
+
+      <span className="text-2xl font-semibold">
+        Điểm {currentUser.role === "headTransaction" ? "Giao Dịch" : "Tập Kết"}{" "}
+        {currentUser.workDepartment.address}{" "}
+      </span>
     </div>
   );
 };

@@ -1,13 +1,5 @@
-import {
-  SyncOutlined,
-} from "@ant-design/icons";
-import {
-  Form,
-  Input,
-  Select,
-  Table,
-  DatePicker,
-} from "antd";
+import { SyncOutlined } from "@ant-design/icons";
+import { Form, Input, Select, Table, DatePicker } from "antd";
 import { useEffect, useState } from "react";
 import StatusLabel from "../../../components/StatusLabel";
 
@@ -17,8 +9,9 @@ import {
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
-import { data } from "autoprefixer";
+
 import moment from "moment";
+import { orderStatusOptions } from "../../../shared/commonData";
 
 const TransactionPage = () => {
   const [form] = Form.useForm();
@@ -26,18 +19,18 @@ const TransactionPage = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   const [allOrders, setAllOrders] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+
   const [locationFilter, setLocationFilter] = useState("send");
   const [isReloading, setIsReloading] = useState(false);
   const { RangePicker } = DatePicker;
   const [dates, setDates] = useState([]);
-
+  const [filteredInfo, setFilteredInfo] = useState({});
   // Fetch orders based on filter value
   useEffect(() => {
     const fetchOrderWithCondition = async (condition) => {
       setIsLoading(true);
       const res = await getOrderByCondition(condition);
-      console.log('fetch order by depart', res);
+      console.log("fetch order by depart", res);
       if (res?.status === 200) {
         setAllOrders(res.data.orders);
         setIsLoading(false);
@@ -46,15 +39,15 @@ const TransactionPage = () => {
     };
 
     const filter = {
-      condition: {}
+      condition: {},
     };
     //location [send, receive, current, next]
     if (locationFilter === "receive") {
       filter.condition.receive_department = currentUser.workDepartment._id;
     } else if (locationFilter === "send") {
       filter.condition.send_department = currentUser.workDepartment._id;
-    } 
-    fetchOrderWithCondition(filter)
+    }
+    fetchOrderWithCondition(filter);
   }, [locationFilter, currentUser.workDepartment._id, isReloading]);
 
   const columns = [
@@ -62,9 +55,9 @@ const TransactionPage = () => {
       title: "Mã đơn hàng",
       dataIndex: "_id",
       key: "orderCode",
-      render: value => {
-        return <>{value}</>
-      }
+      render: (value) => {
+        return <>{value}</>;
+      },
     },
     {
       title: "Người gửi",
@@ -117,14 +110,10 @@ const TransactionPage = () => {
       render: (value) => {
         return <StatusLabel status={value} />;
       },
-      filteredValue: [statusFilter],
-      onFilter: (value, record) => {
-        if (value === "all") {
-          return true;
-        }
-        return String(record.status) === value;
-      },
+      filteredValue: filteredInfo.status || null,
+      onFilter: (value, record) => record.status.includes(value),
       width: "20%",
+      filters: orderStatusOptions,
     },
     {
       title: "Ngày gửi hàng",
@@ -135,60 +124,30 @@ const TransactionPage = () => {
       },
       filteredValue: [dates],
       onFilter: (value, record) => {
-        if(dates.length > 0){
-          return moment(record.createdAt).isBetween(dates[0], dates[1], undefined, '[]');
+        if (dates.length > 0) {
+          return moment(record.createdAt).isBetween(
+            dates[0],
+            dates[1],
+            undefined,
+            "[]"
+          );
         } else {
           return record;
         }
       },
       width: "16%",
-    }, 
+    },
   ];
 
   // Handle date
-  
+
   return (
     <>
       <div className="w-full h-full">
         <div className="w-full p-3 flex items-center">
           <div className="w-full flex items-center gap-x-3">
             <p className="font-semibold text-xl text-[#266191]">Bộ lọc</p>
-            <Form
-              form={form}
-              initialValues={{
-                statusFilter: "all",
-              }}
-            >
-              <Form.Item noStyle className="w-full" name="statusFilter">
-                <Select
-                  onChange={(value) => setStatusFilter(value)}
-                  placeholder="Chọn trạng thái"
-                  size="large"
-                  options={[
-                    {
-                      value: "all",
-                      label: "Tất cả",
-                    },
-                    {
-                      value: "accepted",
-                      label: "Đã xác nhận",
-                    },
-                    {
-                      value: "delivered",
-                      label: "Đã giao",
-                    },
-                    {
-                      value: "processing",
-                      label: "Chờ xác nhận",
-                    },
-                    {
-                      value: "rejected",
-                      label: "Chuyển tiếp thất bại",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Form>
+
             <Form
               form={form}
               initialValues={{
@@ -202,33 +161,33 @@ const TransactionPage = () => {
                   options={[
                     {
                       value: "send",
-                      label: "Được gửi từ điểm này",
+                      label: "Được gửi từ điểm",
                     },
                     {
                       value: "receive",
-                      label: "Được nhận tại điểm này",
+                      label: "Được nhận tại điểm",
                     },
                   ]}
                 />
               </Form.Item>
             </Form>
             <div className="xl:w-[30%] w-[60%] md:w-[40%]">
-                <RangePicker
-                  className="w-full"
-                  size="large"
-                  format={"DD/MM/YYYY"}
-                  onChange={(value, dateString) => {
-                    if (value === null) {
-                      return setDates([]);
-                    } else {
-                      const formatDates = value.map((date) => {
-                        return moment(date.$d, 'DD/MM/YYYY');
-                      });
-                      setDates(formatDates);
-                    }
-                  }}
-                />
-              </div>
+              <RangePicker
+                className="w-full"
+                size="large"
+                format={"DD/MM/YYYY"}
+                onChange={(value, dateString) => {
+                  if (value === null) {
+                    return setDates([]);
+                  } else {
+                    const formatDates = value.map((date) => {
+                      return moment(date.$d, "DD/MM/YYYY");
+                    });
+                    setDates(formatDates);
+                  }
+                }}
+              />
+            </div>
           </div>
           <Input.Search
             className="max-w-[42%] w-full"
@@ -239,6 +198,9 @@ const TransactionPage = () => {
           />
         </div>
         <Table
+          onChange={(pagination, filters, sorter) => {
+            setFilteredInfo(filters);
+          }}
           loading={isLoading}
           rowKey={(row) => row._id}
           columns={columns}
@@ -260,7 +222,6 @@ const TransactionPage = () => {
             </div>
           )}
         />
-        
       </div>
     </>
   );
