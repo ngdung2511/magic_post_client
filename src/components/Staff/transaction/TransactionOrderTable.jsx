@@ -493,7 +493,7 @@ const TransactionOrderTable = () => {
                     },
                     {
                       value: "at destination",
-                      label: "Điểm đích tại đây",
+                      label: "Đơn nhận tại đây",
                     },
                   ]}
                 />

@@ -127,7 +127,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     setIsModalOpen(false);
   };
   const onHandleFinish = async (values) => {
-    // setIsLoading(true);
+    setIsLoading(true);
     console.log("values: ", values);
     values.siteType === "Transaction"
       ? (values.role = "headTransaction")
@@ -170,27 +170,27 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     };
     console.log(data);
 
-    // try {
-    //   const res = await createDepartment(data);
-    //   if (res.status === 201) {
-    //     fetchDepartments();
+    try {
+      const res = await createDepartment(data);
+      if (res.status === 201) {
+        fetchDepartments();
 
-    //     messageApi.success("Tạo điểm thành công");
-    //     setIsLoading(false);
-    //     setIsModalOpen(false);
-    //     form.resetFields();
-    //   }
-    // } catch (error) {
-    //   if (error.response.data.message === "this user existed") {
-    //     messageApi.error("Email đã tồn tại");
-    //   } else if (
-    //     error.response.data.message === "this gathering point already exists"
-    //   ) {
-    //     messageApi.error("Điểm đã tồn tại");
-    //   } else messageApi.error("Đã có lỗi xảy ra");
-    //   setIsLoading(false);
-    //   console.log(error.response.data.message);
-    // }
+        messageApi.success("Tạo điểm thành công");
+        setIsLoading(false);
+        setIsModalOpen(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      if (error.response.data.message === "this user existed") {
+        messageApi.error("Email đã tồn tại");
+      } else if (
+        error.response.data.message === "this gathering point already exists"
+      ) {
+        messageApi.error("Điểm đã tồn tại");
+      } else messageApi.error("Đã có lỗi xảy ra");
+      setIsLoading(false);
+      console.log(error.response.data.message);
+    }
   };
 
   const filterOption = (input, option) => {

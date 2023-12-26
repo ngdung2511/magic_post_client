@@ -1,6 +1,6 @@
 import { LeftOutlined, VerticalAlignTopOutlined } from "@ant-design/icons";
 import { Button, Descriptions, Divider, Spin, message } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import StatusLabel from "../statusLabel";
 import { useEffect, useState } from "react";
 import { getOrderById, getOrderPdf } from "../../repository/order/order";
@@ -12,6 +12,7 @@ const OrderDetailPage = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   const [isLoading, setIsLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchOrderById = async (orderId) => {
       const res = await getOrderById(orderId);
@@ -159,18 +160,23 @@ const OrderDetailPage = () => {
           : next_department?.name,
     },
   ];
+  // const isBoss = currentUser?.role.includes("admin");
+
   return (
     <>
       {contextHolder}
 
       <div className="w-full h-full">
         <div className="flex items-center w-full">
-          <Link
-            to="/employee/manage-orders"
+          {/* <Link
+            to={`/${isBoss ? 'boss':'employee'}/manage-orders`}
             className="p-2 text-black hover:text-black"
           >
             <LeftOutlined className="text-md hover:text-neutral-500" />
-          </Link>
+          </Link> */}
+          <div onClick={() => navigate(-1)}>
+            <LeftOutlined className="text-md hover:text-neutral-500 cursor-pointer" />
+          </div>
           <Divider type="vertical" />
           <div className="flex items-center justify-between w-full">
             <h1 className="font-semibold text-md">Chi tiết đơn hàng</h1>

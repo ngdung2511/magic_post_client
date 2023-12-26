@@ -5,7 +5,7 @@ import DashBoard from "./pages/DashBoard/DashBoard";
 import NotFound from "./pages/NotFound/NotFound";
 import ManageSitePage from "./pages/DashBoard/boss/ManageSitePage";
 import SingleSitePage from "./pages/DashBoard/boss/SingleSitePage";
-import GoodsStatsPage from "./pages/DashBoard/boss/GoodsStatsPage";
+
 import ManageAccountPage from "./pages/DashBoard/headOfSite/ManageAccountPage";
 import GoodsInventoryPage from "./pages/DashBoard/headOfSite/GoodsInventoryPage";
 import Home from "./pages/Home/Home";
@@ -51,8 +51,8 @@ function App() {
           <Route path="/" element={<DashBoard />}>
             <Route path="boss/manage-sites" element={<ManageSitePage />} />
             <Route path="boss/manage-sites/:id" element={<SingleSitePage />} />
-            <Route path="boss/goods-stats" element={<GoodsStatsPage />} />
-            <Route path="boss/order-list/:id" element={<OrdersListPage />} /> 
+            <Route path="boss/order-list/:id" element={<OrdersListPage />} />
+            <Route path="boss/order-detail/:id" element={<OrderDetailPage />} />
             <Route path="boss/points-order" element={<ManagePointOrders />} />
           </Route>
           <Route path="/" element={<DashBoard />}>

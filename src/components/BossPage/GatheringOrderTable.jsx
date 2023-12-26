@@ -10,10 +10,9 @@ import {
   message,
 } from "antd";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import StatusLabel from "../StatusLabel";
-
 
 import moment from "moment";
 import { getDepartmentById } from "../../repository/department/department";
@@ -36,6 +35,7 @@ const GatheringOrderTable = () => {
   const [currentDepInfo, setCurrentDepInfo] = useState({});
   const [dates, setDates] = useState([]);
   const { id } = useParams();
+  const navigate = useNavigate();
   console.log(id);
   useEffect(() => {
     const fetchCurrentDepInfo = async () => {
@@ -73,13 +73,7 @@ const GatheringOrderTable = () => {
       },
     };
     fetchOrderByGatheringDep(data);
-     
-  }, [
-    id,
-    messageApi,
-    isOrderUpdated,
-    isReloading,
-  ]);
+  }, [id, messageApi, isOrderUpdated, isReloading]);
 
   const columns = [
     {
@@ -97,9 +91,9 @@ const GatheringOrderTable = () => {
               "Chọn đơn để giao lại!"
             }
           >
-            <NavLink to={`/employee/order-detail/${record._id}`}>
+            <a onClick={() => navigate(`/boss/order-detail/${record._id}`)}>
               {value}
-            </NavLink>
+            </a>
           </Tooltip>
         );
       },
@@ -204,7 +198,7 @@ const GatheringOrderTable = () => {
         } else return record;
       },
       width: "16%",
-    }
+    },
   ];
 
   // Handle format linked departments so they don't include send department of order
@@ -271,14 +265,13 @@ const GatheringOrderTable = () => {
   }
 
   // Handle select rows of orders in table
-   
+
   console.log(dates);
   return (
     <>
       {contextHolder}
       <div className="w-full h-full">
         <div className="w-full p-3 flex items-center justify-between">
-          
           <div className="w-[60%]">
             <Input.Search
               className="w-full"
@@ -291,7 +284,6 @@ const GatheringOrderTable = () => {
         </div>
         <Table
           loading={isLoading}
-           
           rowKey={(row) => row._id}
           columns={columns}
           dataSource={allOrders}
@@ -307,7 +299,13 @@ const GatheringOrderTable = () => {
                 >
                   <SyncOutlined spin={isReloading} className="text-[18px]" />
                 </span>
-                <h2 className="font-semibold h-full">Điểm {(currentDepInfo.type === 'Gathering') ? 'Tập kết' : 'Giao dịch'} {currentDepInfo.name}</h2>
+                <h2 className="font-semibold h-full">
+                  Điểm{" "}
+                  {currentDepInfo.type === "Gathering"
+                    ? "Tập kết"
+                    : "Giao dịch"}{" "}
+                  {currentDepInfo.name}
+                </h2>
               </div>
               <div className="xl:w-[30%] w-[60%] md:w-[40%]">
                 <RangePicker
@@ -321,7 +319,7 @@ const GatheringOrderTable = () => {
                       const formattedDates = value.map((date) => {
                         return moment(date.$d, "DD/MM/YYYY");
                       });
-                       
+
                       setDates(formattedDates);
                     }
                   }}
@@ -330,8 +328,6 @@ const GatheringOrderTable = () => {
             </div>
           )}
         />
-
-       
       </div>
     </>
   );

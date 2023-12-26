@@ -62,7 +62,7 @@ function DashBoard() {
         getItem(
           <NavLink to="/head/goods-inventory">Thống kê hàng hóa</NavLink>,
           "3"
-        ), 
+        ),
       ],
       currentUser?.role !== "headTransaction" &&
         currentUser?.role !== "headGathering"
@@ -73,14 +73,11 @@ function DashBoard() {
       <UserOutlined />,
       [
         getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "4"),
+
         getItem(
-          <NavLink to="/boss/goods-stats">Thống kê hàng hóa</NavLink>,
+          <NavLink to="/boss/points-order">Thống kê hàng hóa</NavLink>,
           "5"
-        ),  
-        getItem(
-          <NavLink to="/boss/points-order">Đơn hàng tại các điểm</NavLink>,
-          "6"
-        )
+        ),
       ],
       currentUser?.role !== "admin"
     ),
