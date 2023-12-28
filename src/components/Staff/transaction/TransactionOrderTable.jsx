@@ -1,18 +1,13 @@
-import {
-  DeleteOutlined,
-  PlusOutlined,
-  SendOutlined,
-  SyncOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined, SyncOutlined } from "@ant-design/icons";
 import {
   Button,
+  DatePicker,
   Form,
   Input,
   Popconfirm,
   Select,
   Table,
   Tooltip,
-  Typography,
   message,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -28,6 +23,8 @@ import {
 } from "../../../repository/order/order";
 import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
+import moment from "moment";
+import { orderStatusOptions } from "../../../shared/commonData";
 
 const TransactionOrderTable = () => {
   const [form] = Form.useForm();
@@ -45,6 +42,8 @@ const TransactionOrderTable = () => {
   const [ordersData, setOrdersData] = useState([]);
   const [isOrderUpdated, setIsOrderUpdated] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
+  const [dates, setDates] = useState([]);
+  const [filteredInfo, setFilteredInfo] = useState({});
   useEffect(() => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(currentUser.workDepartment._id);
@@ -101,16 +100,29 @@ const TransactionOrderTable = () => {
         },
       };
       fetchOrderByTransactionDep(data);
+    } else if (filterValue === "at destination") {
+      const data = {
+        condition: {
+          current_department: currentUser.workDepartment._id,
+        },
+      };
+      fetchOrderByTransactionDep(data);
     }
-  }, [filterValue, currentUser.workDepartment._id, isReloading]);
+  }, [
+    filterValue,
+    currentUser.workDepartment._id,
+    isReloading,
+    isOrderUpdated,
+  ]);
 
   // Handle format selected orders to send to server
-  const handleFormatResendOrder = () => {
+  const handleFormatResendOrder = (selectedRows) => {
+    console.log(selectedRows);
     const formattedOrders = selectedRows.map((order) => {
       if (
         order.status === "rejected" &&
         order.next_department._id ===
-          currentDepInfo?.linkDepartments[0].departmentId
+          currentDepInfo?.linkDepartments[0]?.departmentId
       ) {
         return {
           orderId: order._id,
@@ -124,12 +136,75 @@ const TransactionOrderTable = () => {
     };
   };
 
+  const handleFormatRejectOrders = (selectedRows) => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "processing" &&
+        order.next_department._id === currentUser.workDepartment._id
+      ) {
+        return {
+          orderId: order._id,
+          description: `Đơn hàng giao đến ${currentUser.workDepartment.name} thất bại`,
+        };
+      } else if (
+        order.status === "accepted" &&
+        order.receive_department._id === order.current_department._id
+      ) {
+        return {
+          orderId: order._id,
+          description: `Đơn hàng giao đến bạn thất bại. Đang giao lại!`,
+        };
+      }
+    });
+    return {
+      type: "reject",
+      orders: [...formattedOrders],
+    };
+  };
+  const handleFormatConfirmOrders = (selectedRows) => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "processing" &&
+        order.next_department._id === currentUser.workDepartment._id
+      ) {
+        return {
+          orderId: order._id,
+          current_department: currentUser.workDepartment._id,
+          description: `Đơn hàng đã đến ${currentUser.workDepartment.name}`,
+        };
+      }
+    });
+    return {
+      type: "confirm",
+      orders: [...formattedOrders],
+    };
+  };
+
+  const handleFormatDeliveredOrders = (selectedRows) => {
+    const formattedOrders = selectedRows.map((order) => {
+      if (
+        order.status === "accepted" ||
+        (order.status === "rejected" &&
+          order.current_department._id === order.receive_department._id)
+      ) {
+        return {
+          orderId: order._id,
+          description: `Đơn hàng đã được giao thành công`,
+        };
+      }
+    });
+    return {
+      type: "delivered",
+      orders: [...formattedOrders],
+    };
+  };
   const handleOnConfirm = async () => {
-    setIsLoading(true);
-    console.log("order data", ordersData);
+    // setIsLoading(true);
+
     if (filterValue === "outgoing orders") {
-      const ordersData = handleFormatResendOrder();
+      const ordersData = handleFormatResendOrder(selectedRows);
       setOrdersData(ordersData.orders);
+      console.log(ordersData);
       if (ordersData.orders.length > 0 && ordersData.type === "resend") {
         const res = await updateOrder(ordersData);
         console.log("update order: ", res);
@@ -137,10 +212,70 @@ const TransactionOrderTable = () => {
           messageApi.success("Xác nhận đơn hàng thành công");
           setIsLoading(false);
           setIsOrderUpdated((prevState) => !prevState);
+          setIsRowSelected(false);
+          setSelectedRows([]);
         } else {
           messageApi.error("Xác nhận đơn hàng thất bại");
           setIsLoading(false);
         }
+      }
+    } else if (filterValue === "incoming orders") {
+      const ordersData = handleFormatConfirmOrders(selectedRows);
+      setOrdersData(ordersData.orders);
+      if (ordersData.orders.length > 0 && ordersData.type === "confirm") {
+        const res = await updateOrder(ordersData);
+        console.log("update order: ", res);
+        if (res?.status === 200) {
+          messageApi.success("Xác nhận đơn hàng thành công");
+          setIsLoading(false);
+          setIsOrderUpdated((prevState) => !prevState);
+          setIsRowSelected(false);
+          setSelectedRows([]);
+        } else {
+          messageApi.error("Xác nhận đơn hàng thất bại");
+          setIsLoading(false);
+        }
+      }
+      console.log(ordersData);
+    } else if (filterValue === "at destination") {
+      const ordersData = handleFormatDeliveredOrders(selectedRows);
+      setOrdersData(ordersData.orders);
+      if (ordersData.orders.length > 0 && ordersData.type === "delivered") {
+        console.log(ordersData);
+        const res = await updateOrder(ordersData);
+        console.log("update order: ", res);
+        if (res?.status === 200) {
+          messageApi.success("Xác nhận đơn hàng thành công");
+          setIsLoading(false);
+          setIsOrderUpdated((prevState) => !prevState);
+          setIsRowSelected(false);
+          setSelectedRows([]);
+        } else {
+          messageApi.error("Xác nhận đơn hàng thất bại");
+          setIsLoading(false);
+        }
+      }
+    }
+  };
+
+  // Handle when user clicks reject button
+  const handleOnReject = async () => {
+    // setIsLoading(true);
+    const ordersData = handleFormatRejectOrders(selectedRows);
+    console.log(ordersData);
+    if (ordersData.orders.length > 0 && ordersData.type === "reject") {
+      console.log(ordersData);
+      const res = await updateOrder(ordersData);
+      console.log("update order: ", res);
+      if (res?.status === 200) {
+        messageApi.success("Từ chối đơn hàng thành công");
+        setIsLoading(false);
+        setIsOrderUpdated((prevState) => !prevState);
+        setIsRowSelected(false);
+        setSelectedRows([]);
+      } else {
+        messageApi.error("Từ chối đơn hàng thất bại");
+        setIsLoading(false);
       }
     }
   };
@@ -167,7 +302,10 @@ const TransactionOrderTable = () => {
     }
     console.log(orderId);
   };
-
+  const handleChange = (pagination, filters, sorter) => {
+    console.log(filters);
+    setFilteredInfo(filters);
+  };
   const columns = [
     {
       title: "Mã đơn hàng",
@@ -178,8 +316,8 @@ const TransactionOrderTable = () => {
           <Tooltip
             title={
               // Check if order is rejected and is in transit to linked department
-              record.status === "rejected" &&
-              record.next_department._id ===
+              record?.status === "rejected" &&
+              record?.next_department?._id ===
                 currentDepInfo?.linkDepartments[0]?.departmentId &&
               "Chọn đơn để giao lại!"
             }
@@ -195,18 +333,38 @@ const TransactionOrderTable = () => {
       title: "Người gửi",
       dataIndex: "sender",
       key: "senderName",
-      width: "14%",
+      width: "17%",
       filteredValue: [searchValue],
       onFilter: (value, record) =>
         String(record.sender).toLowerCase().includes(value.toLowerCase()) ||
         String(record.receiver).toLowerCase().includes(value.toLowerCase()) ||
         String(record._id).toLowerCase().includes(value.toLowerCase()),
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.send_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Người nhận",
       dataIndex: "receiver",
       key: "receiverName",
-      width: "14%",
+      width: "17%",
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.receive_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Trạng thái",
@@ -216,6 +374,9 @@ const TransactionOrderTable = () => {
         return <StatusLabel status={value} />;
       },
       width: "20%",
+      filteredValue: filteredInfo.status || null,
+      onFilter: (value, record) => record.status.includes(value),
+      filters: orderStatusOptions,
     },
 
     {
@@ -225,12 +386,29 @@ const TransactionOrderTable = () => {
       render: (value) => {
         return <div>{new Date(value).toLocaleDateString("vi-VN")}</div>;
       },
-      width: "16%",
+      width: "14%",
+      filteredValue: [dates],
+      onFilter: (value, record) => {
+        if (dates.length > 0) {
+          return moment(record.createdAt).isBetween(
+            dates[0],
+            dates[1],
+            undefined,
+            "[]"
+          );
+        } else return record;
+      },
     },
     {
       key: "action",
       render: (value, record) => (
-        <div className="flex items-center justify-center">
+        <div
+          className={`items-center justify-center ${
+            record.send_department._id === currentUser.workDepartment._id
+              ? "flex"
+              : "hidden"
+          }`}
+        >
           <Popconfirm
             title="Xác nhận"
             description="Bạn chắc chắn muốn xóa dữ liệu này?"
@@ -272,12 +450,17 @@ const TransactionOrderTable = () => {
     getCheckboxProps: (record) => ({
       // Disable check box when order is processing and being transported to another department
       disabled:
-        record.status === "processing" ||
+        // Disable orders that are going out from current dep and are processing
+        (record.status === "processing" &&
+          record?.next_department?._id !== currentDepInfo?._id) ||
+        // Disable orders that are rejected and are not in current dep
+        (record.status === "rejected" &&
+          record?.current_department?._id !== currentDepInfo?._id) ||
         record.status === "delivered" ||
-        record.status === "accepted",
-      // &&
-      // record.next_department !== currentUser.workDepartment._id,
-      // Column configuration not to be checked
+        // Disable orders that are accepted and are not in current dep
+        (record.status === "accepted" &&
+          record?.receive_department?._id !== currentUser.workDepartment._id),
+
       status: record.status,
     }),
   };
@@ -302,15 +485,15 @@ const TransactionOrderTable = () => {
                   options={[
                     {
                       value: "outgoing orders",
-                      label: "Đơn gốc từ điểm",
+                      label: "Đơn gửi từ điểm",
                     },
                     {
                       value: "incoming orders",
-                      label: "Đơn hàng đến",
+                      label: "Đơn đang đến",
                     },
                     {
-                      value: "tom",
-                      label: "Giao đơn thất bại",
+                      value: "at destination",
+                      label: "Đơn nhận tại điểm",
                     },
                   ]}
                 />
@@ -326,6 +509,7 @@ const TransactionOrderTable = () => {
           />
         </div>
         <Table
+          onChange={handleChange}
           loading={isLoading}
           rowSelection={{
             ...rowSelection,
@@ -338,21 +522,37 @@ const TransactionOrderTable = () => {
           pagination={{ pageSize: 10, position: ["bottomCenter"] }}
           title={() => (
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <span
-                  onClick={() => setIsReloading(!isReloading)}
-                  className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
-                >
-                  <SyncOutlined spin={isReloading} className="text-[18px]" />
-                </span>
-                <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center w-full">
+                  <span
+                    onClick={() => setIsReloading(!isReloading)}
+                    className="mr-3 cursor-pointer p-2 hover:bg-neutral-200 rounded-full flex items-center"
+                  >
+                    <SyncOutlined spin={isReloading} className="text-[18px]" />
+                  </span>
+                  <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+                </div>
+
+                <div className="xl:w-[100%]">
+                  <DatePicker.RangePicker
+                    className="w-full"
+                    size="large"
+                    format={"DD/MM/YYYY"}
+                    onChange={(value, dateString) => {
+                      console.log(value, dateString);
+                      if (value === null) return setDates([]);
+                      else {
+                        const formattedDates = value.map((date) => {
+                          return moment(date.$d, "DD/MM/YYYY");
+                        });
+                        console.log(formattedDates);
+                        setDates(formattedDates);
+                      }
+                    }}
+                  />
+                </div>
               </div>
-              <CreateOrderModal
-                isNewOrderCreated={isNewOrderCreated}
-                setIsNewOrderCreated={setIsNewOrderCreated}
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-              />
+
               <Button
                 onClick={() => setIsModalOpen(true)}
                 icon={<PlusOutlined />}
@@ -361,28 +561,58 @@ const TransactionOrderTable = () => {
               >
                 Tạo đơn
               </Button>
+              <CreateOrderModal
+                isNewOrderCreated={isNewOrderCreated}
+                setIsNewOrderCreated={setIsNewOrderCreated}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+              />
             </div>
           )}
         />
         {/* <TrackingOrderInfo /> */}
         <div className="w-full flex items-center justify-between my-2">
-          <p className="font-semibold text-xl text-[#266191] bg-neutral-300 p-2 rounded-lg">
+          <p className="font-semibold text-xl text-[#266191] bg-neutral-200 p-2 rounded-lg">
             Đã chọn:{" "}
             <span className="text-orange-600">
               {selectedRows.length}/{allOrders.length}
             </span>
           </p>
-          <Button
-            loading={isLoading}
-            onClick={handleOnConfirm}
-            htmlType="submit"
-            className="float-right"
-            type="primary"
-            disabled={!isRowSelected}
-            size="large"
-          >
-            Xác nhận
-          </Button>
+          <div className="flex items-center gap-x-3">
+            {(filterValue === "incoming orders" ||
+              filterValue === "at destination") && (
+              <Button
+                // loading={isLoading}
+                onClick={handleOnReject}
+                htmlType="submit"
+                className="float-right"
+                type="primary"
+                danger
+                disabled={
+                  !isRowSelected ||
+                  // Disable reject button when selected orders are at current dep and status is rejected
+                  (selectedRows.some((row) => row.status === "rejected") &&
+                    filterValue === "at destination")
+                }
+                size="large"
+              >
+                {filterValue === "at destination" ? "Giao thất bại" : "Từ chối"}
+              </Button>
+            )}
+            <Button
+              // loading={isLoading}
+              onClick={handleOnConfirm}
+              htmlType="submit"
+              className="float-right"
+              type="primary"
+              disabled={!isRowSelected}
+              size="large"
+            >
+              {filterValue === "at destination"
+                ? "Giao thành công"
+                : "Xác nhận"}
+            </Button>
+          </div>
         </div>
       </div>
     </>

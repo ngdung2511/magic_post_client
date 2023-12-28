@@ -16,7 +16,7 @@ const StatusLabel = ({ status }) => {
       statusColor = "#e3503e";
       break;
     default:
-      statusLabel = "Đã giao";
+      statusLabel = "Giao thành công";
       statusColor = "#4cb64c";
       break;
   }

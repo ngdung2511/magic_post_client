@@ -19,3 +19,11 @@ export const getOrderByCondition = async (condition) => {
 export const updateOrder = async (ordersData) => {
     return api.post(`${UtilConstants.baseUrl}/orders-status`, ordersData)
 }
+export const getOrderPdf = async (orderId) => {
+    return api.post(`${UtilConstants.baseUrl}/orders-pdf`, orderId, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        responseType: "blob",
+    })
+}

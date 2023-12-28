@@ -61,7 +61,7 @@ const Navbar = ({ handleClick }) => {
       ),
     },
   ];
-  const test = "headGathering";
+
   return (
     <div className="w-full h-[64px] bg-white fixed top-0 right-0 left-0 z-50 mb-[64px] shadow-md">
       <Container>
