@@ -5,7 +5,7 @@ import { Content, Header } from "antd/es/layout/layout";
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
-import logo from "../../assets/logo.svg";
+import { GrUserManager } from "react-icons/gr";
 import {
   AppleOutlined,
   DashboardOutlined,
@@ -44,7 +44,7 @@ function DashBoard() {
     getItem(
       "Nhân viên",
       "sub1",
-      <AppleOutlined />,
+      <UserOutlined />,
       [getItem(<NavLink to="/employee/manage-orders">Đơn hàng</NavLink>, "1")],
       currentUser?.role !== "transactionStaff" &&
         currentUser?.role !== "gatheringStaff"
@@ -53,7 +53,7 @@ function DashBoard() {
     getItem(
       "Trưởng điểm",
       "sub2",
-      <AppleOutlined />,
+      <UserOutlined />,
       [
         getItem(
           <NavLink to="/head/manage-accounts">Quản lý tài khoản</NavLink>,
@@ -70,7 +70,7 @@ function DashBoard() {
     getItem(
       "Lãnh đạo",
       "sub3",
-      <UserOutlined />,
+      <GrUserManager />,
       [
         getItem(<NavLink to="/boss/manage-sites">Quản lý điểm</NavLink>, "4"),
 
@@ -98,7 +98,8 @@ function DashBoard() {
             left: 0,
             top: 64,
             padding: "8px 0",
-            background: "#f2f3f5",
+
+            // background: "#f2f3f5",
           }}
           collapsible
           collapsed={collapsed}
@@ -106,12 +107,9 @@ function DashBoard() {
           breakpoint="md"
           collapsedWidth="60"
         >
-          <Header style={{ background: "#f6f8fc" }}>
-            <Image src={logo} preview={false} />
-          </Header>
           <Menu
-            className="overflow-y-auto bg-[#f6f8fc]"
-            theme="light"
+            className="overflow-y-auto"
+            theme="dark"
             defaultSelectedKeys={selectedKey}
             mode="inline"
             items={items}
@@ -139,7 +137,8 @@ function DashBoard() {
                 borderRadius: "10px",
                 minHeight: "100vh",
                 padding: 20,
-                background: colorBgContainer,
+                // background: colorBgContainer,
+                background: "#f6f8fc",
               }}
             >
               <Outlet />

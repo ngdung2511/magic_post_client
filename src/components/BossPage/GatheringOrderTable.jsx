@@ -41,7 +41,8 @@ const GatheringOrderTable = () => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(id);
       if (res?.status === 200) {
-        setCurrentDepInfo(res.data.data.gatherPoint);
+        setCurrentDepInfo(res.data.gatherPoint);
+
       }
     };
     fetchCurrentDepInfo();

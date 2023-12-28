@@ -2,8 +2,10 @@ import { Avatar, Button, Dropdown, Image, Modal } from "antd";
 import Container from "../Container";
 import { useEffect, useState } from "react";
 import { HomeOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-
+import { signout } from "../../repository/auth/auth";
 import logo from "../../assets/logo.svg";
+import MagicPostLogo from "../../assets/magic-post-transformed.png";
+
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { useNavigate } from "react-router";
 
@@ -13,6 +15,10 @@ const Navbar = ({ handleClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleName, setRoleName] = useState("");
   const removeState = useStoreActions((actions) => actions.removeState);
+  const removeDepartment = useStoreActions(
+    (actions) => actions.removeDepartment
+  );
+
   const navigate = useNavigate();
 
   // Check if user is logged in
@@ -33,6 +39,7 @@ const Navbar = ({ handleClick }) => {
       }
     }
   }, [currentUser?.role, currentUser?.loggedIn]);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -41,10 +48,13 @@ const Navbar = ({ handleClick }) => {
     setIsModalOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     removeState();
+    removeDepartment();
+    await signout();
     navigate("/home");
   };
+
   const items = [
     {
       key: "1",
@@ -67,9 +77,11 @@ const Navbar = ({ handleClick }) => {
       <Container>
         <div className="flex items-center justify-between w-full h-full">
           <Image
+            width={160}
+            height={80}
             className="cursor-pointer"
             onClick={() => navigate("/home")}
-            src={logo}
+            src={MagicPostLogo}
             preview={false}
           />
           {currentUser?.loggedIn ? (
@@ -93,16 +105,14 @@ const Navbar = ({ handleClick }) => {
               >
                 <ul className="font-semibold list-none">
                   <li>
-                    Họ và tên: <span>{currentUser.name}</span>
+                    Họ và tên: <span>{currentUser?.name}</span>
                   </li>
                   <li>
-                    Email: <span>{currentUser.email}</span>
+                    Email: <span>{currentUser?.email}</span>
                   </li>
+
                   <li>
-                    Ngày sinh: <span>25/11/1969</span>
-                  </li>
-                  <li>
-                    Số điện thoại <span>0989989989</span>
+                    Số điện thoại: <span>{currentUser?.phone}</span>
                   </li>
                 </ul>
                 <h3 className="text-lg">

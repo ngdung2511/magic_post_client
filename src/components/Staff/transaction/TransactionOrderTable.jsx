@@ -48,7 +48,7 @@ const TransactionOrderTable = () => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(currentUser.workDepartment._id);
       if (res?.status === 200) {
-        setCurrentDepInfo(res.data.data.gatherPoint);
+        setCurrentDepInfo(res.data.gatherPoint);
       }
     };
     fetchCurrentDepInfo();
@@ -104,6 +104,7 @@ const TransactionOrderTable = () => {
       const data = {
         condition: {
           current_department: currentUser.workDepartment._id,
+          receive_department: currentUser.workDepartment._id,
         },
       };
       fetchOrderByTransactionDep(data);
@@ -455,7 +456,8 @@ const TransactionOrderTable = () => {
           record?.next_department?._id !== currentDepInfo?._id) ||
         // Disable orders that are rejected and are not in current dep
         (record.status === "rejected" &&
-          record?.current_department?._id !== currentDepInfo?._id) ||
+          record?.current_department?._id !== currentDepInfo?._id &&
+          filterValue === "at destination") ||
         record.status === "delivered" ||
         // Disable orders that are accepted and are not in current dep
         (record.status === "accepted" &&
@@ -485,7 +487,7 @@ const TransactionOrderTable = () => {
                   options={[
                     {
                       value: "outgoing orders",
-                      label: "Đơn gốc từ điểm",
+                      label: "Đơn gửi từ điểm",
                     },
                     {
                       value: "incoming orders",
@@ -493,7 +495,8 @@ const TransactionOrderTable = () => {
                     },
                     {
                       value: "at destination",
-                      label: "Đơn nhận tại đây",
+                      label: "Đơn nhận tại điểm",
+
                     },
                   ]}
                 />

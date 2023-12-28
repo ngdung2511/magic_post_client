@@ -2,6 +2,7 @@ import { action, persist, createStore, thunk } from 'easy-peasy';
 import { getDepartmentById, getDepartments } from '../repository/department/department';
 import { getUserById } from '../repository/user/user';
 import { getEmployees, getEmployeeByDepartmentId } from '../repository/employee/employee';
+import { getAllOrders } from '../repository/order/order';
 
 export const store = createStore({
   currentUser: persist({
@@ -22,6 +23,9 @@ export const store = createStore({
     };
 
   }),
+  removeDepartment: action((state) => {
+    state.workDepartment = null;
+  }),
   departments: [],
   setDepartments: action((state, departments) => {
     state.departments = departments;
@@ -30,24 +34,24 @@ export const store = createStore({
     try {
       const res = await getDepartments();
       console.log(res);
-      actions.setDepartments(res.data.data.departments);
+      actions.setDepartments(res.data.departments);
     } catch (error) {
       console.log(error);
     }
   }),
-  fetchDepartmentById: thunk(async (actions, id) => {
-    try {
-      const res = await getDepartmentById(id);
-      return res.data.data;
-    } catch (error) {
-      console.log(error);
-    }
-  }),
+  // fetchDepartmentById: thunk(async (actions, id) => {
+  //   try {
+  //     const res = await getDepartmentById(id);
+  //     return res.data.data;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }),
   employees: [],
   setEmployees: action((state, employees) => {
     state.employees = employees;
   }),
-  
+
   fetchEmployeesByDepartment: thunk(async (actions, id) => {
     try {
       const res = await getEmployeeByDepartmentId(id);
@@ -65,6 +69,19 @@ export const store = createStore({
     } catch (error) {
       console.log(error);
     }
-  })
+  }),
+  orders: [],
+  fetchAllOrders: thunk(async (actions) => {
+    const res = await getAllOrders();
+    if (res?.status === 200) {
+      actions.setAllOrders(res.data.orders);
+
+    } else {
+      console.error("Error fetching orders:", res);
+    }
+  }),
+  setAllOrders: action((state, orders) => {
+    state.orders = orders;
+  }),
 
 });

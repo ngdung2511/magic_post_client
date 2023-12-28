@@ -23,7 +23,8 @@ const Statistics = () => {
     const fetchDepartments = async () => {
       try {
         const res = await getDepartments();
-        setDepartments(res.data.data.departments);
+        setDepartments(res.data.departments);
+
       } catch (error) {
         // Handle error
         console.error("Error fetching departments:", error);
@@ -34,9 +35,7 @@ const Statistics = () => {
       const res = await getAllOrders();
       if (res?.status === 200) {
         setOrders(res.data.orders);
-      } else {
-        console.error("Error fetching orders:", res);
-      }
+      } 
     };
 
     const fetchEmployees = async () => {
@@ -47,8 +46,8 @@ const Statistics = () => {
       const res = await getEmployeeByCondition(stringifiedCondition);
       if (res?.status === 200) {
         setEmployees(res.data.users);
-      } else {
-        console.error("Error fetching employees:", res);
+
+      } 
       }
     };
     fetchData();

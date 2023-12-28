@@ -1,19 +1,18 @@
-import { Popconfirm, Table, Typography, message } from "antd";
+import { Form, Input, Popconfirm, Table, Typography, message } from "antd";
 
 import { useEffect, useState } from "react";
 
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+
 import Highlighter from "react-highlight-words";
 
 import { NavLink } from "react-router-dom";
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { deleteDepartment } from "../../repository/department/department";
 
-import Statistics from "./Statistics";
-
 const PointList = () => {
   const [messageApi, contextHolder] = message.useMessage();
-
+  const [searchValue, setSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // Get all departments from API
@@ -63,11 +62,14 @@ const PointList = () => {
       render: (value, record) => {
         return <NavLink to={`/boss/order-list/${record._id}`}>{value}</NavLink>;
       },
+      filteredValue: [searchValue],
+      onFilter: (value, record) =>
+        String(record.name.toLowerCase()).includes(value.toLowerCase()),
+
     },
     {
       title: "Địa chỉ",
       dataIndex: "address",
-
       width: "3%",
     },
     {
@@ -120,9 +122,7 @@ const PointList = () => {
     <>
       {contextHolder}
       <div className="w-full h-full py-4">
-        <div className="w-full mb-5">
-          <Statistics />
-        </div>
+
         <Table
           rowKey={(row) => row._id}
           columns={columns}
@@ -132,9 +132,20 @@ const PointList = () => {
           pagination={{ pageSize: 10 }}
           title={() => (
             <div className="flex items-center justify-between">
-              <Typography.Title className="mb-0" level={3}>
-                Danh sách các điểm
-              </Typography.Title>
+              <h2 className="font-semibold">Danh sách các điểm</h2>
+              <Form.Item noStyle className="w-full">
+                <Input
+                  className="w-[30%]"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  size="large"
+                  placeholder="Tìm kiếm"
+                  prefix={<SearchOutlined />}
+                  // onChange={handleSearch}
+                  allowClear
+                />
+              </Form.Item>
+
             </div>
           )}
         />

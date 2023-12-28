@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 
 import EditSiteModal from "../../../components/BossPage/EditSiteModal";
 import { useStoreActions, useStoreState } from "../../../store/hook";
+import { getDepartmentById } from "../../../repository/department/department";
 
 const SingleSitePage = () => {
   const { id: departmentId } = useParams();
@@ -14,19 +15,15 @@ const SingleSitePage = () => {
   const [isDepChanged, setIsDepChanged] = useState(false);
   console.log("dep changed: ", isDepChanged);
 
-  // Get department by id
-  const fetchDepartmentById = useStoreActions(
-    (actions) => actions.fetchDepartmentById
-  );
   useEffect(() => {
     async function fetchData() {
-      const res = await fetchDepartmentById(departmentId);
-      setCurrentDepartment(res.gatherPoint);
-      setCurrentHead(res.user);
+      const res = await getDepartmentById(departmentId);
+      setCurrentDepartment(res.data.gatherPoint);
+      setCurrentHead(res.data.user);
     }
     fetchData();
     setIsDepChanged(false);
-  }, [departmentId, isDepChanged, fetchDepartmentById]);
+  }, [departmentId, isDepChanged]);
 
   // Get all departments from API
   const fetchDepartments = useStoreActions(
