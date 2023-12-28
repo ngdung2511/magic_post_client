@@ -58,10 +58,10 @@ const EmployeeAccountTable = () => {
     console.log(file);
     try {
       const res = await createEmployeeFromFile(file);
-      if (res.status === 201) {
+      if (res.status === 200) {
         messageApi.success("Thêm nhân viên thành công");
         setIsLoading(false);
-        fetchEmployees(currentUser.departmentId);
+        fetchEmployees(currentUser.workDepartment._id);
       }
     } catch (error) {
       setIsLoading(false);

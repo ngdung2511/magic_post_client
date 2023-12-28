@@ -7,7 +7,7 @@ import ManageSitePage from "./pages/DashBoard/boss/ManageSitePage";
 import SingleSitePage from "./pages/DashBoard/boss/SingleSitePage";
 import ManagePointOrders from "./pages/DashBoard/boss/ManagePointOrders";
 import ManageAccountPage from "./pages/DashBoard/headOfSite/ManageAccountPage";
-import GoodsInventoryPage from "./pages/DashBoard/headOfSite/GoodsInventoryPage";
+import { OrdersListPage } from "./pages/DashBoard/boss/OrdersListPage";
 import SingleEmployeePage from "./pages/DashBoard/headOfSite/SingleEmployeePage"
 import StatisticPage from "./pages/DashBoard/headOfSite/StatisticPage";
 import Home from "./pages/Home/Home";
@@ -65,6 +65,8 @@ const App = () => {
             <Route path="boss/manage-sites" element={currentUser.role === 'admin'? <ManageSitePage /> : notAuth} />
             <Route path="boss/manage-sites/:id" element={currentUser.role === 'admin'? <SingleSitePage /> : notAuth} />
             <Route path="boss/points-order" element={currentUser.role === 'admin'? <ManagePointOrders /> : notAuth} />
+            <Route path="boss/order-list/:id" element={currentUser.role === 'admin'? <OrdersListPage /> : notAuth} />
+            <Route path="/boss/order-detail/:id" element={currentUser.role === 'admin'? <OrderDetailPage /> : notAuth} />
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route

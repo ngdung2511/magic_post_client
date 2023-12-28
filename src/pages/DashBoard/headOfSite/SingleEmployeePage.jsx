@@ -10,6 +10,7 @@ import {
   import EditEmployeeModal from "../../../components/HeadOfSite/EditEmployeeModal";
   import { useStoreActions, useStoreState } from "../../../store/hook";
   import { updateEmployee } from "../../../repository/employee/employee";
+  import { getEmployeeById } from "../../../repository/employee/employee";
 import { current } from "@reduxjs/toolkit";
   
   const SingleEmployeePage = () => {
@@ -20,17 +21,21 @@ import { current } from "@reduxjs/toolkit";
     const [isLoading, setIsLoading] = useState(false);
     const currentUser = useStoreState((state) => state.currentUser);
     // Get department by id
-    const fetchUserById = useStoreActions(
-      (actions) => actions.fetchUserById
-    );
+    
     useEffect(() => {
+      console.log('employee id', employeeId);
       async function fetchData() {
-        const res = await fetchUserById(employeeId);
-        setCurrentEmployee(res.user);
-        setIsEmployeeChanged(false);
+        const res = await getEmployeeById(employeeId);
+        console.log('employee', res);
+        if(res.status === 200){
+          console.log('ok');
+          console.log(res.data.data.user);
+          setCurrentEmployee(res.data.data.user);
+          setIsEmployeeChanged(false);
+        }
       }
       fetchData();
-    }, [employeeId, fetchUserById, isEmployeeChanged]);
+    }, [isEmployeeChanged]);
   
     const changeAvatar = async (file) => {
       setIsLoading(true);
@@ -38,7 +43,7 @@ import { current } from "@reduxjs/toolkit";
         const res = await updateEmployee(currentEmployee._id, currentEmployee, file);
         if (res.status === 200) {
           setIsLoading(false);
-          console.log(res);
+          console.log('upload', res);
           setIsEmployeeChanged(true);
         }
       } catch (error) {
@@ -52,6 +57,7 @@ import { current } from "@reduxjs/toolkit";
         <Spin />
       </div>
     );
+    console.log('current employee', currentEmployee);
     let adrs = currentEmployee.departmentId.address;
     const location = currentEmployee.departmentId.type === 'Transaction' ? 'Điểm giao dịch ' + adrs : 'Điểm tập kết ' + adrs;
     const employeeInfo = [
