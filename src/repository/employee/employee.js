@@ -16,6 +16,21 @@ export const createEmployee = async (user) => {
         throw error;
     }
 }
+export const createEmployeeFromFile = async (file) => {
+    try {
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+        }
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await axios.post(UtilConstants.baseUrl + '/user', formData, { headers: header });
+
+        return res;
+    } catch (error) {
+        console.log('Error:', error);
+        throw error;
+    }
+}
 export const getEmployees = async () => {
     try {
         return await axios.get(UtilConstants.baseUrl + '/users');
