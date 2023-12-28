@@ -16,7 +16,7 @@ const GatheringPage = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [filteredInfo, setFilteredInfo] = useState({});
-  const [locationFilter, setLocationFilter] = useState("send");
+  const [locationFilter, setLocationFilter] = useState("current");
   const [isReloading, setIsReloading] = useState(false);
   const { RangePicker } = DatePicker;
   const [dates, setDates] = useState([]);

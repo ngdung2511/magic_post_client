@@ -2,7 +2,7 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Card, Divider, Statistic, Typography } from "antd";
 import { useStoreState } from "../../../store/hook";
 import { useEffect, useState } from "react";
-import { getOrderByDepartmentId } from "../../../repository/order/order";
+import { getOrderByCondition } from "../../../repository/order/order";
 import { getEmployeeByDepartmentId } from "../../../repository/employee/employee";
 import GatheringPage from "./GatheringPage";
 import TransactionPage from "./TransactionPage";
@@ -10,24 +10,76 @@ import TransactionPage from "./TransactionPage";
 const StatisticPage = () => {
     const currentUser = useStoreState((state) => state.currentUser);
     const department = currentUser.workDepartment;
-    const [orders, setOrders] = useState(0);
     const [employees, setEmployees] = useState(0);
-    useEffect(() => {
-        const fetchOrder = async() => {
-            const res = await getOrderByDepartmentId(department._id);
-            console.log('order number', department._id, res);
-            setOrders(res.data.orders.length);
-        }
+    const [ordersCurrent, setOrdersCurrent] = useState(0);
+    const [ordersNext, setOrdersNext] = useState(0);
+    const [ordersSend, setOrdersSend] = useState(0);
+    const [ordersReceive, setOrdersReceive] = useState(0);
 
-        const fetchEmployee = async() => {
+    useEffect(() => {
+      const fetchOrderGather = async () => {
+        const res = await getOrderByCondition({condition: {current_department: department._id}})
+        const res2 = await getOrderByCondition({condition: {next_department: department._id}})
+        
+        if (res?.status === 200 && res2?.status === 200) {
+          setOrdersCurrent(res.data.orders.length);
+          setOrdersNext(res2.data.orders.length);
+          
+        }
+      };
+      fetchOrderGather();
+
+      //
+      const fetchOrderTrans = async () => {
+        const res = await getOrderByCondition({condition: {send_department: department._id}})
+        const res2 = await getOrderByCondition({condition: {receive_department: department._id}})
+        
+        if (res?.status === 200 && res2?.status === 200) {
+          setOrdersSend(res.data.orders.length);
+          setOrdersReceive(res2.data.orders.length);
+        }
+      }
+      fetchOrderTrans();
+
+      const fetchEmployee = async() => {
             const res = await getEmployeeByDepartmentId(department);
             console.log('employ nums', res);
             setEmployees(res.data.data.users.length - 1);
         }
-        fetchOrder();
         fetchEmployee();
         
     }, [department]);
+
+    const gatheringStatistic = (
+      <Card>
+      <Statistic
+        prefix={<ShoppingCartOutlined size={20} />}
+        title="Số đơn hàng đang xử lý"
+        value={ordersCurrent}
+      />
+      <Statistic
+        prefix={<ShoppingCartOutlined size={20} />}
+        title="Số đơn hàng sắp tới"
+        value={ordersNext}
+      />
+      </Card>
+    );
+
+    const transactionStatistic = (
+      <Card>
+      <Statistic
+        prefix={<ShoppingCartOutlined size={20} />}
+        title="Số đơn hàng đã gửi"
+        value={ordersSend}
+      />
+      <Statistic
+        prefix={<ShoppingCartOutlined size={20} />}
+        title="Số đơn hàng đã nhận"
+        value={ordersReceive}
+      />
+      </Card>
+    );
+
   return (
     <div className="w-full h-full">
       <Typography.Title className="mb-0" level={1}>
@@ -36,13 +88,7 @@ const StatisticPage = () => {
       <Divider />
       <div className="w-full">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-          <Card>
-            <Statistic
-              prefix={<ShoppingCartOutlined size={20} />}
-              title="Số đơn hàng"
-              value={orders}
-            />
-          </Card>
+          {department.type === 'Gathering' ? gatheringStatistic : transactionStatistic}
           <Card>
             <Statistic
               prefix={<ShoppingCartOutlined size={20} />}
