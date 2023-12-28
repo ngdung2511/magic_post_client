@@ -12,7 +12,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { NavLink } from "react-router-dom";
-import StatusLabel from "../../statusLabel";
 
 import {
   getOrderByCondition,
@@ -22,6 +21,7 @@ import { useStoreState } from "../../../store/hook";
 import { getDepartmentById } from "../../../repository/department/department";
 
 import moment from "moment";
+import StatusLabel from "../../StatusLabel";
 
 const GatheringOrderTable = () => {
   const { RangePicker } = DatePicker;
@@ -45,7 +45,7 @@ const GatheringOrderTable = () => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(currentUser.workDepartment._id);
       if (res?.status === 200) {
-        setCurrentDepInfo(res.data.data.gatherPoint);
+        setCurrentDepInfo(res.data.gatherPoint);
       }
     };
     fetchCurrentDepInfo();

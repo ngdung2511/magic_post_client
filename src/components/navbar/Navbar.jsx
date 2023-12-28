@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { HomeOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 
 import logo from "../../assets/logo.svg";
+import MagicPostLogo from "../../assets/magic-post-transformed.png";
+
 import { useStoreActions, useStoreState } from "../../store/hook";
 import { useNavigate } from "react-router";
 
@@ -67,9 +69,11 @@ const Navbar = ({ handleClick }) => {
       <Container>
         <div className="flex items-center justify-between w-full h-full">
           <Image
+            width={160}
+            height={80}
             className="cursor-pointer"
             onClick={() => navigate("/home")}
-            src={logo}
+            src={MagicPostLogo}
             preview={false}
           />
           {currentUser?.loggedIn ? (
@@ -93,16 +97,14 @@ const Navbar = ({ handleClick }) => {
               >
                 <ul className="font-semibold list-none">
                   <li>
-                    Họ và tên: <span>{currentUser.name}</span>
+                    Họ và tên: <span>{currentUser?.name}</span>
                   </li>
                   <li>
-                    Email: <span>{currentUser.email}</span>
+                    Email: <span>{currentUser?.email}</span>
                   </li>
+
                   <li>
-                    Ngày sinh: <span>25/11/1969</span>
-                  </li>
-                  <li>
-                    Số điện thoại <span>0989989989</span>
+                    Số điện thoại: <span>{currentUser?.phone}</span>
                   </li>
                 </ul>
                 <h3 className="text-lg">
