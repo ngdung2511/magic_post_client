@@ -13,11 +13,13 @@ import StatisticPage from "./pages/DashBoard/headOfSite/StatisticPage";
 import Home from "./pages/Home/Home";
 import Hero from "./components/hero/Hero";
 import ForgetPassword from "./pages/forgetPass/ForgetPassword";
-
 import OrderDetailPage from "./components/Staff/OrderDetailPage";
 import ManageOrderPage from "./pages/DashBoard/employee/ManageOrderPage";
+import { useStoreState } from "./store/hook";
 
 function App() {
+  const currentUser = useStoreState((state) => state.currentUser);
+  console.log("current user", currentUser);
   const ROUTE = [
     {
       path: "/login",
@@ -39,6 +41,12 @@ function App() {
     },
   ];
 
+  const notAuth = (
+    <>
+      cút ra khỏi đây
+    </>
+  )
+
   return (
     <>
       <BrowserRouter>
@@ -50,22 +58,22 @@ function App() {
           <Route path="/" element={<Navigate to="/home" />} />
 
           <Route path="/" element={<DashBoard />}>
-            <Route path="boss/manage-sites" element={<ManageSitePage />} />
-            <Route path="boss/manage-sites/:id" element={<SingleSitePage />} />
-            <Route path="boss/goods-stats" element={<GoodsStatsPage />} />
+            <Route path="boss/manage-sites" element={currentUser.role === 'admin'? <ManageSitePage /> : notAuth} />
+            <Route path="boss/manage-sites/:id" element={currentUser.role === 'admin'? <SingleSitePage /> : notAuth} />
+            <Route path="boss/goods-stats" element={currentUser.role === 'admin'? <GoodsStatsPage /> : notAuth} />
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route
               path="head/manage-accounts"
-              element={<ManageAccountPage />}
+              element={currentUser.role?.includes('head')? <ManageAccountPage /> : notAuth}
             />
             <Route
               path="head/manage-account/:id"
-              element={<SingleEmployeePage />}
+              element={currentUser.role?.includes('head')? <SingleEmployeePage /> : notAuth}
             />
             <Route
               path="head/goods-inventory"
-              element={<StatisticPage />}
+              element={currentUser.role?.includes('head')? <StatisticPage /> : notAuth}
             />
           </Route>
           <Route path="/" element={<DashBoard />}>
