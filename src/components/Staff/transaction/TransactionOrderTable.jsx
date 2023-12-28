@@ -48,7 +48,7 @@ const TransactionOrderTable = () => {
     const fetchCurrentDepInfo = async () => {
       const res = await getDepartmentById(currentUser.workDepartment._id);
       if (res?.status === 200) {
-        setCurrentDepInfo(res.data.data.gatherPoint);
+        setCurrentDepInfo(res.data.gatherPoint);
       }
     };
     fetchCurrentDepInfo();
@@ -455,7 +455,8 @@ const TransactionOrderTable = () => {
           record?.next_department?._id !== currentDepInfo?._id) ||
         // Disable orders that are rejected and are not in current dep
         (record.status === "rejected" &&
-          record?.current_department?._id !== currentDepInfo?._id) ||
+          record?.current_department?._id !== currentDepInfo?._id &&
+          filterValue === "at destination") ||
         record.status === "delivered" ||
         // Disable orders that are accepted and are not in current dep
         (record.status === "accepted" &&

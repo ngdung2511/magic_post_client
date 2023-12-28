@@ -276,9 +276,7 @@ const CollectionPointTable = () => {
           pagination={{ pageSize: 10 }}
           title={() => (
             <div className="flex items-center justify-between">
-              <Typography.Title className="mb-0" level={3}>
-                Điểm Giao dịch và Tập kết
-              </Typography.Title>
+              <h2 className="font-semibold">Điểm Giao dịch và Tập kết</h2>
               <AddSiteModal
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
