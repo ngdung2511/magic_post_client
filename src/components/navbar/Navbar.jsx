@@ -2,7 +2,7 @@ import { Avatar, Button, Dropdown, Image, Modal } from "antd";
 import Container from "../Container";
 import { useEffect, useState } from "react";
 import { HomeOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-
+import { signout } from "../../repository/auth/auth";
 import logo from "../../assets/logo.svg";
 import MagicPostLogo from "../../assets/magic-post-transformed.png";
 
@@ -15,6 +15,10 @@ const Navbar = ({ handleClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleName, setRoleName] = useState("");
   const removeState = useStoreActions((actions) => actions.removeState);
+  const removeDepartment = useStoreActions(
+    (actions) => actions.removeDepartment
+  );
+
   const navigate = useNavigate();
 
   // Check if user is logged in
@@ -35,6 +39,7 @@ const Navbar = ({ handleClick }) => {
       }
     }
   }, [currentUser?.role, currentUser?.loggedIn]);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -43,10 +48,13 @@ const Navbar = ({ handleClick }) => {
     setIsModalOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     removeState();
+    removeDepartment();
+    await signout();
     navigate("/home");
   };
+
   const items = [
     {
       key: "1",

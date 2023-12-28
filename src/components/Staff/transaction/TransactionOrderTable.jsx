@@ -104,6 +104,7 @@ const TransactionOrderTable = () => {
       const data = {
         condition: {
           current_department: currentUser.workDepartment._id,
+          receive_department: currentUser.workDepartment._id,
         },
       };
       fetchOrderByTransactionDep(data);

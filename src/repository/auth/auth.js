@@ -29,6 +29,6 @@ export const checkVerifyCode = async (information) => {
     }
 }
 
-export const sigout = async () => {
+export const signout = async () => {
     return api.post(UtilConstants.baseUrl + '/auth/logout');
 }
