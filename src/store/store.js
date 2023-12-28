@@ -23,6 +23,9 @@ export const store = createStore({
     };
 
   }),
+  removeDepartment: action((state) => {
+    state.workDepartment = null;
+  }),
   departments: [],
   setDepartments: action((state, departments) => {
     state.departments = departments;
