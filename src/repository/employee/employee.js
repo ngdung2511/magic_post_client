@@ -41,11 +41,14 @@ export const getEmployees = async () => {
 }
 export const getEmployeeByDepartmentId = async (departmentId) => {
     try {
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+        }
         const condition = {
             departmentId: departmentId
         };
 
-        return await axios.get(UtilConstants.baseUrl + `/users?condition=${JSON.stringify(condition)}`);
+        return await axios.get(UtilConstants.baseUrl + `/users?condition=${JSON.stringify(condition)}`, { headers: header });
     } catch (error) {
         console.log('Error:', error);
         throw error;
