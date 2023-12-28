@@ -83,6 +83,7 @@ const ManagePointOrders = () => {
       },
     },
   };
+
   return (
     <div className="w-full h-full">
       <Typography.Title className="mb-0" level={1}>
@@ -100,6 +101,7 @@ const ManagePointOrders = () => {
           </div>
           <div className="col-span-4"></div>
         </div>
+
         <PointList />
       </div>
     </div>

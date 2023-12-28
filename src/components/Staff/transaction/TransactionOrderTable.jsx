@@ -496,6 +496,7 @@ const TransactionOrderTable = () => {
                     {
                       value: "at destination",
                       label: "Đơn nhận tại điểm",
+
                     },
                   ]}
                 />

@@ -3,6 +3,7 @@ import { Form, Input, Popconfirm, Table, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+
 import Highlighter from "react-highlight-words";
 
 import { NavLink } from "react-router-dom";
@@ -64,6 +65,7 @@ const PointList = () => {
       filteredValue: [searchValue],
       onFilter: (value, record) =>
         String(record.name.toLowerCase()).includes(value.toLowerCase()),
+
     },
     {
       title: "Địa chỉ",
@@ -120,6 +122,7 @@ const PointList = () => {
     <>
       {contextHolder}
       <div className="w-full h-full py-4">
+
         <Table
           rowKey={(row) => row._id}
           columns={columns}
@@ -142,6 +145,7 @@ const PointList = () => {
                   allowClear
                 />
               </Form.Item>
+
             </div>
           )}
         />
