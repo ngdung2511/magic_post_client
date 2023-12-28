@@ -94,7 +94,7 @@ const Navbar = ({ handleClick }) => {
                 <Avatar
                   className="cursor-pointer border-neutral-300"
                   size={50}
-                  src={defaultAvatar}
+                  src={currentUser.avatarUrl != '' ? currentUser.avatarUrl : defaultAvatar}
                 />
               </Dropdown>
               <Modal

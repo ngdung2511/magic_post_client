@@ -2,6 +2,27 @@ import { NavLink } from "react-router-dom";
 import { useStoreState } from "../../store/hook";
 const HeroInfo = () => {
   const currentUser = useStoreState((state) => state.currentUser);
+  let path = "";
+  switch (currentUser?.role) {
+    case "admin":
+      path = "/boss/points-order";
+      break;
+    case "headGathering":
+      path = "/head/goods-inventory";
+      break;
+    case "headTransaction":
+      path = "/head/goods-inventory";
+      break;
+    case "gatheringStaff":
+      path = "/employee/manage-orders";
+      break;
+    case "transactionStaff":
+      path = "/employee/manage-orders";
+      break;
+    default:
+      break;
+  }
+
   return (
     <div className="flex flex-col justify-center h-full gap-4 px-4 pt-8 pb-4">
       <h1 className="text-4xl font-bold md:text-5xl">Magic Post</h1>
@@ -12,7 +33,7 @@ const HeroInfo = () => {
 
       <div className="max-w[400px]">
         {currentUser?.loggedIn ? (
-          <NavLink to="/dashboard">
+          <NavLink to={path}>
             <button className="cursor-pointer w-full py-5 px-8 md:py-4 text-2xl border border-black rounded-md hover:bg-[#266191] transition hover:text-white bg-white">
               Quản lý
             </button>

@@ -55,8 +55,12 @@ export const store = createStore({
   fetchEmployeesByDepartment: thunk(async (actions, id) => {
     try {
       const res = await getEmployeeByDepartmentId(id);
-      console.log(res);
-      actions.setEmployees(res.data.data.users);
+      let employees = res.data.data.users;
+      const indexOfObject = employees.findIndex(object => {
+        return object.role === "headTransaction" || object.role === "headGathering";
+      });
+      employees.splice(indexOfObject, 1);
+      actions.setEmployees(employees);
     } catch (error) {
       console.log(error);
     }

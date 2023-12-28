@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import CreateOrderModal from "./CreateOrderModal";
 import { NavLink } from "react-router-dom";
-import StatusLabel from "../../statusLabel";
+import StatusLabel from "../../StatusLabel";
 
 import {
   deleteOrder,
