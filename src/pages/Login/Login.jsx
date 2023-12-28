@@ -12,11 +12,11 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  useEffect(() => {
-    if (currentUser?.loggedIn) {
-      navigate("/dashboard");
-    }
-  }, [currentUser?.loggedIn, navigate]);
+  // useEffect(() => {
+  //   if (currentUser?.loggedIn) {
+  //     navigate("/dashboard");
+  //   }
+  // }, [currentUser?.loggedIn, navigate]);
 
   const onFinish = async (values) => {
     setIsLoading(true);
@@ -35,7 +35,25 @@ const Login = () => {
       });
       localStorage.setItem("token", res.data.token);
       setIsLoading(false);
-      navigate("/dashboard");
+      switch (res.data.user.role) {
+        case "admin":
+          navigate("/boss/points-order");
+          break;
+        case 'headGathering':
+          navigate("/head/goods-inventory");
+          break;
+        case 'headTransaction':
+          navigate("/head/goods-inventory");
+          break;
+        case "gatheringStaff":
+          navigate("/employee/manage-orders");
+          break;
+        case "transactionStaff":
+          navigate("/employee/manage-orders");
+          break;
+        default:
+          break;
+      }
     } else {
       setIsLoading(false);
       messageApi.error("Email đăng nhập hoặc mật khẩu không đúng");

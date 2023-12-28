@@ -40,7 +40,7 @@ const EmployeeAccountTable = () => {
   );
 
   useEffect(() => {
-    fetchEmployees(currentUser.workDepartment);
+    fetchEmployees(currentUser.workDepartment._id);
   }, []);
   const employees = useStoreState((state) => state.employees);
 

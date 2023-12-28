@@ -41,13 +41,11 @@ export const getEmployees = async () => {
 }
 export const getEmployeeByDepartmentId = async (departmentId) => {
     try {
-        const query = {
-            condition: {
-                departmentId: departmentId
-            }
+        const condition = {
+            departmentId: departmentId
         };
 
-        return await axios.get(UtilConstants.baseUrl + `/users`, { params: query });
+        return await axios.get(UtilConstants.baseUrl + `/users?condition=${JSON.stringify(condition)}`);
     } catch (error) {
         console.log('Error:', error);
         throw error;

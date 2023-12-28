@@ -83,11 +83,11 @@ const App = () => {
           <Route path="/" element={<DashBoard />}>
             <Route
               path="employee/manage-orders"
-              element={currentUser.role?.includes('staff')? <ManageOrderPage /> : notAuth}
+              element={currentUser.role?.includes('Staff')? <ManageOrderPage /> : notAuth}
             />
             <Route
               path="employee/order-detail/:id"
-              element={currentUser.role?.includes('staff')? <OrderDetailPage /> : notAuth}
+              element={currentUser.role?.includes('Staff')? <OrderDetailPage /> : notAuth}
             />
           </Route>
           <Route path="/home" element={<Home />}>

@@ -1,4 +1,5 @@
 import { ShoppingCartOutlined } from "@ant-design/icons";
+import { AiOutlineTeam } from "react-icons/ai";
 import { Card, Divider, Statistic, Typography } from "antd";
 import { useStoreState } from "../../../store/hook";
 import { useEffect, useState } from "react";
@@ -51,33 +52,41 @@ const StatisticPage = () => {
     }, [department]);
 
     const gatheringStatistic = (
+      <>
       <Card>
       <Statistic
         prefix={<ShoppingCartOutlined size={20} />}
         title="Số đơn hàng đang xử lý"
         value={ordersCurrent}
       />
+      </Card>
+      <Card>
       <Statistic
         prefix={<ShoppingCartOutlined size={20} />}
         title="Số đơn hàng sắp tới"
         value={ordersNext}
       />
       </Card>
+      </>
     );
 
     const transactionStatistic = (
-      <Card>
+      <>
+        <Card>
       <Statistic
         prefix={<ShoppingCartOutlined size={20} />}
         title="Số đơn hàng đã gửi"
         value={ordersSend}
       />
+      </Card>
+      <Card>
       <Statistic
         prefix={<ShoppingCartOutlined size={20} />}
         title="Số đơn hàng đã nhận"
         value={ordersReceive}
       />
       </Card>
+      </>
     );
 
   return (
@@ -91,7 +100,7 @@ const StatisticPage = () => {
           {department.type === 'Gathering' ? gatheringStatistic : transactionStatistic}
           <Card>
             <Statistic
-              prefix={<ShoppingCartOutlined size={20} />}
+              prefix={<AiOutlineTeam size={20} />}
               title="Nhân viên"
               value={employees}
             />
