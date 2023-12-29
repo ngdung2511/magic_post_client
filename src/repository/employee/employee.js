@@ -3,12 +3,23 @@ import UtilConstants from "../../shared/constants";
 import { utilFuncs } from "../../utils/utils";
 
 import api from '../index'
-export const createEmployee = async (user) => {
+export const createEmployee = async (user, image) => {
     try {
         const header = {
-            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`,
+            'Content-Type': 'multipart/form-data'
         }
-        const res = await axios.post(UtilConstants.baseUrl + '/user', user, { headers: header });
+        const formData = new FormData();
+        formData.append('image', image);
+        formData.append('name', user.name);
+        formData.append('email', user.email);
+        formData.append('phone', user.phone);
+        formData.append('role', user.role);
+        formData.append('departmentId', user.departmentId._id);
+        formData.append('password', user.password);
+        formData.append('gender', user.gender);
+
+        const res = await axios.post(UtilConstants.baseUrl + '/user', formData, { headers: header });
 
         return res;
     } catch (error) {
