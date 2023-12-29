@@ -3,12 +3,23 @@ import UtilConstants from "../../shared/constants";
 import { utilFuncs } from "../../utils/utils";
 
 import api from '../index'
-export const createEmployee = async (user) => {
+export const createEmployee = async (user, image) => {
     try {
         const header = {
-            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`,
+            'Content-Type': 'multipart/form-data'
         }
-        const res = await axios.post(UtilConstants.baseUrl + '/user', user, { headers: header });
+        const formData = new FormData();
+        formData.append('image', image);
+        formData.append('name', user.name);
+        formData.append('email', user.email);
+        formData.append('phone', user.phone);
+        formData.append('role', user.role);
+        formData.append('departmentId', user.departmentId._id);
+        formData.append('password', user.password);
+        formData.append('gender', user.gender);
+
+        const res = await axios.post(UtilConstants.baseUrl + '/user', formData, { headers: header });
 
         return res;
     } catch (error) {
@@ -19,11 +30,12 @@ export const createEmployee = async (user) => {
 export const createEmployeeFromFile = async (file) => {
     try {
         const header = {
-            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`,
+            'Content-Type': 'multipart/form-data'
         }
         const formData = new FormData();
         formData.append('file', file);
-        const res = await axios.post(UtilConstants.baseUrl + '/user', formData, { headers: header });
+        const res = await axios.post(UtilConstants.baseUrl + '/users/import', formData, { headers: header });
 
         return res;
     } catch (error) {
@@ -41,11 +53,14 @@ export const getEmployees = async () => {
 }
 export const getEmployeeByDepartmentId = async (departmentId) => {
     try {
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+        }
         const condition = {
             departmentId: departmentId
         };
 
-        return await axios.get(UtilConstants.baseUrl + `/users?condition=${JSON.stringify(condition)}`);
+        return await axios.get(UtilConstants.baseUrl + `/users?condition=${JSON.stringify(condition)}`, { headers: header });
     } catch (error) {
         console.log('Error:', error);
         throw error;
@@ -53,7 +68,10 @@ export const getEmployeeByDepartmentId = async (departmentId) => {
 }
 export const getEmployeeById = async (userId) => {
     try {
-        return await axios.get(`${UtilConstants.baseUrl}/user/${userId}`);
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+        }
+        return await axios.get(`${UtilConstants.baseUrl}/user/${userId}`, { headers: header });
     } catch (error) {
         console.log('Error:', error);
         throw error;
@@ -61,15 +79,27 @@ export const getEmployeeById = async (userId) => {
 }
 export const deleteEmployee = async (userId) => {
     try {
-        return await axios.delete(`${UtilConstants.baseUrl}/user/${userId}`);
+        return await api.delete(`${UtilConstants.baseUrl}/user/${userId}`);
     } catch (error) {
         console.log('Error:', error);
         throw error;
     }
 }
-export const updateEmployee = async (userId, userData) => {
+export const updateEmployee = async (userId, userData, image) => {
     try {
-        return await axios.put(`${UtilConstants.baseUrl}/user/${userId}`, userData);
+        const header = {
+            authorization: `Bearer ${utilFuncs.getStorage('token')}`
+        }
+        const formData = new FormData();
+        if (image) {
+            formData.append('image', image);
+        }
+        formData.append('name', userData.name);
+        formData.append('email', userData.email);
+        formData.append('phone', userData.phone);
+        formData.append('gender', userData.gender);
+
+        return await axios.put(`${UtilConstants.baseUrl}/user/${userId}`, formData, { headers: header });
     } catch (error) {
         console.log('Error:', error);
         throw error;

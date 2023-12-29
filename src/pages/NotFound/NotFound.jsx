@@ -1,4 +1,3 @@
-import React from 'react'
 import { Result, Button } from "antd";
 
 function NotFound() {
@@ -7,9 +6,13 @@ function NotFound() {
       status={404}
       title="404"
       subTitle="Trang không tồn tại."
-      extra={<Button type="primary" href="/home">Back Home</Button>}
+      extra={
+        <Button type="primary" href="/home">
+          Quay lại
+        </Button>
+      }
     />
-  )
+  );
 }
 
-export default NotFound
+export default NotFound;

@@ -207,7 +207,7 @@ const GatheringOrderTable = () => {
       fetchOrderByGatheringDep(data);
     }
   }, [
-    currentUser.workDepartment._id,
+    currentUser?.workDepartment?._id,
     messageApi,
     isOrderUpdated,
     filterValue,

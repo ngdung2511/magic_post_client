@@ -20,6 +20,14 @@ export const treeSelectData = [
                 value: "Hoàng Mai",
                 label: "Hoàng Mai",
             },
+            {
+                value: "Hà Đông",
+                label: "Hà Đông",
+            },
+            {
+                value: "Hoàn Kiếm",
+                label: "Hoàn Kiếm",
+            },
         ],
     },
     {
@@ -35,12 +43,12 @@ export const treeSelectData = [
                 label: "Quận 2",
             },
             {
-                value: "Quận Thủ Đức",
-                label: "Quận Thủ Đức",
+                value: "Thủ Đức",
+                label: "Thủ Đức",
             },
             {
-                value: "Quận Thủ Dầu Một",
-                label: "Quận Thủ Dầu Một",
+                value: "Thủ Dầu Một",
+                label: "Thủ Dầu Một",
             },
         ],
     },

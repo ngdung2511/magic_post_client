@@ -65,40 +65,46 @@ const GatheringPage = () => {
         String(record.sender).toLowerCase().includes(value.toLowerCase()) ||
         String(record.receiver).toLowerCase().includes(value.toLowerCase()) ||
         String(record._id).toLowerCase().includes(value.toLowerCase()),
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.send_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Người nhận",
       dataIndex: "receiver",
       key: "receiverName",
-      width: "14%",
-    },
-    {
-      title: "Điểm gửi hàng",
-      dataIndex: "send_department",
-      key: "sendDepartment",
-      render: (value) => {
-        return <div>{value.name}</div>;
+      width: "20%",
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.receiverPhone} - {record?.receive_department.name}
+            </p>
+          </div>
+        );
       },
-      width: "14%",
     },
+
     {
       title: "Điểm đến tiếp theo",
       dataIndex: "next_department",
       key: "nextDepartment",
       render: (value) => {
-        return <div>{value?.name}</div>;
+        return (
+          <div className="font-semibold text-orange-500">{value?.name}</div>
+        );
       },
-      width: "14%",
+      width: "20%",
     },
-    {
-      title: "Điểm nhận hàng",
-      dataIndex: "receive_department",
-      key: "receiveDepartment",
-      render: (value) => {
-        return <div>{value.name}</div>;
-      },
-      width: "14%",
-    },
+
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -108,7 +114,7 @@ const GatheringPage = () => {
       },
       filteredValue: filteredInfo.status || null,
       onFilter: (value, record) => record.status.includes(value),
-      width: "20%",
+      width: "16%",
       filters: orderStatusOptions,
     },
     {
@@ -140,7 +146,9 @@ const GatheringPage = () => {
       <div className="w-full h-full">
         <div className="w-full p-3 flex items-center">
           <div className="w-full flex items-center gap-x-3">
-            <p className="font-semibold text-xl text-[#266191]">Bộ lọc</p>
+            <p className="font-semibold text-xl text-[#266191] md:block hidden">
+              Bộ lọc
+            </p>
 
             <Form
               form={form}
@@ -211,7 +219,9 @@ const GatheringPage = () => {
                 >
                   <SyncOutlined spin={isReloading} className="text-[18px]" />
                 </span>
-                <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+                <h2 className="font-semibold h-full">
+                  Danh sách đơn hàng {currentUser?.workDepartment?.name}
+                </h2>
               </div>
             </div>
           )}

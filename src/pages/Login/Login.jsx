@@ -25,6 +25,7 @@ const Login = () => {
     console.log(res);
     if (res.status === 200) {
       setUserInfo({
+        phone: res.data.user.phone,
         avatarUrl: res.data.user.avatarUrl,
         role: res.data.user.role,
         email: res.data.user.email,

@@ -63,46 +63,52 @@ const TransactionPage = () => {
       title: "Người gửi",
       dataIndex: "sender",
       key: "senderName",
-      width: "14%",
+      width: "20%",
       filteredValue: [searchValue],
       onFilter: (value, record) =>
         String(record.sender).toLowerCase().includes(value.toLowerCase()) ||
         String(record.receiver).toLowerCase().includes(value.toLowerCase()) ||
         String(record._id).toLowerCase().includes(value.toLowerCase()),
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.senderPhone} - {record?.send_department.name}
+            </p>
+          </div>
+        );
+      },
     },
     {
       title: "Người nhận",
       dataIndex: "receiver",
       key: "receiverName",
-      width: "14%",
-    },
-    {
-      title: "Điểm gửi hàng",
-      dataIndex: "send_department",
-      key: "sendDepartment",
-      render: (value) => {
-        return <div>{value.name}</div>;
+      width: "20%",
+      render: (value, record) => {
+        return (
+          <div>
+            <p className="font-semibold text-blue-800">{value}</p>
+            <p className="text-sm text-gray-800">
+              {record?.receiverPhone} - {record?.receive_department.name}
+            </p>
+          </div>
+        );
       },
-      width: "14%",
     },
+
     {
       title: "Đơn hàng đang ở",
       dataIndex: "current_department",
       key: "currentDepartment",
       render: (value) => {
-        return <div>{value.name}</div>;
+        return (
+          <div className="text-orange-500 font-semibold">{value.name}</div>
+        );
       },
       width: "14%",
     },
-    {
-      title: "Điểm nhận hàng",
-      dataIndex: "receive_department",
-      key: "receiveDepartment",
-      render: (value) => {
-        return <div>{value.name}</div>;
-      },
-      width: "14%",
-    },
+
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -112,7 +118,7 @@ const TransactionPage = () => {
       },
       filteredValue: filteredInfo.status || null,
       onFilter: (value, record) => record.status.includes(value),
-      width: "20%",
+      width: "18%",
       filters: orderStatusOptions,
     },
     {
@@ -135,7 +141,7 @@ const TransactionPage = () => {
           return record;
         }
       },
-      width: "16%",
+      width: "10%",
     },
   ];
 
@@ -144,34 +150,40 @@ const TransactionPage = () => {
   return (
     <>
       <div className="w-full h-full">
-        <div className="w-full p-3 flex items-center">
-          <div className="w-full flex items-center gap-x-3">
-            <p className="font-semibold text-xl text-[#266191]">Bộ lọc</p>
+        <div className="w-full md:p-3 my-3">
+          <div className="w-full flex md:items-center flex-col md:flex-row">
+            <div className="w-full flex items-center gap-3 mb-3 md:mb-0">
+              <p className="font-semibold text-xl text-[#266191] hidden md:block">
+                Bộ lọc
+              </p>
 
-            <Form
-              form={form}
-              initialValues={{
-                locationFilter: "send",
-              }}
-            >
-              <Form.Item noStyle className="w-full" name="locationFilter">
-                <Select
-                  onChange={(value) => setLocationFilter(value)}
-                  size="large"
-                  options={[
-                    {
-                      value: "send",
-                      label: "Được gửi từ điểm",
-                    },
-                    {
-                      value: "receive",
-                      label: "Được nhận tại điểm",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Form>
-            <div className="xl:w-[30%] w-[60%] md:w-[40%]">
+              <Form
+                form={form}
+                initialValues={{
+                  locationFilter: "send",
+                }}
+                className="w-full md:w-auto"
+              >
+                <Form.Item noStyle className="w-full" name="locationFilter">
+                  <Select
+                    className="w-full md:w-auto"
+                    onChange={(value) => setLocationFilter(value)}
+                    size="large"
+                    options={[
+                      {
+                        value: "send",
+                        label: "Được gửi từ điểm",
+                      },
+                      {
+                        value: "receive",
+                        label: "Được nhận tại điểm",
+                      },
+                    ]}
+                  />
+                </Form.Item>
+              </Form>
+            </div>
+            <div className="w-full flex items-center flex-col md:flex-row gap-3 grow">
               <RangePicker
                 className="w-full"
                 size="large"
@@ -187,15 +199,15 @@ const TransactionPage = () => {
                   }
                 }}
               />
+              <Input.Search
+                className="w-full"
+                size="large"
+                placeholder="Nhập mã đơn hàng, tên người gửi, người nhận"
+                onSearch={(value) => setSearchValue(value)}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
             </div>
           </div>
-          <Input.Search
-            className="max-w-[42%] w-full"
-            size="large"
-            placeholder="Nhập mã đơn hàng, tên người gửi, người nhận"
-            onSearch={(value) => setSearchValue(value)}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
         </div>
         <Table
           onChange={(pagination, filters, sorter) => {
@@ -206,7 +218,7 @@ const TransactionPage = () => {
           columns={columns}
           dataSource={allOrders}
           bordered
-          scroll={{ x: 1000 }}
+          scroll={{ x: 1200 }}
           pagination={{ pageSize: 10, position: ["bottomCenter"] }}
           title={() => (
             <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import UtilConstants from "../../shared/constants";
 
 export const getUserById = async (userId) => {
     try {
+        console.log('userId:', userId);
         return await axios.get(`${UtilConstants.baseUrl}/user/${userId}`);
     } catch (error) {
         console.log('Error:', error);

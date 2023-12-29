@@ -3,7 +3,7 @@ import Container from "../Container";
 import { useEffect, useState } from "react";
 import { HomeOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { signout } from "../../repository/auth/auth";
-import logo from "../../assets/logo.svg";
+
 import MagicPostLogo from "../../assets/magic-post-transformed.png";
 
 import { useStoreActions, useStoreState } from "../../store/hook";
@@ -49,10 +49,10 @@ const Navbar = ({ handleClick }) => {
   };
 
   const handleLogout = async () => {
+    navigate("/");
+    await signout();
     removeState();
     removeDepartment();
-    await signout();
-    navigate("/home");
   };
 
   const items = [
@@ -94,7 +94,11 @@ const Navbar = ({ handleClick }) => {
                 <Avatar
                   className="cursor-pointer border-neutral-300"
                   size={50}
-                  src={currentUser.avatarUrl != '' ? currentUser.avatarUrl : defaultAvatar}
+                  src={
+                    currentUser.avatarUrl != ""
+                      ? currentUser.avatarUrl
+                      : defaultAvatar
+                  }
                 />
               </Dropdown>
               <Modal

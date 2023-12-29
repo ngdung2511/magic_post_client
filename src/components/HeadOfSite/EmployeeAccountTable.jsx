@@ -58,10 +58,10 @@ const EmployeeAccountTable = () => {
     console.log(file);
     try {
       const res = await createEmployeeFromFile(file);
-      if (res.status === 201) {
+      if (res.status === 200) {
         messageApi.success("Thêm nhân viên thành công");
         setIsLoading(false);
-        fetchEmployees(currentUser.departmentId);
+        fetchEmployees(currentUser.workDepartment._id);
       }
     } catch (error) {
       setIsLoading(false);
@@ -245,9 +245,7 @@ const EmployeeAccountTable = () => {
         pagination={{ pageSize: 10 }}
         title={() => (
           <div className="flex items-center justify-between">
-            <Typography.Title className="mb-0" level={3}>
-              Danh sách nhân viên
-            </Typography.Title>
+            <h2 className="font-semibold">Danh sách nhân viên</h2>
             <CreateEmployeeModal
               isModalOpen={isModalOpen}
               setIsModalOpen={setIsModalOpen}
@@ -276,10 +274,9 @@ const EmployeeAccountTable = () => {
         )}
       />
 
-      <span className="text-2xl font-semibold">
-        Điểm {currentUser.role === "headTransaction" ? "Giao Dịch" : "Tập Kết"}{" "}
+      <p className="text-2xl font-semibold mt-6">
         {currentUser.workDepartment.address}{" "}
-      </span>
+      </p>
     </div>
   );
 };

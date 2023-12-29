@@ -361,7 +361,7 @@ const TransactionOrderTable = () => {
           <div>
             <p className="font-semibold text-blue-800">{value}</p>
             <p className="text-sm text-gray-800">
-              {record?.senderPhone} - {record?.receive_department.name}
+              {record?.receiverPhone} - {record?.receive_department.name}
             </p>
           </div>
         );
@@ -481,6 +481,7 @@ const TransactionOrderTable = () => {
             >
               <Form.Item noStyle className="w-full" name="filterValue">
                 <Select
+                  className="min-w-[160px] w-full"
                   onChange={(value) => setFilterValue(value)}
                   placeholder="Chọn trạng thái"
                   size="large"
