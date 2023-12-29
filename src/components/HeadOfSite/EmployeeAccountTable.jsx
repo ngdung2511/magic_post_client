@@ -274,10 +274,9 @@ const EmployeeAccountTable = () => {
         )}
       />
 
-      <span className="text-2xl font-semibold">
-        Điểm {currentUser.role === "headTransaction" ? "Giao Dịch" : "Tập Kết"}{" "}
+      <p className="text-2xl font-semibold mt-6">
         {currentUser.workDepartment.address}{" "}
-      </span>
+      </p>
     </div>
   );
 };

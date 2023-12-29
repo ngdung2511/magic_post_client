@@ -1,10 +1,4 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Result, Button } from "antd";
 import Login from "./pages/Login/Login";
 import DashBoard from "./pages/DashBoard/DashBoard";

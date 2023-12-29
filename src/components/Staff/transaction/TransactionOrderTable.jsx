@@ -361,7 +361,7 @@ const TransactionOrderTable = () => {
           <div>
             <p className="font-semibold text-blue-800">{value}</p>
             <p className="text-sm text-gray-800">
-              {record?.senderPhone} - {record?.receive_department.name}
+              {record?.receiverPhone} - {record?.receive_department.name}
             </p>
           </div>
         );

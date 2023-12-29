@@ -72,8 +72,10 @@ const CollectionPointTable = () => {
     {
       title: "Địa chỉ",
       dataIndex: "address",
-
       width: "3%",
+      render: (value) => {
+        return <span className="text-orange-500 font-semibold">{value}</span>;
+      },
     },
     {
       title: "Phân loại",

@@ -42,12 +42,22 @@ const ManagePointOrders = () => {
       "Quý 1": 0,
       "Quý 2": 0,
       "Quý 3": 0,
+      "Quý 4": 0,
     };
+    const orderYears = orders.map((order) => moment(order.createdAt).year());
+    const uniqueOrderYears = [...new Set(orderYears)].sort((a, b) => a - b);
+    const yearCounts = uniqueOrderYears.map((year) => ({
+      time: year,
+      value: 0,
+    }));
+    console.log("orderYears", yearCounts);
+
     const formatOrders = (data) =>
       Object.entries(data).map(([time, value]) => ({
         time,
         value,
       }));
+
     if (orders.length > 0 && chartTime === "month") {
       orders.forEach((order) => {
         const month = moment(order.createdAt).format("MMMM");
@@ -57,6 +67,7 @@ const ManagePointOrders = () => {
     } else if (orders.length > 0 && chartTime === "quarter") {
       orders.forEach((order) => {
         const quarter = moment(order.createdAt).quarter();
+        console.log("dfwafwa", quarter);
         if (quarter === 1) {
           quarterCounts["Quý 1"]++;
         } else if (quarter === 2) {
@@ -68,6 +79,16 @@ const ManagePointOrders = () => {
         }
       });
       setOrderDates(formatOrders(quarterCounts));
+    } else if (orders.length > 0 && chartTime === "year") {
+      orders.forEach((order) => {
+        const year = moment(order.createdAt).year();
+        yearCounts.forEach((item) => {
+          if (item.time === year) {
+            item.value++;
+          }
+        });
+      });
+      setOrderDates(yearCounts);
     }
   }, [orders, chartTime]);
   console.log("orderDates", orderDates);
@@ -148,9 +169,23 @@ const ManagePointOrders = () => {
       },
     },
   };
-
+  const monthLabels = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+  ];
   const lineChartData = {
-    labels: orderDates.map((item) => item.time),
+    labels:
+      chartTime === "month" ? monthLabels : orderDates.map((item) => item.time),
     datasets: [
       {
         label: "Đơn hàng",
@@ -174,17 +209,18 @@ const ManagePointOrders = () => {
         </div>
         <div className="w-full flex justify-end my-3">
           <Radio.Group
-            size="large"
+            size="medium"
             onChange={(e) => setChartTime(e.target.value)}
             defaultValue="month"
             buttonStyle="solid"
           >
             <Radio.Button value="month">Tháng</Radio.Button>
             <Radio.Button value="quarter">Quý</Radio.Button>
+            <Radio.Button value="year">Năm</Radio.Button>
           </Radio.Group>
         </div>
         <div className="w-full grid md:grid-cols-6 grid-cols-1 gap-6">
-          <div className="md:col-span-2 col-span-full bg-white w-full flex justify-center items-center rounded-xl py-4 px-2">
+          <div className="order-last md:order-none md:col-span-2 col-span-full bg-white w-full flex justify-center items-center rounded-xl py-4 px-2">
             <DonutChart chartData={pieChartData} options={options} />
           </div>
           <div className="md:col-span-4 col-span-full bg-white w-full flex justify-center items-center rounded-xl py-4 px-2">
