@@ -1,18 +1,5 @@
-import {
-  InfoCircleOutlined,
-  PlusCircleTwoTone,
-  UploadOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Cascader,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Upload,
-  message,
-} from "antd";
+import { InfoCircleOutlined, PlusCircleTwoTone } from "@ant-design/icons";
+import { Button, Cascader, Form, Input, Modal, Select, message } from "antd";
 import { useForm } from "antd/es/form/Form";
 
 import { useEffect, useRef, useState } from "react";
@@ -25,7 +12,6 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
   const inputRef = useRef(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(false);
-  const [fileList, setFileList] = useState([]);
 
   // Handle form logic
   const [form] = useForm();
@@ -105,19 +91,7 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
     lookup[item.value] = item.type;
     return lookup;
   }, {});
-  const uploadProps = {
-    onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
-    },
-    beforeUpload: (file) => {
-      setFileList([...fileList, file]);
-      return false;
-    },
-    fileList,
-  };
+
   // Handle modal
   const handleOk = () => {
     setIsModalOpen(false);
@@ -165,7 +139,6 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
         email: values.headOfSiteEmail,
         password: values.headOfSitePassword,
         role: values.role,
-        avatarUrl: values.avatarImg?.[0]?.response?.url,
       },
     };
     console.log(data);
@@ -332,53 +305,44 @@ const AddSiteModal = ({ isModalOpen, setIsModalOpen }) => {
                   <Input size="large" placeholder="Họ và tên" type="text" />
                 </Form.Item>
               </div>
-              <div className="flex items-center gap-x-3">
-                <Form.Item
-                  name="headOfSiteEmail"
+
+              <Form.Item
+                name="headOfSiteEmail"
+                className="grow"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng email tài khoản",
+                  },
+                ]}
+              >
+                <Input
+                  size="large"
+                  placeholder="Email tài khoản"
+                  type="email"
+                />
+              </Form.Item>
+              <Form.Item
+                name="headOfSitePassword"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập mật khẩu",
+                  },
+                  {
+                    pattern:
+                      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                    message:
+                      "Mật khẩu phải có ít nhất 8 ký tự, ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt",
+                  },
+                ]}
+              >
+                <Input
                   className="grow"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng email tài khoản",
-                    },
-                  ]}
-                >
-                  <Input
-                    size="large"
-                    placeholder="Email tài khoản"
-                    type="email"
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="headOfSitePassword"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập mật khẩu",
-                    },
-                  ]}
-                >
-                  <Input
-                    size="large"
-                    placeholder="Mật khẩu tài khoản"
-                    type="text"
-                  />
-                </Form.Item>
-              </div>
-              <Form.Item className="mb-3" name="avatarImg">
-                <Upload
-                  {...uploadProps}
-                  // action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
-                  listType="picture"
-                >
-                  <Button
-                    disabled={fileList.length > 0}
-                    size="large"
-                    icon={<UploadOutlined />}
-                  >
-                    Tải lên ảnh đại diện
-                  </Button>
-                </Upload>
+                  size="large"
+                  placeholder="Mật khẩu tài khoản"
+                  type="text"
+                />
               </Form.Item>
             </div>
             <Form.Item noStyle>

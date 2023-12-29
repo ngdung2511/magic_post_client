@@ -30,5 +30,6 @@ export const checkVerifyCode = async (information) => {
 }
 
 export const signout = async () => {
+    localStorage.removeItem('token');
     return api.post(UtilConstants.baseUrl + '/auth/logout');
 }

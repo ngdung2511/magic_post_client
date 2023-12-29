@@ -481,6 +481,7 @@ const TransactionOrderTable = () => {
             >
               <Form.Item noStyle className="w-full" name="filterValue">
                 <Select
+                  className="min-w-[160px] w-full"
                   onChange={(value) => setFilterValue(value)}
                   placeholder="Chọn trạng thái"
                   size="large"

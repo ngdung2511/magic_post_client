@@ -245,9 +245,7 @@ const EmployeeAccountTable = () => {
         pagination={{ pageSize: 10 }}
         title={() => (
           <div className="flex items-center justify-between">
-            <Typography.Title className="mb-0" level={3}>
-              Danh sách nhân viên
-            </Typography.Title>
+            <h2 className="font-semibold">Danh sách nhân viên</h2>
             <CreateEmployeeModal
               isModalOpen={isModalOpen}
               setIsModalOpen={setIsModalOpen}

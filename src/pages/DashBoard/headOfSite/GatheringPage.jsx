@@ -211,7 +211,9 @@ const GatheringPage = () => {
                 >
                   <SyncOutlined spin={isReloading} className="text-[18px]" />
                 </span>
-                <h2 className="font-semibold h-full">Danh sách đơn hàng</h2>
+                <h2 className="font-semibold h-full">
+                  Danh sách đơn hàng {currentUser?.workDepartment?.name}
+                </h2>
               </div>
             </div>
           )}

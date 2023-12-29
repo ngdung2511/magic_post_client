@@ -1,4 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import { Result, Button } from "antd";
 import Login from "./pages/Login/Login";
 import DashBoard from "./pages/DashBoard/DashBoard";
@@ -8,7 +14,7 @@ import SingleSitePage from "./pages/DashBoard/boss/SingleSitePage";
 import ManagePointOrders from "./pages/DashBoard/boss/ManagePointOrders";
 import ManageAccountPage from "./pages/DashBoard/headOfSite/ManageAccountPage";
 import { OrdersListPage } from "./pages/DashBoard/boss/OrdersListPage";
-import SingleEmployeePage from "./pages/DashBoard/headOfSite/SingleEmployeePage"
+import SingleEmployeePage from "./pages/DashBoard/headOfSite/SingleEmployeePage";
 import StatisticPage from "./pages/DashBoard/headOfSite/StatisticPage";
 import Home from "./pages/Home/Home";
 import Hero from "./components/hero/Hero";
@@ -20,7 +26,7 @@ import { useStoreState } from "./store/hook";
 const App = () => {
   const currentUser = useStoreState((state) => state.currentUser);
   console.log("current user", currentUser);
-  
+
   const ROUTE = [
     {
       path: "/login",
@@ -47,9 +53,13 @@ const App = () => {
       status={403}
       title="403"
       subTitle="Bạn không có quyền truy cập vào đây."
-      extra={<Button type="primary" href="/home">Back Home</Button>}
+      extra={
+        <Button type="primary" href="/home">
+          Quay lại
+        </Button>
+      }
     />
-  )
+  );
 
   return (
     <>
@@ -62,34 +72,85 @@ const App = () => {
           <Route path="/" element={<Navigate to="/home" />} />
 
           <Route path="/" element={<DashBoard />}>
-            <Route path="boss/manage-sites" element={currentUser.role === 'admin'? <ManageSitePage /> : notAuth} />
-            <Route path="boss/manage-sites/:id" element={currentUser.role === 'admin'? <SingleSitePage /> : notAuth} />
-            <Route path="boss/points-order" element={currentUser.role === 'admin'? <ManagePointOrders /> : notAuth} />
-            <Route path="boss/order-list/:id" element={currentUser.role === 'admin'? <OrdersListPage /> : notAuth} />
-            <Route path="/boss/order-detail/:id" element={currentUser.role === 'admin'? <OrderDetailPage /> : notAuth} />
+            <Route
+              path="boss/manage-sites"
+              element={
+                currentUser.role === "admin" ? <ManageSitePage /> : notAuth
+              }
+            />
+            <Route
+              path="boss/manage-sites/:id"
+              element={
+                currentUser.role === "admin" ? <SingleSitePage /> : notAuth
+              }
+            />
+            <Route
+              path="boss/points-order"
+              element={
+                currentUser.role === "admin" ? <ManagePointOrders /> : notAuth
+              }
+            />
+            <Route
+              path="boss/order-list/:id"
+              element={
+                currentUser.role === "admin" ? <OrdersListPage /> : notAuth
+              }
+            />
+            <Route
+              path="/boss/order-detail/:id"
+              element={
+                currentUser.role === "admin" ? <OrderDetailPage /> : notAuth
+              }
+            />
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route
               path="head/manage-accounts"
-              element={currentUser.role?.includes('head')? <ManageAccountPage /> : notAuth}
+              element={
+                currentUser.role?.includes("head") ? (
+                  <ManageAccountPage />
+                ) : (
+                  notAuth
+                )
+              }
             />
             <Route
               path="head/manage-account/:id"
-              element={currentUser.role?.includes('head')? <SingleEmployeePage /> : notAuth}
+              element={
+                currentUser.role?.includes("head") ? (
+                  <SingleEmployeePage />
+                ) : (
+                  notAuth
+                )
+              }
             />
             <Route
               path="head/goods-inventory"
-              element={currentUser.role?.includes('head')? <StatisticPage /> : notAuth}
+              element={
+                currentUser.role?.includes("head") ? <StatisticPage /> : notAuth
+              }
             />
           </Route>
           <Route path="/" element={<DashBoard />}>
             <Route
               path="employee/manage-orders"
-              element={currentUser.role?.includes('Staff')? <ManageOrderPage /> : notAuth}
+              element={
+                currentUser.role?.includes("Staff") ? (
+                  <ManageOrderPage />
+                ) : (
+                  notAuth
+                )
+              }
             />
             <Route
               path="employee/order-detail/:id"
-              element={currentUser.role?.includes('Staff')? <OrderDetailPage /> : notAuth}
+              element={
+                currentUser.role?.includes("Staff") ? (
+                  <OrderDetailPage />
+                ) : (
+                  notAuth
+                )
+              }
             />
           </Route>
           <Route path="/home" element={<Home />}>
@@ -104,6 +165,6 @@ const App = () => {
       </BrowserRouter>
     </>
   );
-}
+};
 
 export default App;
