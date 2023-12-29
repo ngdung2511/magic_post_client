@@ -48,7 +48,7 @@ const Statistics = () => {
         setEmployees(res.data.users);
 
       } 
-      }
+      
     };
     fetchData();
   }, []);
